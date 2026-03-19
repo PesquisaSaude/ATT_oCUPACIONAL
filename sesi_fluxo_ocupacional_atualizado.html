@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SESI Saúde Paulista • Fluxo Ocupacional</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --panel: #121a2b;
+      --panel-2: #172133;
+      --line: #263246;
+      --text: #ecf2ff;
+      --muted: #9db0cf;
+      --accent: #38bdf8;
+      --accent-2: #22c55e;
+      --warning-bg: rgba(250, 204, 21, .14);
+      --warning-tx: #facc15;
+      --info-bg: rgba(59, 130, 246, .14);
+      --info-tx: #60a5fa;
+      --success-bg: rgba(34, 197, 94, .14);
+      --success-tx: #4ade80;
+      --danger-bg: rgba(239, 68, 68, .14);
+      --danger-tx: #f87171;
+      --na-bg: rgba(148, 163, 184, .12);
+      --na-tx: #cbd5e1;
+      --shadow: 0 20px 45px rgba(0,0,0,.28);
+      --radius: 22px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(56,189,248,.14), transparent 26%),
+        radial-gradient(circle at top right, rgba(34,197,94,.10), transparent 24%),
+        linear-gradient(180deg, #08101b, #0b1220 42%, #09101c);
+      min-height: 100vh;
+    }
+    .app { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+    .sidebar {
+      background: rgba(10, 16, 29, .82);
+      backdrop-filter: blur(18px);
+      border-right: 1px solid rgba(255,255,255,.06);
+      padding: 24px 18px;
+      position: sticky; top: 0; height: 100vh;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px; border-radius: 20px; background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06); margin-bottom: 22px;
+    }
+    .brand-badge {
+      width: 48px; height: 48px; border-radius: 16px;
+      display: grid; place-items: center; font-size: 22px;
+      background: linear-gradient(135deg, rgba(56,189,248,.35), rgba(34,197,94,.2));
+      box-shadow: inset 0 1px 1px rgba(255,255,255,.15);
+    }
+    .brand h1 { font-size: 18px; margin: 0 0 4px; }
+    .brand p { font-size: 12px; margin: 0; color: var(--muted); }
+    .nav {
+      display: grid; gap: 8px;
+    }
+    .nav button {
+      width: 100%; border: 0; background: transparent; color: var(--text);
+      padding: 14px 16px; border-radius: 16px; text-align: left; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      font-size: 14px; transition: .2s ease;
+    }
+    .nav button:hover, .nav button.active {
+      background: rgba(56,189,248,.12);
+      border: 1px solid rgba(56,189,248,.18);
+    }
+    .nav .left { display: flex; align-items: center; gap: 12px; }
+    .sidebar-footer {
+      margin-top: 18px; padding: 14px; border-radius: 18px;
+      background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06);
+      color: var(--muted); font-size: 12px;
+    }
+
+    .main { padding: 22px; min-width: 0; }
+    .topbar {
+      display: flex; gap: 14px; justify-content: space-between; align-items: center;
+      padding: 18px 20px; border-radius: 24px;
+      background: rgba(18, 26, 43, .78);
+      border: 1px solid rgba(255,255,255,.06); box-shadow: var(--shadow); margin-bottom: 18px;
+      backdrop-filter: blur(14px);
+    }
+    .topbar h2 { margin: 0; font-size: 28px; }
+    .topbar p { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
+    .topbar-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+    button, input, select, textarea { font: inherit; }
+    .btn {
+      border: 0; border-radius: 14px; cursor: pointer; padding: 12px 16px;
+      color: white; background: rgba(255,255,255,.08); transition: .2s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: linear-gradient(135deg, #0ea5e9, #2563eb); }
+    .btn-success { background: linear-gradient(135deg, #16a34a, #22c55e); }
+    .btn-warning { background: linear-gradient(135deg, #d97706, #f59e0b); }
+    .btn-danger { background: linear-gradient(135deg, #dc2626, #ef4444); }
+    .btn-ghost { background: rgba(255,255,255,.06); color: var(--text); border: 1px solid rgba(255,255,255,.08); }
+    .content { display: grid; gap: 18px; }
+    .hidden { display: none !important; }
+
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .grid-2 { display: grid; grid-template-columns: 1.3fr .9fr; gap: 18px; }
+    .card {
+      background: rgba(18, 26, 43, .78);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      min-width: 0;
+    }
+    .kpi .label { color: var(--muted); font-size: 13px; margin-bottom: 8px; }
+    .kpi .value { font-size: 34px; font-weight: 700; line-height: 1; }
+    .kpi .hint { color: var(--muted); font-size: 12px; margin-top: 8px; }
+
+    .chart-box { height: 360px; position: relative; overflow: hidden; }
+    .chart-box canvas { width: 100% !important; height: 100% !important; display: block; }
+
+    .filters {
+      display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+      margin-bottom: 12px;
+    }
+    .search {
+      flex: 1 1 280px; display: flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 0 14px;
+    }
+    .search input {
+      background: transparent; border: 0; outline: 0; color: var(--text); width: 100%; padding: 12px 0;
+    }
+    .field, .field textarea, .field input, .field select {
+      width: 100%;
+    }
+    .field label {
+      display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px;
+    }
+    .field input, .field select, .field textarea {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      color: var(--text);
+      padding: 12px 14px;
+      border-radius: 14px;
+      outline: none;
+    }
+    .field textarea { min-height: 90px; resize: vertical; }
+    .form-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
+    }
+    .form-grid-3 {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+    }
+    .exam-checklist {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+    }
+    .check {
+      display: flex; gap: 10px; align-items: center; padding: 12px 14px; border-radius: 14px;
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.06);
+    }
+
+    .table-wrap {
+      overflow: auto; border-radius: 18px; border: 1px solid rgba(255,255,255,.06);
+    }
+    table {
+      width: 100%; border-collapse: collapse; min-width: 900px;
+      background: rgba(12,18,31,.58);
+    }
+    th, td {
+      padding: 14px 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,.05);
+      vertical-align: top; font-size: 14px;
+    }
+    th {
+      position: sticky; top: 0; z-index: 1;
+      background: rgba(15,22,36,.98); color: var(--muted); font-weight: 600;
+      backdrop-filter: blur(10px);
+    }
+    tr:hover td { background: rgba(255,255,255,.02); }
+    .row-title { font-weight: 700; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .small { font-size: 12px; color: var(--muted); }
+    .status {
+      display: inline-flex; align-items: center; gap: 7px;
+      border-radius: 999px; padding: 6px 10px; font-size: 12px; font-weight: 700;
+      white-space: nowrap;
+    }
+    .st-pendente { background: var(--warning-bg); color: var(--warning-tx); }
+    .st-andamento { background: var(--info-bg); color: var(--info-tx); }
+    .st-concluido { background: var(--success-bg); color: var(--success-tx); }
+    .st-bloqueado { background: var(--danger-bg); color: var(--danger-tx); }
+    .st-na { background: var(--na-bg); color: var(--na-tx); }
+
+    .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      border-radius: 999px; padding: 6px 10px; font-size: 11px;
+      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.06);
+    }
+    .progress {
+      height: 10px; background: rgba(255,255,255,.07);
+      border-radius: 999px; overflow: hidden; min-width: 120px;
+    }
+    .progress > span {
+      display: block; height: 100%;
+      background: linear-gradient(90deg, #38bdf8, #22c55e);
+      border-radius: inherit;
+    }
+
+    .split {
+      display: grid; grid-template-columns: 1.15fr .85fr; gap: 18px;
+    }
+    .timeline {
+      display: grid; gap: 12px;
+    }
+    .timeline-item {
+      display: grid; grid-template-columns: 120px 1fr; gap: 12px;
+      padding: 14px; border-radius: 16px; background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.05);
+    }
+
+    .modal {
+      position: fixed; inset: 0; background: rgba(4,8,15,.72); display: none;
+      align-items: center; justify-content: center; padding: 20px; z-index: 80;
+      backdrop-filter: blur(8px);
+    }
+    .modal.open { display: flex; }
+    .modal-card {
+      width: min(980px, 100%); max-height: 92vh; overflow: auto;
+      background: #0f1727; border: 1px solid rgba(255,255,255,.08); border-radius: 24px; box-shadow: var(--shadow);
+    }
+    .modal-head {
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+      padding: 18px 22px; border-bottom: 1px solid rgba(255,255,255,.06);
+      position: sticky; top: 0; background: rgba(15,23,39,.95); z-index: 2;
+    }
+    .modal-body { padding: 20px 22px 22px; display: grid; gap: 18px; }
+    .modal-foot {
+      padding: 18px 22px; border-top: 1px solid rgba(255,255,255,.06);
+      display: flex; gap: 10px; justify-content: flex-end;
+    }
+
+    .summary-list { display: grid; gap: 12px; }
+    .summary-item {
+      display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center;
+      padding: 14px; border-radius: 16px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.05);
+    }
+
+    @media (max-width: 1200px) {
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .grid-2, .split { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 980px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { position: static; height: auto; }
+      .topbar { flex-direction: column; align-items: stretch; }
+      .topbar-actions { justify-content: stretch; }
+      .topbar-actions .btn { flex: 1; }
+    }
+    @media (max-width: 720px) {
+      .main { padding: 14px; }
+      .grid-4, .form-grid, .form-grid-3, .exam-checklist { grid-template-columns: 1fr; }
+      .timeline-item { grid-template-columns: 1fr; }
+      .topbar h2 { font-size: 22px; }
+      table { min-width: 760px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-badge">🩺</div>
+        <div>
+          <h1>SESI Saúde Paulista</h1>
+          <p>Fluxo ocupacional do paciente</p>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-btn active" data-page="dashboard"><span class="left"><span>📊</span><span>Dashboard</span></span><span>›</span></button>
+        <button class="nav-btn" data-page="recepcao"><span class="left"><span>🧾</span><span>Recepção</span></span><span>›</span></button>
+        <button class="nav-btn" data-page="exames"><span class="left"><span>🔬</span><span>Exames Ocupacionais</span></span><span>›</span></button>
+        <button class="nav-btn" data-page="triagem"><span class="left"><span>🚦</span><span>Triagem</span></span><span>›</span></button>
+        <button class="nav-btn" data-page="medico"><span class="left"><span>👨‍⚕️</span><span>Médico do Trabalho</span></span><span>›</span></button>
+        <button class="nav-btn" data-page="acompanhamento"><span class="left"><span>🗂️</span><span>Acompanhamento</span></span><span>›</span></button>
+      </nav>
+
+      <div class="sidebar-footer">
+        Cores de status:<br>
+        🟡 Pendente • 🔵 Em andamento • 🟢 Concluído • 🔴 Bloqueado
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h2 id="pageTitle">Dashboard</h2>
+          <p id="pageSubtitle">Visão geral do atendimento ocupacional desde a recepção até o médico do trabalho.</p>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost" id="btnRestaurar">Restaurar base inicial</button>
+          <button class="btn btn-primary" id="btnNovoAtendimento">+ Novo Atendimento</button>
+        </div>
+      </header>
+
+      <section id="page-dashboard" class="content"></section>
+      <section id="page-recepcao" class="content hidden"></section>
+      <section id="page-exames" class="content hidden"></section>
+      <section id="page-triagem" class="content hidden"></section>
+      <section id="page-medico" class="content hidden"></section>
+      <section id="page-acompanhamento" class="content hidden"></section>
+    </main>
+  </div>
+
+  <div class="modal" id="patientModal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="small mono" id="modalPatientId"></div>
+          <div style="font-size:22px;font-weight:700" id="modalPatientName"></div>
+        </div>
+        <button class="btn btn-ghost" onclick="closePatientModal()">Fechar</button>
+      </div>
+      <div class="modal-body" id="modalPatientBody"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="newModal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="small">Cadastro inicial da recepção</div>
+          <div style="font-size:22px;font-weight:700">Novo Atendimento</div>
+        </div>
+        <button class="btn btn-ghost" onclick="closeNewModal()">Fechar</button>
+      </div>
+      <form class="modal-body" id="newAttendanceForm">
+        <div class="form-grid">
+          <div class="field"><label>Nome do paciente</label><input required name="nome"></div>
+          <div class="field"><label>CPF</label><input name="cpf"></div>
+          <div class="field"><label>Empresa</label><input name="empresa"></div>
+          <div class="field"><label>Tipo de atendimento</label>
+            <select name="tipoAtendimento">
+              <option>Admissional</option>
+              <option>Periódico</option>
+              <option>Demissional</option>
+              <option>Retorno ao Trabalho</option>
+              <option>Mudança de Função</option>
+            </select>
+          </div>
+          <div class="field"><label>Data de atendimento</label><input type="date" name="dataAtendimento"></div>
+          <div class="field"><label>Telefone</label><input name="telefone"></div>
+          <div class="field"><label>Setor</label><input name="setor"></div>
+          <div class="field"><label>Função</label><input name="funcao"></div>
+        </div>
+
+        <div class="field">
+          <label>ASO cadastrado na recepção?</label>
+          <select name="asoCadastrado">
+            <option value="true">Sim</option>
+            <option value="false">Não</option>
+          </select>
+        </div>
+
+        <div>
+          <div class="small" style="margin-bottom:8px">Exames ocupacionais em ordem de cadastro</div>
+          <div class="exam-checklist" id="examChecklist"></div>
+        </div>
+
+        <div class="field">
+          <label>Observações iniciais</label>
+          <textarea name="obsCadastro" placeholder="Ex.: retorno ORL, orientação da empresa, prioridade, observações gerais."></textarea>
+        </div>
+
+        <div class="modal-foot">
+          <button type="button" class="btn btn-ghost" onclick="closeNewModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar atendimento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'sesi-fluxo-ocupacional-v2';
+    const INITIAL_PATIENTS = [{"ordem": 1, "id": "AT-0001", "dataAtendimento": "2026-03-12", "retorno": "Sim", "dataRetorno": "2026-03-18", "cnpj": "09.461.567/0002-10", "empresa": "PAUDALHO", "obra": "", "cei": "", "preferencial": "Não", "nome": "MILENA SOARES DO NASCIMENTO", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "715.255.414-55", "dataNascimento": "1998-03-18", "sexo": "F", "telefone": "(81) 9 9105-1471", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Concluído", "statusAtendimento": "Concluído", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Não se aplica"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Concluído", "data": "2026-03-18", "observacoes": ""}, "medico": {"nome": "Dra. Kátia Dutra", "resultado": "Apto", "data": "2026-03-18", "pendencia": "", "observacoes": ""}}, {"ordem": 2, "id": "AT-0002", "dataAtendimento": "2026-03-12", "retorno": "Sim", "dataRetorno": "2026-03-18", "cnpj": "09.461.567/0002-10", "empresa": "PAUDALHO", "obra": "", "cei": "", "preferencial": "Não", "nome": "EDNA FERREIRA DA SILVA", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "066.662.674-00", "dataNascimento": "1983-09-06", "sexo": "F", "telefone": "(81) 9 8519-8002", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Concluído", "statusAtendimento": "Concluído", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Não se aplica"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Concluído", "data": "2026-03-18", "observacoes": ""}, "medico": {"nome": "Dra. Kátia Dutra", "resultado": "Apto", "data": "2026-03-18", "pendencia": "", "observacoes": ""}}, {"ordem": 3, "id": "AT-0003", "dataAtendimento": "2026-03-12", "retorno": "Sim", "dataRetorno": "2026-03-18", "cnpj": "03.887.324/0002-62", "empresa": "ADIMAX", "obra": "", "cei": "", "preferencial": "Não", "nome": "JOSE MARIA DA SILVA FILHO", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "085.563.664-57", "dataNascimento": "1999-11-21", "sexo": "M", "telefone": "", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Periódico", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Concluído", "statusAtendimento": "Concluído", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Não se aplica"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Concluído", "data": "2026-03-18", "observacoes": ""}, "medico": {"nome": "Dra. Kátia Dutra", "resultado": "Apto", "data": "2026-03-18", "pendencia": "", "observacoes": ""}}, {"ordem": 4, "id": "AT-0004", "dataAtendimento": "2026-03-18", "retorno": "Não", "dataRetorno": "2026-03-23", "cnpj": "09.461.567/0002-10", "empresa": "PAUDALHO", "obra": "", "cei": "", "preferencial": "Não", "nome": "ANDRÉ JOSE PRUDENCIO", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "093.823.024-76", "dataNascimento": "1991-03-24", "sexo": "M", "telefone": "(81) 98427-6052", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "EXAMES OCUPACIONAIS", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "HEMOGRAMA + PARASITOLÓGICO DE FEZES", "obsCadastro": "", "asoCadastrado": false, "etapa": "Exames", "statusAtendimento": "Bloqueado", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Pendente"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 5, "id": "AT-0005", "dataAtendimento": "2026-03-12", "retorno": "Sim", "dataRetorno": "2026-03-18", "cnpj": "09.461.567/0002-10", "empresa": "PAUDALHO", "obra": "", "cei": "", "preferencial": "Não", "nome": "HOSANA LOURENÇO DE SOUZA", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "096.929.854-40", "dataNascimento": "1989-08-08", "sexo": "F", "telefone": "(81) 9 8451-8293", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Concluído", "statusAtendimento": "Concluído", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Concluído", "data": "2026-03-18", "observacoes": ""}, "medico": {"nome": "Dra. Kátia Dutra", "resultado": "Apto", "data": "2026-03-18", "pendencia": "", "observacoes": ""}}, {"ordem": 6, "id": "AT-0006", "dataAtendimento": "2026-03-18", "retorno": "Não", "dataRetorno": "2026-03-23", "cnpj": "18.650.667/0001-03", "empresa": "I9 PAULISTA", "obra": "", "cei": "", "preferencial": "Não", "nome": "VANDERSON BELO MARINHO", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "151.967.234-98", "dataNascimento": "2002-03-16", "sexo": "M", "telefone": "81 9 8409-9961", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Demissional", "grupoServico": "EXAMES OCUPACIONAIS", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "RX TÓRAX OIT", "labTipo": "", "obsCadastro": "RX TÓRAX OIT", "asoCadastrado": false, "etapa": "Exames", "statusAtendimento": "Bloqueado", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Pendente"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Pendente"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 7, "id": "AT-0007", "dataAtendimento": "2026-03-12", "retorno": "Sim", "dataRetorno": "2026-03-18", "cnpj": "09.461.567/0002-10", "empresa": "PAUDALHO", "obra": "", "cei": "", "preferencial": "Não", "nome": "AMYNADABE RODRIGUES DA COSTA", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "168.887.224-81", "dataNascimento": "2006-03-15", "sexo": "M", "telefone": "(81) 9 9990-5119", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Concluído", "statusAtendimento": "Concluído", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Concluído", "data": "2026-03-18", "observacoes": ""}, "medico": {"nome": "Dra. Kátia Dutra", "resultado": "Apto", "data": "2026-03-18", "pendencia": "", "observacoes": ""}}, {"ordem": 8, "id": "AT-0008", "dataAtendimento": "2026-03-12", "retorno": "Sim", "dataRetorno": "2026-03-18", "cnpj": "09.461.567/0002-10", "empresa": "PAUDALHO", "obra": "", "cei": "", "preferencial": "Não", "nome": "JOSE MARCOS DE OLIVEIRA JUNIOR", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "177.547.054-78", "dataNascimento": "2006-08-01", "sexo": "M", "telefone": "(81) 99114-1355", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "RETORNO ORL", "asoCadastrado": true, "etapa": "Concluído", "statusAtendimento": "Concluído", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Concluído", "data": "2026-03-18", "observacoes": ""}, "medico": {"nome": "Dra. Kátia Dutra", "resultado": "Apto", "data": "2026-03-18", "pendencia": "", "observacoes": ""}}, {"ordem": 9, "id": "AT-0009", "dataAtendimento": "2026-03-12", "retorno": "Sim", "dataRetorno": "2026-03-18", "cnpj": "09.461.567/0002-10", "empresa": "PAUDALHO", "obra": "", "cei": "", "preferencial": "Não", "nome": "JEAN CARLOS DE PAULA SALLES", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "708.068.904-01", "dataNascimento": "1996-05-09", "sexo": "M", "telefone": "81 99920-0654", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": false, "etapa": "Concluído", "statusAtendimento": "Concluído", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Não se aplica"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Concluído", "data": "2026-03-18", "observacoes": ""}, "medico": {"nome": "Dra. Kátia Dutra", "resultado": "Apto", "data": "2026-03-18", "pendencia": "", "observacoes": ""}}, {"ordem": 10, "id": "AT-0010", "dataAtendimento": "2026-03-18", "retorno": "Não", "dataRetorno": "2026-03-23", "cnpj": "09.461.567/0002-10", "empresa": "PAUDALHO", "obra": "", "cei": "", "preferencial": "Não", "nome": "ISAIAS LUCAS CABRAL DA SILVA", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "170.782.164-07", "dataNascimento": "2006-05-06", "sexo": "M", "telefone": "(81) 9 9954-6115", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "EXAMES OCUPACIONAIS", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "HEMOGRAMA + PARASITOLÓGICO DE FEZES", "obsCadastro": "", "asoCadastrado": false, "etapa": "Exames", "statusAtendimento": "Bloqueado", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Pendente"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 11, "id": "AT-0011", "dataAtendimento": "2026-03-12", "retorno": "Sim", "dataRetorno": "2026-03-18", "cnpj": "09.461.567/0002-10", "empresa": "PAUDALHO", "obra": "", "cei": "", "preferencial": "Não", "nome": "LARISSA EMILY BARBOSA DA SILVA", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "719.648.364-25", "dataNascimento": "2006-08-12", "sexo": "F", "telefone": "81 99969-3752", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Concluído", "statusAtendimento": "Concluído", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Não se aplica"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Concluído", "data": "2026-03-18", "observacoes": ""}, "medico": {"nome": "Dra. Kátia Dutra", "resultado": "Apto", "data": "2026-03-18", "pendencia": "", "observacoes": ""}}, {"ordem": 12, "id": "AT-0012", "dataAtendimento": "2026-03-18", "retorno": "Não", "dataRetorno": "", "cnpj": "05.509.693/0001-66", "empresa": "PROBENE FOODS", "obra": "", "cei": "", "preferencial": "Não", "nome": "JOBSON MAHON VIEIRA DA SILVA", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "165.119.384-33", "dataNascimento": "2005-08-06", "sexo": "M", "telefone": "81 98595-0749", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Concluído", "statusAtendimento": "Concluído", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Não se aplica"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Pendente"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Concluído", "data": "2026-03-18", "observacoes": ""}, "medico": {"nome": "Dra. Kátia Dutra", "resultado": "Apto", "data": "2026-03-18", "pendencia": "", "observacoes": ""}}, {"ordem": 13, "id": "AT-0013", "dataAtendimento": "2026-03-18", "retorno": "Não", "dataRetorno": "", "cnpj": "01.912.239/0001-09", "empresa": "MARCHI & FILDI", "obra": "", "cei": "", "preferencial": "Não", "nome": "SERGIO LUIZ DE SOUZA", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "032.839.284-79", "dataNascimento": "1979-01-10", "sexo": "M", "telefone": "(81) 9 8974-6652", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Concluído", "statusAtendimento": "Concluído", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Concluído", "data": "2026-03-18", "observacoes": ""}, "medico": {"nome": "Dra. Kátia Dutra", "resultado": "Apto", "data": "2026-03-18", "pendencia": "", "observacoes": ""}}, {"ordem": 14, "id": "AT-0014", "dataAtendimento": "2026-03-18", "retorno": "Não", "dataRetorno": "", "cnpj": "03.910.210/0025-82", "empresa": "SERVIÇO SOCIAL DA INDÚSTRIA - SESI SAÚDE", "obra": "", "cei": "", "preferencial": "Não", "nome": "FRANCYELE ALVES DE LIMA", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "127.694.354-77", "dataNascimento": "2000-10-05", "sexo": "F", "telefone": "", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Periódico", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "HEMOGRAMA", "obsCadastro": "", "asoCadastrado": true, "etapa": "Concluído", "statusAtendimento": "Concluído", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Pendente"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Concluído", "data": "2026-03-18", "observacoes": "Hemograma Pendente"}, "medico": {"nome": "Dra. Kátia Dutra", "resultado": "Pendente", "data": "2026-03-18", "pendencia": "", "observacoes": "Aguardando resultado do hemograma"}}, {"ordem": 15, "id": "AT-0015", "dataAtendimento": "2026-03-18", "retorno": "Não", "dataRetorno": "2026-03-23", "cnpj": "18.650.667/0001-03", "empresa": "I9 PAULISTA", "obra": "", "cei": "", "preferencial": "Não", "nome": "EDSON DOS SANTOS IMPERIO", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "098.760.414-79", "dataNascimento": "1989-04-26", "sexo": "M", "telefone": "9 98197-9751", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Demissional", "grupoServico": "EXAMES OCUPACIONAIS", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "RX TÓRAX OIT", "labTipo": "", "obsCadastro": "RX TÓRAX OIT", "asoCadastrado": false, "etapa": "Exames", "statusAtendimento": "Bloqueado", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Pendente"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Pendente"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": "                ORL"}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 16, "id": "AT-0016", "dataAtendimento": "2026-03-18", "retorno": "Não", "dataRetorno": "", "cnpj": "11.507.415/0001-72", "empresa": "INDUSTRIAS REUNIDAS RAYMUNDO DA FONTE", "obra": "", "cei": "", "preferencial": "Não", "nome": "ALDEMIR DA SILVA FRAZÃO", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "105.024.514-83", "dataNascimento": "1994-09-04", "sexo": "M", "telefone": "(81) 9 8400-0535", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Periódico", "grupoServico": "EXAMES OCUPACIONAIS", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "HEMOGRAMA + TGO + TGP", "obsCadastro": "", "asoCadastrado": false, "etapa": "Exames", "statusAtendimento": "Bloqueado", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Não se aplica"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Pendente"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 17, "id": "AT-0017", "dataAtendimento": "2026-03-18", "retorno": "Não", "dataRetorno": "", "cnpj": "03.226.633/0001-00", "empresa": "OASIS ALIMENTOS", "obra": "", "cei": "", "preferencial": "Não", "nome": "EDSON DA SILVA LUNA", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "847.865.154-34", "dataNascimento": "1975-09-14", "sexo": "M", "telefone": "81 98451-0885", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Demissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Concluído", "statusAtendimento": "Concluído", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Concluído", "data": "2026-03-18", "observacoes": ""}, "medico": {"nome": "Dra. Kátia Dutra", "resultado": "Apto", "data": "2026-03-18", "pendencia": "", "observacoes": ""}}, {"ordem": 18, "id": "AT-0018", "dataAtendimento": "2026-03-18", "retorno": "Não", "dataRetorno": "2026-03-23", "cnpj": "09.461.567/0002-10", "empresa": "PAUDALHO", "obra": "", "cei": "", "preferencial": "Não", "nome": "ROBERNAN WILSON DE MELO OLIVEIRA JUNIOR", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "859.974.875-04", "dataNascimento": "2000-06-07", "sexo": "M", "telefone": "81 997511244", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "EXAMES OCUPACIONAIS", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "HEMOGRAMA + PARASITOLÓGICO DE FEZES", "obsCadastro": "", "asoCadastrado": false, "etapa": "Exames", "statusAtendimento": "Bloqueado", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Pendente"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 19, "id": "AT-0019", "dataAtendimento": "2026-03-18", "retorno": "Não", "dataRetorno": "", "cnpj": "11.507.415/0001-72", "empresa": "INDUSTRIAS REUNIDAS RAYMUNDO DA FONTE", "obra": "", "cei": "", "preferencial": "Não", "nome": "JOSE MARIO DAS GRAÇAS", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "709.217.924-68", "dataNascimento": "1969-05-25", "sexo": "M", "telefone": "(81) 9 8781-7940", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Periódico", "grupoServico": "EXAMES OCUPACIONAIS", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "RAIO X TÓRAX", "labTipo": "HEMOGRAMA + GLICOSE + TGO + TGP + TSH + T4 LIVRE", "obsCadastro": "ACUIDADE: SOLDADOR", "asoCadastrado": false, "etapa": "Exames", "statusAtendimento": "Bloqueado", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Não se aplica"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Pendente"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Pendente"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Pendente"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Pendente"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 20, "id": "AT-0020", "dataAtendimento": "2026-03-18", "retorno": "Não", "dataRetorno": "", "cnpj": "09.769.035/0001-64", "empresa": "COMPESA", "obra": "", "cei": "", "preferencial": "Não", "nome": "GUTEMBERG TAVARES AMARAL", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "053.261.384-84", "dataNascimento": "1984-12-06", "sexo": "M", "telefone": "8 1 99103-7516", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Periódico", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Concluído", "statusAtendimento": "Concluído", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Concluído", "data": "2026-03-18", "observacoes": ""}, "medico": {"nome": "Dra. Kátia Dutra", "resultado": "Apto", "data": "2026-03-18", "pendencia": "", "observacoes": ""}}, {"ordem": 21, "id": "AT-0021", "dataAtendimento": "2026-03-18", "retorno": "Não", "dataRetorno": "", "cnpj": "01.912.239/0001-09", "empresa": "MARCHI & FILDI", "obra": "", "cei": "", "preferencial": "Não", "nome": "JOSÉ CORREIA DE FREITAS", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "704.817.504-44", "dataNascimento": "1972-01-17", "sexo": "M", "telefone": "81 986075649", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Concluído", "statusAtendimento": "Concluído", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Concluído", "data": "2026-03-18", "observacoes": ""}, "medico": {"nome": "Dra. Kátia Dutra", "resultado": "Apto", "data": "2026-03-18", "pendencia": "", "observacoes": ""}}, {"ordem": 22, "id": "AT-0022", "dataAtendimento": "2026-03-18", "retorno": "Não", "dataRetorno": "", "cnpj": "11.507.415/0001-72", "empresa": "INDUSTRIAS REUNIDAS RAYMUNDO DA FONTE", "obra": "", "cei": "", "preferencial": "Não", "nome": "MIKAELL HENRIQUE DE FRANÇA LEAL", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "115.112.374-90", "dataNascimento": "1997-05-06", "sexo": "M", "telefone": "(81) 9 8689-0500", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Periódico", "grupoServico": "EXAMES OCUPACIONAIS", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "GLICOSE", "obsCadastro": "", "asoCadastrado": false, "etapa": "Exames", "statusAtendimento": "Bloqueado", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Não se aplica"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Pendente"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Pendente"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 23, "id": "AT-0023", "dataAtendimento": "2026-03-18", "retorno": "Não", "dataRetorno": "", "cnpj": "02.295.769/0007-03", "empresa": "BENTELER", "obra": "", "cei": "", "preferencial": "Não", "nome": "DENYS MICHAEL VIEIRA SOARES ", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "106.378.284-88", "dataNascimento": "1993-05-27", "sexo": "M", "telefone": "81 98504-5021", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Demissional", "grupoServico": "EXAMES OCUPACIONAIS", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "HEMOGRAMA", "obsCadastro": "", "asoCadastrado": false, "etapa": "Exames", "statusAtendimento": "Bloqueado", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Pendente"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 24, "id": "AT-0024", "dataAtendimento": "2026-03-18", "retorno": "Não", "dataRetorno": "", "cnpj": "02.295.769/0007-03", "empresa": "BENTELER", "obra": "", "cei": "", "preferencial": "Não", "nome": "PATRICIO DOMINGOS DA SILVA", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "053.827.094-24", "dataNascimento": "1983-01-09", "sexo": "M", "telefone": "(81) 9 8743-7328", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Demissional", "grupoServico": "EXAMES OCUPACIONAIS", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": false, "etapa": "Exames", "statusAtendimento": "Bloqueado", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 25, "id": "AT-0025", "dataAtendimento": "2026-03-18", "retorno": "Não", "dataRetorno": "", "cnpj": "18.650.667/0001-03", "empresa": "I9 PAULISTA", "obra": "", "cei": "", "preferencial": "Não", "nome": "LUCAS BAXENDALE DOS SANTOS", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "156.336.284-89", "dataNascimento": "2006-03-12", "sexo": "M", "telefone": "81 98993-4425", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Demissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "RAIO X TÓRAX", "labTipo": "", "obsCadastro": "RX TÓRAX OIT", "asoCadastrado": false, "etapa": "Exames", "statusAtendimento": "Bloqueado", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Pendente"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Pendente"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 26, "id": "AT-0026", "dataAtendimento": "2026-03-18", "retorno": "Não", "dataRetorno": "", "cnpj": "03.887.324/0002-62", "empresa": "ADIMAX", "obra": "", "cei": "", "preferencial": "Não", "nome": "FABRICIO RODRIGO DA SILVA SANTIAGO", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "041.047.864-46", "dataNascimento": "1981-02-24", "sexo": "M", "telefone": "81 98136-9611", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Periódico", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Concluído", "statusAtendimento": "Concluído", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Não se aplica"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Concluído", "data": "2026-03-18", "observacoes": ""}, "medico": {"nome": "Dra. Kátia Dutra", "resultado": "Apto", "data": "2026-03-18", "pendencia": "", "observacoes": ""}}, {"ordem": 27, "id": "AT-0027", "dataAtendimento": "2026-03-18", "retorno": "Não", "dataRetorno": "", "cnpj": "05.509.693/0001-66", "empresa": "PROBENE FOODS", "obra": "", "cei": "", "preferencial": "Não", "nome": "GABRIELLY BARRETO DE CARVALHO", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "139.154.784-58", "dataNascimento": "2004-07-01", "sexo": "F", "telefone": "81 99520-5247", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Concluído", "statusAtendimento": "Concluído", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Pendente"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Concluído", "data": "2026-03-18", "observacoes": ""}, "medico": {"nome": "Dra. Kátia Dutra", "resultado": "Apto", "data": "2026-03-18", "pendencia": "", "observacoes": ""}}, {"ordem": 28, "id": "AT-0028", "dataAtendimento": "2026-03-18", "retorno": "Não", "dataRetorno": "", "cnpj": "03.887.324/0002-62", "empresa": "ADIMAX", "obra": "", "cei": "", "preferencial": "Não", "nome": "JOSEMIR FERREIRA DE LIMA", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "118.289.994-31", "dataNascimento": "1994-03-31", "sexo": "M", "telefone": "(81) 9 ", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Periódico", "grupoServico": "EXAMES OCUPACIONAIS", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "RAIO X TÓRA PA", "labTipo": "", "obsCadastro": "", "asoCadastrado": false, "etapa": "Exames", "statusAtendimento": "Bloqueado", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Não se aplica"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Pendente"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Pendente"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 29, "id": "AT-0029", "dataAtendimento": "2026-03-18", "retorno": "Não", "dataRetorno": "", "cnpj": "01.912.239/0001-09", "empresa": "MARCHI & FILDI", "obra": "", "cei": "", "preferencial": "Não", "nome": "ELTON BARBOSA DE MENDONÇA", "nomeSocial": "", "setor": "", "funcao": "", "cpf": "078.516.464-21", "dataNascimento": "1988-09-18", "sexo": "M", "telefone": "(81) 9 9327-4274", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Concluído", "statusAtendimento": "Concluído", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Concluído", "data": "2026-03-18", "observacoes": ""}, "medico": {"nome": "Dra. Kátia Dutra", "resultado": "Apto", "data": "2026-03-18", "pendencia": "", "observacoes": ""}}, {"ordem": 30, "id": "AT-0030", "dataAtendimento": "2026-03-19", "retorno": "Não", "dataRetorno": "", "cnpj": "04.781.666/0001-85", "empresa": "Colamid do Brasil Ltda", "obra": "", "cei": "", "preferencial": "Não", "nome": "JULHIANA ALBUQUERQUE SILVA", "nomeSocial": "", "setor": "Administrativo", "funcao": "Jovem Aprendiz", "cpf": "149.017.404-40", "dataNascimento": "2006-09-07", "sexo": "F", "telefone": "(81) 9 91512417", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Triagem", "statusAtendimento": "Pendente", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Não se aplica"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Pendente", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 31, "id": "AT-0031", "dataAtendimento": "2026-03-19", "retorno": "Não", "dataRetorno": "", "cnpj": "05.509.693/0001-66", "empresa": "Probene Foods Indústria e Comercio de Alimentos Ltda", "obra": "", "cei": "", "preferencial": "Não", "nome": "LUZITANIA LUCIA DA SLIVA", "nomeSocial": "", "setor": "Administrativo", "funcao": "Assistente Administrativo/Compras", "cpf": "594.534.944-53", "dataNascimento": "1968-10-30", "sexo": "F", "telefone": "(81) 9 9675-4667", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Concluído", "statusAtendimento": "Concluído", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Não se aplica"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Pendente"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "Dra. Anna Luize", "resultado": "Apto", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 32, "id": "AT-0032", "dataAtendimento": "2026-03-19", "retorno": "Sim", "dataRetorno": "2026-03-26", "cnpj": "18.650.667/0001-03", "empresa": "I9 PAULISTA GESTAO DE RESIDUOS S/A", "obra": "", "cei": "", "preferencial": "Não", "nome": "WILKEN ROGERIO SANTOS DE MENEZES", "nomeSocial": "", "setor": "COLETA DIURNA", "funcao": "AGENTE DE LIMPEZA", "cpf": "038.293.384-22", "dataNascimento": "1981-05-25", "sexo": "M", "telefone": "(81) 9 9808-2837", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "RAIO X TÓRAX PADRÃO OIT", "labTipo": "HEPATITE B - ANTI HBs ", "obsCadastro": "", "asoCadastrado": false, "etapa": "Exames", "statusAtendimento": "Bloqueado", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Pendente"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Pendente"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Pendente"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 33, "id": "AT-0033", "dataAtendimento": "2026-03-19", "retorno": "Não", "dataRetorno": "", "cnpj": "04.221.067/0002-98", "empresa": "FIBRASA S.A.", "obra": "", "cei": "", "preferencial": "Não", "nome": "ADRYAN SILVA DIAS", "nomeSocial": "", "setor": "SETOR DE IMPRESSAO", "funcao": "OPERADOR DE PRODUÇÃO I", "cpf": "161.260.754-39", "dataNascimento": "2007-07-31", "sexo": "M", "telefone": "(81) 9 9329-9661", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Exames", "statusAtendimento": "Em andamento", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Pendente"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 34, "id": "AT-0034", "dataAtendimento": "2026-03-19", "retorno": "Não", "dataRetorno": "", "cnpj": "09.461.567/0002-10", "empresa": "PAUDALHO", "obra": "", "cei": "", "preferencial": "Não", "nome": "VINICIUS GABRIEL PAIVA EMIDIO DA SILVA", "nomeSocial": "", "setor": "Reposição", "funcao": "Repositor de Mecadorias", "cpf": "711.930.464-08", "dataNascimento": "2006-03-12", "sexo": "M", "telefone": "81 98967-4191", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Médico", "statusAtendimento": "Em andamento", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Não se aplica"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Concluído", "data": "2026-03-19", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 35, "id": "AT-0035", "dataAtendimento": "2026-03-19", "retorno": "Sim", "dataRetorno": "2026-03-26", "cnpj": "18.650.667/0001-03", "empresa": "I9 PAULISTA GESTAO DE RESIDUOS S/A", "obra": "", "cei": "", "preferencial": "Não", "nome": "EDVALDO FILHO", "nomeSocial": "", "setor": "COLETA DIURNA", "funcao": "AGENTE DE LIMPEZA", "cpf": "039.904.574-03", "dataNascimento": "1977-02-10", "sexo": "M", "telefone": "(81) 9 7515-6701", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "RAIO X TÓRAX PADRÃO OIT", "labTipo": "HEPATITE B - ANTI HBs ", "obsCadastro": "", "asoCadastrado": false, "etapa": "Exames", "statusAtendimento": "Bloqueado", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Pendente"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Pendente"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Pendente"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": "                 ORL"}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 36, "id": "AT-0036", "dataAtendimento": "2026-03-19", "retorno": "Sim", "dataRetorno": "2026-03-26", "cnpj": "18.650.667/0001-03", "empresa": "I9 PAULISTA GESTAO DE RESIDUOS S/A", "obra": "", "cei": "", "preferencial": "Não", "nome": "RAFAEL FRAGOSO BARBOSA", "nomeSocial": "", "setor": "COLETA DIURNA", "funcao": "AGENTE DE LIMPEZA", "cpf": "067.301.694-35", "dataNascimento": "1985-07-12", "sexo": "M", "telefone": "81 99492-2787", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "RAIO X TÓRAX PADRÃO OIT", "labTipo": "HEPATITE B - ANTI HBs ", "obsCadastro": "", "asoCadastrado": false, "etapa": "Exames", "statusAtendimento": "Bloqueado", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Pendente"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Pendente"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 37, "id": "AT-0037", "dataAtendimento": "2026-03-19", "retorno": "Não", "dataRetorno": "", "cnpj": "04.221.067/0002-98", "empresa": "FIBRASA S.A.", "obra": "", "cei": "", "preferencial": "Não", "nome": "DAVID TEILON DE OLIVEIRA ALVES", "nomeSocial": "", "setor": "SETOR DE TERMOFORMAGEM", "funcao": "OPERADOR DE PRODUÇÃO I", "cpf": "152.823.774-97", "dataNascimento": "2005-10-05", "sexo": "M", "telefone": "81 98986-5523", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Exames", "statusAtendimento": "Em andamento", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 38, "id": "AT-0038", "dataAtendimento": "2026-03-19", "retorno": "Não", "dataRetorno": "", "cnpj": "05.509.693/0001-66", "empresa": "Probene Foods Indústria e Comercio de Alimentos Ltda", "obra": "", "cei": "", "preferencial": "Não", "nome": "WILLIAMS NATALICIO DOS SANTOS", "nomeSocial": "", "setor": "Administrativo", "funcao": "Porteiro I", "cpf": "031.820.544-06", "dataNascimento": "1978-04-13", "sexo": "M", "telefone": "(81) 9 8737-8833", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Exames", "statusAtendimento": "Em andamento", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Não se aplica"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Pendente"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 39, "id": "AT-0039", "dataAtendimento": "2026-03-19", "retorno": "Não", "dataRetorno": "", "cnpj": "10.835.932/0001-08", "empresa": "COMPANHIA ENERGETICA DE PERNAMBUCO", "obra": "", "cei": "", "preferencial": "Não", "nome": "PAULO HENRIQUE DE ALMEIDA SILVA", "nomeSocial": "", "setor": "", "funcao": "ELETRICISTA SERVICOS DE REDE II", "cpf": "083.011.224-39", "dataNascimento": "1988-05-06", "sexo": "M", "telefone": "(81) 9 8718-1283", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Periódico", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "HEMOGRAMA + GLICOSE + TRIGLICERIDEOS", "obsCadastro": "", "asoCadastrado": true, "etapa": "Exames", "statusAtendimento": "Em andamento", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Não se aplica"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Pendente"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 40, "id": "AT-0040", "dataAtendimento": "2026-03-19", "retorno": "Não", "dataRetorno": "", "cnpj": "01.301.612/0004-20 ", "empresa": "T&A CONSTRUÇÕES", "obra": "", "cei": "", "preferencial": "Não", "nome": "FABIO AUGUSTINHO DA SILVA", "nomeSocial": "", "setor": "\nPROTENDIDOS E ARMADOS", "funcao": "AUXILIAR DE PRODUÇÃO", "cpf": "008.065.784-24", "dataNascimento": "1977-07-30", "sexo": "M", "telefone": "81 99407-8890", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "EXAMES OCUPACIONAIS", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": false, "etapa": "Exames", "statusAtendimento": "Bloqueado", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 41, "id": "AT-0041", "dataAtendimento": "2026-03-19", "retorno": "Sim", "dataRetorno": "2026-03-26", "cnpj": "18.650.667/0001-03", "empresa": "I9 PAULISTA GESTAO DE RESIDUOS S/A", "obra": "", "cei": "", "preferencial": "Não", "nome": "CRISTIANO PEDRO DA SILVA", "nomeSocial": "", "setor": "COLETA DIURNA", "funcao": "AGENTE DE LIMPEZA", "cpf": "076.355.884-27", "dataNascimento": "1986-05-31", "sexo": "M", "telefone": "81 99614-6296", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "RAIO X TÓRAX PADRÃO OIT", "labTipo": "HEPATITE B - ANTI HBs ", "obsCadastro": "", "asoCadastrado": false, "etapa": "Exames", "statusAtendimento": "Bloqueado", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Pendente"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Pendente"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Pendente"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 42, "id": "AT-0042", "dataAtendimento": "2026-03-19", "retorno": "Não", "dataRetorno": "", "cnpj": "04.221.067/0002-98", "empresa": "FIBRASA S.A.", "obra": "", "cei": "", "preferencial": "Não", "nome": "GLEIBSON RAMOS DA SILVA", "nomeSocial": "", "setor": "SETOR DE IMPRESSAO", "funcao": "OPERADOR DE PRODUÇÃO I", "cpf": "708.970.234-04", "dataNascimento": "2002-11-17", "sexo": "M", "telefone": "(81) 9 9202-8752", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Exames", "statusAtendimento": "Em andamento", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Pendente"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 43, "id": "AT-0043", "dataAtendimento": "", "retorno": "Sim", "dataRetorno": "2026-03-19", "cnpj": "18.650.667/0001-03", "empresa": "I9 PAULISTA GESTAO DE RESIDUOS S/A", "obra": "", "cei": "", "preferencial": "Não", "nome": "LUCAS DORNELAS PEREIRA", "nomeSocial": "", "setor": "OFICINA", "funcao": "AUXILIAR DE MECANICO", "cpf": "718.347.014-81", "dataNascimento": "", "sexo": "M", "telefone": "", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Periódico", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Médico", "statusAtendimento": "Em andamento", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Não se aplica"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Concluído", "data": "2026-03-19", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 44, "id": "AT-0044", "dataAtendimento": "2026-03-19", "retorno": "Não", "dataRetorno": "", "cnpj": "04.781.666/0001-85", "empresa": "Colamid do Brasil Ltda", "obra": "", "cei": "", "preferencial": "Não", "nome": "EDVANIA BEATRIZ ANGELICA DA SILVA", "nomeSocial": "", "setor": "Administrativo", "funcao": "Assistente de compras", "cpf": "053.207.334-70", "dataNascimento": "1985-08-03", "sexo": "F", "telefone": "(81) 9 9651-0417", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Triagem", "statusAtendimento": "Pendente", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Não se aplica"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Pendente", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 45, "id": "AT-0045", "dataAtendimento": "2026-03-03", "retorno": "Sim", "dataRetorno": "2026-03-19", "cnpj": "09.114.818/0001-00", "empresa": "ALGOBOM INDUSTRIA", "obra": "", "cei": "", "preferencial": "Não", "nome": "FILIPE SOARES DE LIMA", "nomeSocial": "", "setor": "COMERCIAL ", "funcao": "PROMOTOR DE VENDAS", "cpf": "128.500.364-04", "dataNascimento": "1998-09-01", "sexo": "M", "telefone": "", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Periódico", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Triagem", "statusAtendimento": "Pendente", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Não se aplica"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Pendente", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 46, "id": "AT-0046", "dataAtendimento": "2026-03-19", "retorno": "Sim", "dataRetorno": "2026-03-24", "cnpj": "18.650.667/0001-03", "empresa": "I9 PAULISTA GESTAO DE RESIDUOS S/A", "obra": "", "cei": "", "preferencial": "Não", "nome": "ADRIANO CARLOS DA SILVA", "nomeSocial": "", "setor": "CAPINAÇÃO MANUAL III", "funcao": "AGENTE DE LIMPEZA", "cpf": "070.692.214-01", "dataNascimento": "1988-01-11", "sexo": "M", "telefone": "(81) 9 9948-3781", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Periódico", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "RAIO X TÓRAX PADRÃO OIT", "labTipo": "", "obsCadastro": "", "asoCadastrado": false, "etapa": "Exames", "statusAtendimento": "Bloqueado", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Pendente"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Pendente"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 47, "id": "AT-0047", "dataAtendimento": "2026-03-19", "retorno": "Não", "dataRetorno": "2026-03-24", "cnpj": "18.650.667/0001-03", "empresa": "I9 PAULISTA GESTAO DE RESIDUOS S/A", "obra": "", "cei": "", "preferencial": "Não", "nome": "KAUANNY CYNTHYA REGINA SOUZA E SILVA", "nomeSocial": "", "setor": "CAPINAÇÃO ROÇADEIRA", "funcao": "AGENTE DE LIMPEZA", "cpf": "014.124.474-70", "dataNascimento": "1995-08-10", "sexo": "F", "telefone": "81 99248-1928", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Periódico", "grupoServico": "EXAMES OCUPACIONAIS", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "RAIO X TÓRAX PADRÃO OIT", "labTipo": "", "obsCadastro": "", "asoCadastrado": false, "etapa": "Exames", "statusAtendimento": "Bloqueado", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Pendente"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Pendente"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 48, "id": "AT-0048", "dataAtendimento": "2026-03-19", "retorno": "Não", "dataRetorno": "", "cnpj": "11.507.415/0001-72", "empresa": "Industrias Reunidas Raymundo da Fonte S/A", "obra": "", "cei": "", "preferencial": "Não", "nome": "VICTORIA COSTA", "nomeSocial": "", "setor": "LABORATORIO CONTROLE QUALIDADE", "funcao": "TECNICO QUIMICA", "cpf": "122.354.134-71", "dataNascimento": "1998-09-26", "sexo": "F", "telefone": "(81) 9 9640-3979", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Periódico", "grupoServico": "EXAMES OCUPACIONAIS", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "HEMOGRAMA + TGO + TGP", "obsCadastro": "", "asoCadastrado": false, "etapa": "Exames", "statusAtendimento": "Bloqueado", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Não se aplica"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Pendente"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 49, "id": "AT-0049", "dataAtendimento": "2026-03-19", "retorno": "Não", "dataRetorno": "", "cnpj": "04.221.067/0002-98", "empresa": "FIBRASA S.A.", "obra": "", "cei": "", "preferencial": "Não", "nome": "WESLEY JOSE DA SILVA", "nomeSocial": "", "setor": "SETOR DE IMPRESSAO", "funcao": "OPERADOR DE PRODUÇÃO I", "cpf": "129.163.334-01", "dataNascimento": "2003-03-09", "sexo": "M", "telefone": "81 98902-0058", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Exames", "statusAtendimento": "Em andamento", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Pendente"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 50, "id": "AT-0050", "dataAtendimento": "2026-03-19", "retorno": "Não", "dataRetorno": "", "cnpj": "87.833.737/0004-16", "empresa": "Pisani Plásticos Ltda", "obra": "", "cei": "", "preferencial": "Não", "nome": "FERNANDES FERREIRA DE OLIVEIRA", "nomeSocial": "", "setor": "injeção", "funcao": "Auxiliar de Produção", "cpf": "020.444.624-43", "dataNascimento": "1973-10-17", "sexo": "M", "telefone": "(81) 9 8460-1685", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Periódico", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Exames", "statusAtendimento": "Em andamento", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 51, "id": "AT-0051", "dataAtendimento": "2026-03-19", "retorno": "Não", "dataRetorno": "", "cnpj": "03.887.324/0002-62", "empresa": "ADIMAX", "obra": "", "cei": "", "preferencial": "Não", "nome": "ELIZANGELA DA CONCEICAO TENORIO", "nomeSocial": "", "setor": "RECURSOS HUMANOS", "funcao": "ANALISTA DE RECURSOS HUMANOS JUNIOR", "cpf": "042.288.214-30", "dataNascimento": "1982-06-18", "sexo": "F", "telefone": "81 99735-5735", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Periódico", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Triagem", "statusAtendimento": "Pendente", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Não se aplica"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Pendente", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 52, "id": "AT-0052", "dataAtendimento": "2026-03-19", "retorno": "Não", "dataRetorno": "", "cnpj": "04.781.666/0001-85", "empresa": "Colamid do Brasil Ltda", "obra": "", "cei": "", "preferencial": "Não", "nome": "MARIA EDUARDA FERREIRA DOS SANTOS", "nomeSocial": "", "setor": "Administrativo", "funcao": "JOVEM APRENDIZ", "cpf": "715.778.414-92", "dataNascimento": "2006-09-14", "sexo": "F", "telefone": "81 98815-4447", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Triagem", "statusAtendimento": "Pendente", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Não se aplica"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Pendente", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 53, "id": "AT-0053", "dataAtendimento": "2026-03-19", "retorno": "Sim", "dataRetorno": "2026-03-26", "cnpj": "18.650.667/0001-03", "empresa": "I9 PAULISTA GESTAO DE RESIDUOS S/A", "obra": "", "cei": "", "preferencial": "Não", "nome": "ALEXANDRO ALBUQUERQUE FLORENCIO ROCHA", "nomeSocial": "", "setor": "COLETA DIURNA", "funcao": "AGENTE DE LIMPEZA", "cpf": "145.604.804-00", "dataNascimento": "1999-02-03", "sexo": "M", "telefone": "(81) 9 9243-0614 SIRLENE", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "EXAMES OCUPACIONAIS", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "RAIO X TÓRAX PADRÃO OIT", "labTipo": "HEPATITE B - ANTI HBs", "obsCadastro": "", "asoCadastrado": false, "etapa": "Exames", "statusAtendimento": "Bloqueado", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Pendente"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Pendente"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Pendente"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 54, "id": "AT-0054", "dataAtendimento": "2026-03-19", "retorno": "Não", "dataRetorno": "", "cnpj": "04.221.067/0002-98", "empresa": "FIBRASA S.A.", "obra": "", "cei": "", "preferencial": "Não", "nome": "LUIZ HENRIQUE DA SILVA LIRA", "nomeSocial": "", "setor": "SETOR KASE IMPRESSORA K6000", "funcao": "OPERADOR DE PRODUÇÃO I", "cpf": "154.316.394-71", "dataNascimento": "2008-01-09", "sexo": "M", "telefone": "81 99448-5210", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Admissional", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Exames", "statusAtendimento": "Em andamento", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Pendente"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 55, "id": "AT-0055", "dataAtendimento": "2026-03-19", "retorno": "Não", "dataRetorno": "", "cnpj": "04.781.666/0001-85", "empresa": "Colamid do Brasil Ltda", "obra": "", "cei": "", "preferencial": "Não", "nome": "LILIANE ALVES DE LUCENA XAVIER", "nomeSocial": "", "setor": "VENDAS", "funcao": "Supervisora Comercial", "cpf": "045.525.684-50", "dataNascimento": "1982-01-30", "sexo": "F", "telefone": "81 99802162", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Periódico", "grupoServico": "CONSULTA OCUPACIONAL", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": true, "etapa": "Triagem", "statusAtendimento": "Pendente", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Não se aplica"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Não se aplica"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Não se aplica"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Pendente", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}, {"ordem": 56, "id": "AT-0056", "dataAtendimento": "2026-03-19", "retorno": "Não", "dataRetorno": "2026-03-24", "cnpj": "18.650.667/0001-03", "empresa": "I9 PAULISTA GESTAO DE RESIDUOS S/A", "obra": "", "cei": "", "preferencial": "Não", "nome": "DEBORA HADASSA DE OLIVEIRA FALCAO", "nomeSocial": "", "setor": "VARRIÇÃO DIURNA", "funcao": "\t\nAPRENDIZ EM SERV LIMP CONS DE AREAS PUBL", "cpf": "712.995.264-46", "dataNascimento": "2002-12-07", "sexo": "F", "telefone": "81 98272-9196", "email": "", "endereco": "", "cep": "", "tipoAtendimento": "Periódico", "grupoServico": "EXAMES OCUPACIONAIS", "servico": "SERVIÇOS MÉDICOS OCUPACIONAIS", "rxTipo": "", "labTipo": "", "obsCadastro": "", "asoCadastrado": false, "etapa": "Exames", "statusAtendimento": "Bloqueado", "exames": [{"key": "audiometria", "nome": "Audiometria", "status": "Pendente"}, {"key": "acuidade", "nome": "Acuidade Visual", "status": "Não se aplica"}, {"key": "espirometria", "nome": "Espirometria", "status": "Pendente"}, {"key": "ecg", "nome": "ECG", "status": "Não se aplica"}, {"key": "eeg", "nome": "EEG", "status": "Não se aplica"}, {"key": "rx", "nome": "RX", "status": "Pendente"}, {"key": "lab", "nome": "Exames Laboratoriais", "status": "Não se aplica"}, {"key": "psicossocial", "nome": "Avaliação Psicossocial", "status": "Não se aplica"}], "triagem": {"status": "Bloqueado", "data": "", "observacoes": ""}, "medico": {"nome": "", "resultado": "", "data": "", "pendencia": "", "observacoes": ""}}];
+    const EXAM_ORDER = [
+      { key: 'audiometria', nome: 'Audiometria' },
+      { key: 'acuidade', nome: 'Acuidade Visual' },
+      { key: 'espirometria', nome: 'Espirometria' },
+      { key: 'ecg', nome: 'ECG' },
+      { key: 'eeg', nome: 'EEG' },
+      { key: 'rx', nome: 'RX' },
+      { key: 'lab', nome: 'Exames Laboratoriais' },
+      { key: 'psicossocial', nome: 'Avaliação Psicossocial' },
+    ];
+    const PAGE_META = {
+      dashboard: ['Dashboard', 'Indicadores, filas e status do fluxo completo.'],
+      recepcao: ['Recepção', 'Cadastro inicial e conferência dos exames ocupacionais.'],
+      exames: ['Exames Ocupacionais', 'Fila em linha seguindo a ordem de cadastro.'],
+      triagem: ['Triagem', 'Somente pacientes com ASO cadastrado e exames concluídos.'],
+      medico: ['Médico do Trabalho', 'Fila em linha para atendimento final e decisão do ASO.'],
+      acompanhamento: ['Acompanhamento', 'Visão moderna dos exames realizados, pendentes e bloqueios.']
+    };
+
+    let patients = loadPatients();
+    let currentPage = 'dashboard';
+    let chart;
+
+    function clone(obj) {
+      return JSON.parse(JSON.stringify(obj));
+    }
+
+    function loadPatients() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try { return JSON.parse(saved); } catch (e) {}
+      }
+      return clone(INITIAL_PATIENTS);
+    }
+
+    function savePatients() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(patients));
+    }
+
+    function restoreBase() {
+      if (!confirm('Deseja restaurar a base original da planilha e descartar alterações locais?')) return;
+      patients = clone(INITIAL_PATIENTS);
+      savePatients();
+      refreshAll();
+    }
+
+    function formatDate(value) {
+      if (!value) return '—';
+      const d = new Date(value + 'T00:00:00');
+      return Number.isNaN(d.getTime()) ? value : d.toLocaleDateString('pt-BR');
+    }
+
+    function maskText(v) {
+      return v && String(v).trim() ? v : '—';
+    }
+
+    function getExamCounts(patient) {
+      const applicable = patient.exames.filter(ex => ex.status !== 'Não se aplica');
+      const concluded = applicable.filter(ex => ex.status === 'Concluído');
+      const pending = applicable.filter(ex => ex.status === 'Pendente');
+      return {
+        total: applicable.length,
+        done: concluded.length,
+        pending: pending.length,
+        progress: applicable.length ? Math.round((concluded.length / applicable.length) * 100) : 100
+      };
+    }
+
+    function getStageStatus(patient) {
+      if (patient.etapa === 'Concluído') return 'Concluído';
+      if (patient.etapa === 'Médico') return 'Em andamento';
+      if (patient.etapa === 'Triagem') return 'Em andamento';
+      if (patient.etapa === 'Exames') return 'Em andamento';
+      return 'Pendente';
+    }
+
+    function badge(status) {
+      const map = {
+        'Pendente': ['🟡', 'st-pendente'],
+        'Em andamento': ['🔵', 'st-andamento'],
+        'Concluído': ['🟢', 'st-concluido'],
+        'Bloqueado': ['🔴', 'st-bloqueado'],
+        'Não se aplica': ['⚪', 'st-na'],
+        'Apto': ['🟢', 'st-concluido'],
+        'Pendente ASO': ['🟡', 'st-pendente']
+      };
+      const [emoji, css] = map[status] || ['🔵', 'st-andamento'];
+      return `<span class="status ${css}">${emoji} ${status}</span>`;
+    }
+
+    function updateFlow(patient) {
+      const counts = getExamCounts(patient);
+      const allDone = counts.done === counts.total;
+      const hasApplicable = counts.total > 0;
+
+      if (patient.medico.resultado) {
+        patient.etapa = 'Concluído';
+        patient.statusAtendimento = patient.medico.resultado === 'Pendente' ? 'Bloqueado' : 'Concluído';
+        patient.triagem.status = 'Concluído';
+        return;
+      }
+
+      if (patient.triagem.status === 'Concluído') {
+        patient.etapa = 'Médico';
+        patient.statusAtendimento = 'Em andamento';
+        return;
+      }
+
+      if (patient.asoCadastrado) {
+        if (allDone) {
+          patient.etapa = 'Triagem';
+          patient.statusAtendimento = 'Em andamento';
+          patient.triagem.status = 'Pendente';
+        } else if (hasApplicable) {
+          patient.etapa = 'Exames';
+          patient.statusAtendimento = 'Em andamento';
+          patient.triagem.status = 'Bloqueado';
+        } else {
+          patient.etapa = 'Triagem';
+          patient.statusAtendimento = 'Em andamento';
+          patient.triagem.status = 'Pendente';
+        }
+      } else {
+        patient.triagem.status = 'Bloqueado';
+        if (hasApplicable && !allDone) {
+          patient.etapa = 'Exames';
+          patient.statusAtendimento = 'Bloqueado';
+        } else {
+          patient.etapa = 'Recepção';
+          patient.statusAtendimento = 'Bloqueado';
+        }
+      }
+    }
+
+    function syncAllFlows() {
+      patients.forEach(updateFlow);
+      savePatients();
+    }
+
+    function progressHtml(patient) {
+      const counts = getExamCounts(patient);
+      return `
+        <div>
+          <div class="small" style="margin-bottom:6px">${counts.done} / ${counts.total} exames concluídos</div>
+          <div class="progress"><span style="width:${counts.progress}%"></span></div>
+        </div>
+      `;
+    }
+
+    function examChips(patient, compact = false) {
+      return `<div class="chips">${patient.exames.map(ex => {
+        const label = compact ? ex.nome.replace('Exames ', '') : ex.nome;
+        return `<span class="chip">${label} · ${badge(ex.status)}</span>`;
+      }).join('')}</div>`;
+    }
+
+    function actionButtonsFor(page, patient) {
+      if (page === 'recepcao') {
+        return `<button class="btn btn-primary" onclick="openPatientModal('${patient.id}','recepcao')">Editar cadastro</button>`;
+      }
+      if (page === 'exames') {
+        return `<button class="btn btn-success" onclick="openPatientModal('${patient.id}','exames')">Atualizar exames</button>`;
+      }
+      if (page === 'triagem') {
+        const blocked = !patient.asoCadastrado || getExamCounts(patient).done !== getExamCounts(patient).total;
+        return `<button class="btn ${blocked ? 'btn-danger' : 'btn-primary'}" onclick="openPatientModal('${patient.id}','triagem')">${blocked ? 'Ver bloqueio' : 'Atender triagem'}</button>`;
+      }
+      if (page === 'medico') {
+        return `<button class="btn btn-warning" onclick="openPatientModal('${patient.id}','medico')">Atender médico</button>`;
+      }
+      return `<button class="btn btn-ghost" onclick="openPatientModal('${patient.id}','acompanhamento')">Detalhes</button>`;
+    }
+
+    function patientRow(page, patient) {
+      const counts = getExamCounts(patient);
+      const blockedTriagem = !patient.asoCadastrado ? 'ASO não cadastrado na recepção' : (counts.done !== counts.total ? 'Exames pendentes' : 'Liberado');
+      return `
+        <tr>
+          <td>
+            <div class="row-title">${patient.nome}</div>
+            <div class="small mono">${patient.id} • ${maskText(patient.cpf)}</div>
+          </td>
+          <td>
+            <div>${maskText(patient.empresa)}</div>
+            <div class="small">${maskText(patient.tipoAtendimento)}</div>
+          </td>
+          <td>${badge(getStageStatus(patient))}</td>
+          <td>${progressHtml(patient)}</td>
+          <td>
+            <div class="chips">
+              <span class="chip">ASO recepção: ${badge(patient.asoCadastrado ? 'Concluído' : 'Bloqueado')}</span>
+              <span class="chip">Triagem: ${badge(patient.triagem.status)}</span>
+            </div>
+          </td>
+          <td><div class="small">${blockedTriagem}</div></td>
+          <td>${actionButtonsFor(page, patient)}</td>
+        </tr>
+      `;
+    }
+
+    function renderDashboard() {
+      syncAllFlows();
+      const total = patients.length;
+      const recepcao = patients.filter(p => p.etapa === 'Recepção').length;
+      const exames = patients.filter(p => p.etapa === 'Exames').length;
+      const triagem = patients.filter(p => p.etapa === 'Triagem').length;
+      const medico = patients.filter(p => p.etapa === 'Médico').length;
+      const concluidos = patients.filter(p => p.etapa === 'Concluído').length;
+      const bloqueados = patients.filter(p => !p.asoCadastrado).length;
+
+      const examTotals = EXAM_ORDER.map(ex => {
+        const statuses = patients.map(p => p.exames.find(e => e.key === ex.key)?.status || 'Não se aplica');
+        return {
+          nome: ex.nome,
+          pendente: statuses.filter(s => s === 'Pendente').length,
+          andamento: statuses.filter(s => s === 'Em andamento').length,
+          concluido: statuses.filter(s => s === 'Concluído').length,
+        };
+      });
+
+      document.getElementById('page-dashboard').innerHTML = `
+        <div class="grid-4">
+          <div class="card kpi"><div class="label">Total de pacientes</div><div class="value">${total}</div><div class="hint">Base carregada da planilha</div></div>
+          <div class="card kpi"><div class="label">Fila de exames</div><div class="value">${exames}</div><div class="hint">Pacientes aguardando execução dos exames</div></div>
+          <div class="card kpi"><div class="label">Triagem pronta</div><div class="value">${triagem}</div><div class="hint">Com ASO cadastrado e exames concluídos</div></div>
+          <div class="card kpi"><div class="label">ASO concluído</div><div class="value">${concluidos}</div><div class="hint">Atendimento finalizado pelo médico</div></div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px">
+              <div>
+                <div class="row-title">Status por exame</div>
+                <div class="small">Gráfico corrigido com altura fixa e sem esticar a tela</div>
+              </div>
+              <div class="chips">
+                <span class="chip">${badge('Pendente')}</span>
+                <span class="chip">${badge('Concluído')}</span>
+              </div>
+            </div>
+            <div class="chart-box"><canvas id="statusChart"></canvas></div>
+          </div>
+
+          <div class="card">
+            <div class="row-title" style="margin-bottom:14px">Gargalos atuais</div>
+            <div class="summary-list">
+              <div class="summary-item"><div>Recepção</div><div>${badge(recepcao ? 'Pendente' : 'Concluído')} ${recepcao} paciente(s)</div></div>
+              <div class="summary-item"><div>Exames</div><div>${badge(exames ? 'Em andamento' : 'Concluído')} ${exames} paciente(s)</div></div>
+              <div class="summary-item"><div>Triagem</div><div>${badge(triagem ? 'Em andamento' : 'Concluído')} ${triagem} paciente(s)</div></div>
+              <div class="summary-item"><div>Médico</div><div>${badge(medico ? 'Em andamento' : 'Concluído')} ${medico} paciente(s)</div></div>
+              <div class="summary-item"><div>Bloqueados</div><div>${badge(bloqueados ? 'Bloqueado' : 'Concluído')} ${bloqueados} sem ASO cadastrado</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="split">
+          <div class="card">
+            <div class="row-title" style="margin-bottom:12px">Fila geral por ordem de cadastro</div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Paciente</th>
+                    <th>Empresa</th>
+                    <th>Etapa atual</th>
+                    <th>Progresso</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${patients.slice().sort((a,b) => a.ordem - b.ordem).map(p => `
+                    <tr>
+                      <td><div class="row-title">${p.nome}</div><div class="small mono">${p.id}</div></td>
+                      <td>${maskText(p.empresa)}</td>
+                      <td>${badge(getStageStatus(p))}</td>
+                      <td>${progressHtml(p)}</td>
+                      <td><div class="chips"><span class="chip">Triagem: ${badge(p.triagem.status)}</span><span class="chip">ASO recepção: ${badge(p.asoCadastrado ? 'Concluído' : 'Bloqueado')}</span></div></td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="row-title" style="margin-bottom:12px">Resumo por exame</div>
+            <div class="summary-list">
+              ${examTotals.map(item => `
+                <div class="summary-item">
+                  <div>
+                    <div class="row-title">${item.nome}</div>
+                    <div class="small">Pendente: ${item.pendente} • Concluído: ${item.concluido}</div>
+                  </div>
+                  <div class="chips">
+                    <span class="chip">${badge(item.pendente ? 'Pendente' : 'Concluído')}</span>
+                  </div>
+                </div>`).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+      drawChart(examTotals);
+    }
+
+    function drawChart(examTotals) {
+      const canvas = document.getElementById('statusChart');
+      if (!canvas || typeof Chart === 'undefined') return;
+      if (chart) chart.destroy();
+      chart = new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: examTotals.map(i => i.nome),
+          datasets: [
+            { label: 'Pendente', data: examTotals.map(i => i.pendente), backgroundColor: 'rgba(250,204,21,.8)', borderRadius: 8, maxBarThickness: 38 },
+            { label: 'Concluído', data: examTotals.map(i => i.concluido), backgroundColor: 'rgba(74,222,128,.8)', borderRadius: 8, maxBarThickness: 38 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          resizeDelay: 120,
+          plugins: {
+            legend: {
+              labels: { color: '#d7e3fb' }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#9db0cf', maxRotation: 0, minRotation: 0 },
+              grid: { display: false }
+            },
+            y: {
+              beginAtZero: true,
+              ticks: { color: '#9db0cf', precision: 0 },
+              grid: { color: 'rgba(255,255,255,.06)' }
+            }
+          }
+        }
+      });
+    }
+
+    function renderQueuePage(pageId, pageKey, filterFn, extraColumns = '') {
+      const page = document.getElementById(pageId);
+      const queue = patients.slice().sort((a,b) => a.ordem - b.ordem).filter(filterFn);
+      page.innerHTML = `
+        <div class="card">
+          <div class="filters">
+            <div class="search"><span>🔎</span><input id="search-${pageKey}" placeholder="Buscar por nome, ID, CPF ou empresa"></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Paciente</th>
+                  <th>Empresa / Tipo</th>
+                  <th>Status</th>
+                  <th>Progresso</th>
+                  <th>Regras do fluxo</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-${pageKey}">
+                ${queue.length ? queue.map(p => patientRow(pageKey, p)).join('') : `<tr><td colspan="6"><div class="small">Nenhum paciente nesta etapa.</div></td></tr>`}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+      document.getElementById(`search-${pageKey}`).addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        const filtered = queue.filter(p => [p.nome, p.id, p.cpf, p.empresa].some(v => (v || '').toLowerCase().includes(term)));
+        document.getElementById(`tbody-${pageKey}`).innerHTML = filtered.length ? filtered.map(p => patientRow(pageKey, p)).join('') : `<tr><td colspan="6"><div class="small">Nenhum resultado encontrado.</div></td></tr>`;
+      });
+    }
+
+    function renderRecepcao() {
+      renderQueuePage('page-recepcao', 'recepcao', p => p.etapa === 'Recepção');
+    }
+
+    function renderExames() {
+      renderQueuePage('page-exames', 'exames', p => p.etapa === 'Exames' || (getExamCounts(p).pending > 0 && p.etapa !== 'Concluído'));
+    }
+
+    function renderTriagem() {
+      renderQueuePage('page-triagem', 'triagem', p => p.asoCadastrado && p.etapa === 'Triagem');
+    }
+
+    function renderMedico() {
+      renderQueuePage('page-medico', 'medico', p => p.etapa === 'Médico');
+    }
+
+    function renderAcompanhamento() {
+      const items = patients.slice().sort((a,b) => a.ordem - b.ordem);
+      document.getElementById('page-acompanhamento').innerHTML = `
+        <div class="card">
+          <div class="filters">
+            <div class="search"><span>🔎</span><input id="search-acompanhamento" placeholder="Buscar paciente para acompanhamento"></div>
+          </div>
+          <div id="acompanhamentoList" class="summary-list">
+            ${items.map(renderFollowItem).join('')}
+          </div>
+        </div>
+      `;
+      document.getElementById('search-acompanhamento').addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        const filtered = items.filter(p => [p.nome, p.id, p.cpf, p.empresa].some(v => (v || '').toLowerCase().includes(term)));
+        document.getElementById('acompanhamentoList').innerHTML = filtered.length ? filtered.map(renderFollowItem).join('') : `<div class="small">Nenhum resultado encontrado.</div>`;
+      });
+    }
+
+    function renderFollowItem(patient) {
+      const counts = getExamCounts(patient);
+      const realizados = patient.exames.filter(ex => ex.status === 'Concluído');
+      const pendentes = patient.exames.filter(ex => ex.status === 'Pendente');
+      const naoAplicaveis = patient.exames.filter(ex => ex.status === 'Não se aplica');
+      return `
+        <div class="card" style="padding:16px">
+          <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start">
+            <div>
+              <div class="row-title">${patient.nome}</div>
+              <div class="small mono">${patient.id} • ${maskText(patient.cpf)} • ${maskText(patient.empresa)}</div>
+            </div>
+            <div class="chips">
+              <span class="chip">Etapa: ${badge(getStageStatus(patient))}</span>
+              <span class="chip">Triagem: ${badge(patient.triagem.status)}</span>
+              <span class="chip">ASO recepção: ${badge(patient.asoCadastrado ? 'Concluído' : 'Bloqueado')}</span>
+            </div>
+          </div>
+
+          <div style="margin:14px 0 10px">${progressHtml(patient)}</div>
+
+          <div class="split">
+            <div>
+              <div class="small" style="margin-bottom:8px">Exames realizados</div>
+              <div class="chips">${realizados.length ? realizados.map(ex => `<span class="chip">${badge('Concluído')} ${ex.nome}</span>`).join('') : '<span class="chip">Nenhum realizado</span>'}</div>
+            </div>
+            <div>
+              <div class="small" style="margin-bottom:8px">Exames pendentes / bloqueios</div>
+              <div class="chips">
+                ${pendentes.length ? pendentes.map(ex => `<span class="chip">${badge('Pendente')} ${ex.nome}</span>`).join('') : ''}
+                ${!patient.asoCadastrado ? `<span class="chip">${badge('Bloqueado')} Sem ASO cadastrado na recepção</span>` : ''}
+                ${!pendentes.length && patient.asoCadastrado ? `<span class="chip">${badge('Concluído')} Sem pendências</span>` : ''}
+                ${naoAplicaveis.slice(0,3).map(ex => `<span class="chip">${badge('Não se aplica')} ${ex.nome}</span>`).join('')}
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline" style="margin-top:14px">
+            <div class="timeline-item">
+              <div class="small">Recepção</div>
+              <div>
+                <div>${patient.asoCadastrado ? badge('Concluído') : badge('Bloqueado')}</div>
+                <div class="small">Cadastro em ${formatDate(patient.dataAtendimento)} • Tipo: ${maskText(patient.tipoAtendimento)}</div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="small">Triagem</div>
+              <div>
+                <div>${badge(patient.triagem.status)}</div>
+                <div class="small">${patient.triagem.observacoes || (patient.triagem.status === 'Concluído' ? 'Paciente liberado para médico.' : 'Aguardando requisitos do fluxo.')}</div>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="small">Médico</div>
+              <div>
+                <div>${badge(patient.medico.resultado ? (patient.medico.resultado === 'Pendente' ? 'Bloqueado' : 'Concluído') : (patient.etapa === 'Médico' ? 'Em andamento' : 'Pendente'))}</div>
+                <div class="small">${patient.medico.resultado ? `Resultado: ${patient.medico.resultado}` : 'Ainda não finalizado.'} ${patient.medico.pendencia ? '• ' + patient.medico.pendencia : ''}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function findPatient(id) {
+      return patients.find(p => p.id === id);
+    }
+
+    function openPatientModal(id, context) {
+      const patient = findPatient(id);
+      if (!patient) return;
+      document.getElementById('patientModal').classList.add('open');
+      document.getElementById('modalPatientId').textContent = patient.id;
+      document.getElementById('modalPatientName').textContent = patient.nome;
+      const counts = getExamCounts(patient);
+
+      let content = `
+        <div class="split">
+          <div class="card" style="padding:16px">
+            <div class="row-title" style="margin-bottom:10px">Dados do atendimento</div>
+            <div class="summary-list">
+              <div class="summary-item"><div>Empresa</div><div>${maskText(patient.empresa)}</div></div>
+              <div class="summary-item"><div>Tipo</div><div>${maskText(patient.tipoAtendimento)}</div></div>
+              <div class="summary-item"><div>CPF</div><div>${maskText(patient.cpf)}</div></div>
+              <div class="summary-item"><div>ASO na recepção</div><div>${badge(patient.asoCadastrado ? 'Concluído' : 'Bloqueado')}</div></div>
+              <div class="summary-item"><div>Etapa atual</div><div>${badge(getStageStatus(patient))}</div></div>
+            </div>
+          </div>
+          <div class="card" style="padding:16px">
+            <div class="row-title" style="margin-bottom:10px">Resumo de exames</div>
+            <div class="summary-list">
+              <div class="summary-item"><div>Total aplicável</div><div>${counts.total}</div></div>
+              <div class="summary-item"><div>Concluídos</div><div>${counts.done}</div></div>
+              <div class="summary-item"><div>Pendentes</div><div>${counts.pending}</div></div>
+              <div class="summary-item"><div>Progresso</div><div>${counts.progress}%</div></div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      if (context === 'recepcao' || context === 'acompanhamento') {
+        content += `
+          <div class="card" style="padding:16px">
+            <div class="row-title" style="margin-bottom:12px">Ajustes de recepção</div>
+            <div class="form-grid">
+              <div class="field">
+                <label>ASO cadastrado</label>
+                <select id="edit-aso-cadastrado">
+                  <option value="true" ${patient.asoCadastrado ? 'selected' : ''}>Sim</option>
+                  <option value="false" ${!patient.asoCadastrado ? 'selected' : ''}>Não</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Observações</label>
+                <textarea id="edit-obs-cadastro">${patient.obsCadastro || ''}</textarea>
+              </div>
+            </div>
+            <div class="modal-foot" style="padding:0;margin-top:16px;border-top:0">
+              <button class="btn btn-primary" onclick="saveReception('${patient.id}')">Salvar recepção</button>
+            </div>
+          </div>
+        `;
+      }
+
+      if (context === 'exames' || context === 'acompanhamento') {
+        content += `
+          <div class="card" style="padding:16px">
+            <div class="row-title" style="margin-bottom:12px">Exames ocupacionais em linha</div>
+            <div class="summary-list">
+              ${patient.exames.map(ex => `
+                <div class="summary-item">
+                  <div>${ex.nome}</div>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+                    <select id="exam-${patient.id}-${ex.key}">
+                      <option value="Pendente" ${ex.status === 'Pendente' ? 'selected' : ''}>Pendente</option>
+                      <option value="Concluído" ${ex.status === 'Concluído' ? 'selected' : ''}>Concluído</option>
+                      <option value="Não se aplica" ${ex.status === 'Não se aplica' ? 'selected' : ''}>Não se aplica</option>
+                    </select>
+                  </div>
+                </div>`).join('')}
+            </div>
+            <div class="modal-foot" style="padding:0;margin-top:16px;border-top:0">
+              <button class="btn btn-success" onclick="saveExams('${patient.id}')">Salvar exames</button>
+            </div>
+          </div>
+        `;
+      }
+
+      if (context === 'triagem' || context === 'acompanhamento') {
+        const triageBlocked = !patient.asoCadastrado || counts.done !== counts.total;
+        content += `
+          <div class="card" style="padding:16px">
+            <div class="row-title" style="margin-bottom:12px">Triagem</div>
+            ${triageBlocked ? `
+              <div class="summary-item">
+                <div>Paciente bloqueado para triagem</div>
+                <div>${badge('Bloqueado')}</div>
+              </div>
+              <div class="small" style="margin-top:12px">
+                ${!patient.asoCadastrado ? 'ASO não cadastrado pela recepção.' : 'Ainda existem exames pendentes.'}
+              </div>
+            ` : `
+              <div class="field">
+                <label>Observações da triagem</label>
+                <textarea id="triagem-obs">${patient.triagem.observacoes || ''}</textarea>
+              </div>
+              <div class="modal-foot" style="padding:0;margin-top:16px;border-top:0">
+                <button class="btn btn-primary" onclick="finishTriage('${patient.id}')">Liberar para médico</button>
+              </div>
+            `}
+          </div>
+        `;
+      }
+
+      if (context === 'medico' || context === 'acompanhamento') {
+        content += `
+          <div class="card" style="padding:16px">
+            <div class="row-title" style="margin-bottom:12px">Médico do trabalho</div>
+            ${patient.etapa !== 'Médico' && !patient.medico.resultado ? `<div class="small" style="margin-bottom:14px">O paciente ainda não está liberado para o médico.</div>` : ''}
+            <div class="form-grid">
+              <div class="field">
+                <label>Nome do médico</label>
+                <input id="medico-nome" value="${patient.medico.nome || 'Dra. Kátia Dutra'}">
+              </div>
+              <div class="field">
+                <label>Resultado do ASO</label>
+                <select id="medico-resultado">
+                  <option value="">Selecione</option>
+                  <option value="Apto" ${patient.medico.resultado === 'Apto' ? 'selected' : ''}>Apto</option>
+                  <option value="Inapto" ${patient.medico.resultado === 'Inapto' ? 'selected' : ''}>Inapto</option>
+                  <option value="Pendente" ${patient.medico.resultado === 'Pendente' ? 'selected' : ''}>Pendente</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Pendência</label>
+                <input id="medico-pendencia" value="${patient.medico.pendencia || ''}" placeholder="Motivo da pendência, se houver">
+              </div>
+              <div class="field">
+                <label>Observações</label>
+                <textarea id="medico-obs">${patient.medico.observacoes || ''}</textarea>
+              </div>
+            </div>
+            <div class="modal-foot" style="padding:0;margin-top:16px;border-top:0">
+              <button class="btn btn-warning" onclick="finishMedical('${patient.id}')">Salvar decisão médica</button>
+            </div>
+          </div>
+        `;
+      }
+
+      document.getElementById('modalPatientBody').innerHTML = content;
+    }
+
+    function closePatientModal() {
+      document.getElementById('patientModal').classList.remove('open');
+    }
+
+    function saveReception(id) {
+      const patient = findPatient(id);
+      patient.asoCadastrado = document.getElementById('edit-aso-cadastrado').value === 'true';
+      patient.obsCadastro = document.getElementById('edit-obs-cadastro').value.trim();
+      patient.medico.resultado = patient.medico.resultado || '';
+      updateFlow(patient);
+      savePatients();
+      refreshAll();
+      openPatientModal(id, 'recepcao');
+    }
+
+    function saveExams(id) {
+      const patient = findPatient(id);
+      patient.exames.forEach(ex => {
+        const el = document.getElementById(`exam-${id}-${ex.key}`);
+        if (el) ex.status = el.value;
+      });
+      updateFlow(patient);
+      savePatients();
+      refreshAll();
+      openPatientModal(id, 'exames');
+    }
+
+    function finishTriage(id) {
+      const patient = findPatient(id);
+      const counts = getExamCounts(patient);
+      if (!patient.asoCadastrado) {
+        alert('Este paciente está bloqueado: a recepção ainda não cadastrou o ASO.');
+        return;
+      }
+      if (counts.done !== counts.total) {
+        alert('A triagem só pode liberar pacientes com todos os exames ocupacionais concluídos.');
+        return;
+      }
+      patient.triagem.status = 'Concluído';
+      patient.triagem.data = new Date().toISOString().slice(0,10);
+      patient.triagem.observacoes = document.getElementById('triagem-obs')?.value.trim() || '';
+      updateFlow(patient);
+      savePatients();
+      refreshAll();
+      closePatientModal();
+    }
+
+    function finishMedical(id) {
+      const patient = findPatient(id);
+      const result = document.getElementById('medico-resultado').value;
+      if (!result) {
+        alert('Selecione o resultado do ASO.');
+        return;
+      }
+      patient.medico.nome = document.getElementById('medico-nome').value.trim();
+      patient.medico.resultado = result;
+      patient.medico.pendencia = document.getElementById('medico-pendencia').value.trim();
+      patient.medico.observacoes = document.getElementById('medico-obs').value.trim();
+      patient.medico.data = new Date().toISOString().slice(0,10);
+      if (result === 'Pendente' && !patient.medico.pendencia) {
+        alert('Informe a pendência para manter o ASO pendente.');
+        return;
+      }
+      updateFlow(patient);
+      savePatients();
+      refreshAll();
+      closePatientModal();
+    }
+
+    function openNewModal() {
+      document.getElementById('newModal').classList.add('open');
+    }
+
+    function closeNewModal() {
+      document.getElementById('newModal').classList.remove('open');
+      document.getElementById('newAttendanceForm').reset();
+      document.querySelectorAll('#examChecklist input[type="checkbox"]').forEach(i => i.checked = false);
+      document.querySelector('#newAttendanceForm [name="dataAtendimento"]').value = new Date().toISOString().slice(0,10);
+    }
+
+    function setupNewAttendance() {
+      document.getElementById('examChecklist').innerHTML = EXAM_ORDER.map(ex => `
+        <label class="check">
+          <input type="checkbox" value="${ex.key}">
+          <span>${ex.nome}</span>
+        </label>
+      `).join('');
+      document.querySelector('#newAttendanceForm [name="dataAtendimento"]').value = new Date().toISOString().slice(0,10);
+      document.getElementById('newAttendanceForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const form = new FormData(e.target);
+        const maxOrder = Math.max(0, ...patients.map(p => p.ordem || 0));
+        const nextIdNum = Math.max(0, ...patients.map(p => Number(String(p.id).replace(/\D/g,'')) || 0)) + 1;
+        const selected = new Set(Array.from(document.querySelectorAll('#examChecklist input[type="checkbox"]:checked')).map(i => i.value));
+        const patient = {
+          ordem: maxOrder + 1,
+          id: 'AT-' + String(nextIdNum).padStart(4, '0'),
+          dataAtendimento: form.get('dataAtendimento') || new Date().toISOString().slice(0,10),
+          retorno: 'Não',
+          dataRetorno: '',
+          cnpj: '',
+          empresa: form.get('empresa') || '',
+          obra: '',
+          cei: '',
+          preferencial: 'Não',
+          nome: form.get('nome') || '',
+          nomeSocial: '',
+          setor: form.get('setor') || '',
+          funcao: form.get('funcao') || '',
+          cpf: form.get('cpf') || '',
+          dataNascimento: '',
+          sexo: '',
+          telefone: form.get('telefone') || '',
+          email: '',
+          endereco: '',
+          cep: '',
+          tipoAtendimento: form.get('tipoAtendimento') || 'Admissional',
+          grupoServico: 'EXAMES OCUPACIONAIS',
+          servico: 'SERVIÇOS MÉDICOS OCUPACIONAIS',
+          rxTipo: '',
+          labTipo: '',
+          obsCadastro: form.get('obsCadastro') || '',
+          asoCadastrado: form.get('asoCadastrado') === 'true',
+          etapa: 'Recepção',
+          statusAtendimento: 'Pendente',
+          exames: EXAM_ORDER.map(ex => ({
+            key: ex.key,
+            nome: ex.nome,
+            status: selected.has(ex.key) ? 'Pendente' : 'Não se aplica'
+          })),
+          triagem: { status: 'Bloqueado', data: '', observacoes: '' },
+          medico: { nome: '', resultado: '', data: '', pendencia: '', observacoes: '' }
+        };
+        updateFlow(patient);
+        patients.push(patient);
+        savePatients();
+        refreshAll();
+        closeNewModal();
+        setPage('recepcao');
+      });
+    }
+
+    function setPage(page) {
+      currentPage = page;
+      Object.keys(PAGE_META).forEach(key => {
+        document.getElementById('page-' + key).classList.toggle('hidden', key !== page);
+      });
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.page === page);
+      });
+      document.getElementById('pageTitle').textContent = PAGE_META[page][0];
+      document.getElementById('pageSubtitle').textContent = PAGE_META[page][1];
+      if (page === 'dashboard') renderDashboard();
+      if (page === 'recepcao') renderRecepcao();
+      if (page === 'exames') renderExames();
+      if (page === 'triagem') renderTriagem();
+      if (page === 'medico') renderMedico();
+      if (page === 'acompanhamento') renderAcompanhamento();
+    }
+
+    function refreshAll() {
+      renderDashboard();
+      renderRecepcao();
+      renderExames();
+      renderTriagem();
+      renderMedico();
+      renderAcompanhamento();
+      setPage(currentPage);
+    }
+
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => setPage(btn.dataset.page)));
+    document.getElementById('btnNovoAtendimento').addEventListener('click', openNewModal);
+    document.getElementById('btnRestaurar').addEventListener('click', restoreBase);
+    document.getElementById('patientModal').addEventListener('click', (e) => {
+      if (e.target.id === 'patientModal') closePatientModal();
+    });
+    document.getElementById('newModal').addEventListener('click', (e) => {
+      if (e.target.id === 'newModal') closeNewModal();
+    });
+
+    setupNewAttendance();
+    syncAllFlows();
+    setPage('dashboard');
+  </script>
+</body>
+</html>
