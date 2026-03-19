@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SESI Saúde Paulista • Fluxo Ocupacional</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     :root {
       --bg: #0b1220;
@@ -161,6 +162,13 @@
       display: flex; gap: 10px; align-items: center; padding: 12px 14px; border-radius: 14px;
       background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.06);
     }
+    .check strong { display:block; }
+    .check small { display:block; color: var(--muted); margin-top: 2px; }
+    .exam-extra-fields {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
 
     .table-wrap {
       overflow: auto; border-radius: 18px; border: 1px solid rgba(255,255,255,.06);
@@ -198,6 +206,16 @@
       display: inline-flex; align-items: center; gap: 6px;
       border-radius: 999px; padding: 6px 10px; font-size: 11px;
       background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.06);
+    }
+    .chip-flow-aso {
+      background: rgba(34, 197, 94, .14);
+      border-color: rgba(34, 197, 94, .22);
+      color: #86efac;
+    }
+    .chip-flow-exames {
+      background: rgba(56, 189, 248, .14);
+      border-color: rgba(56, 189, 248, .22);
+      color: #7dd3fc;
     }
     .progress {
       height: 10px; background: rgba(255,255,255,.07);
@@ -248,6 +266,47 @@
       padding: 14px; border-radius: 16px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.05);
     }
 
+
+    .matrix-table table { min-width: 1400px; }
+    .matrix-table th:first-child,
+    .matrix-table td:first-child {
+      position: sticky; left: 0; z-index: 2; background: rgba(15,22,36,.98);
+    }
+    .matrix-table tbody td:first-child { background: rgba(12,18,31,.98); }
+    .status-cell {
+      min-width: 140px;
+    }
+    .status-dot-cell {
+      min-width: 72px;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .signal-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      display: inline-block;
+      border: 2px solid rgba(255,255,255,.14);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.03);
+    }
+    .signal-pendente { background: #facc15; }
+    .signal-andamento { background: #60a5fa; }
+    .signal-concluido { background: #4ade80; }
+    .signal-bloqueado { background: #f87171; }
+    .signal-empty {
+      background: transparent;
+      border-color: rgba(255,255,255,.08);
+      box-shadow: none;
+    }
+    .status-block {
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .obs-box {
+      padding: 12px 14px; border-radius: 14px;
+      background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+      color: var(--muted); font-size: 13px;
+    }
+
     @media (max-width: 1200px) {
       .grid-4 { grid-template-columns: repeat(2, 1fr); }
       .grid-2, .split { grid-template-columns: 1fr; }
@@ -261,7 +320,7 @@
     }
     @media (max-width: 720px) {
       .main { padding: 14px; }
-      .grid-4, .form-grid, .form-grid-3, .exam-checklist { grid-template-columns: 1fr; }
+      .grid-4, .form-grid, .form-grid-3, .exam-checklist, .exam-extra-fields { grid-template-columns: 1fr; }
       .timeline-item { grid-template-columns: 1fr; }
       .topbar h2 { font-size: 22px; }
       table { min-width: 760px; }
@@ -286,6 +345,7 @@
         <button class="nav-btn" data-page="triagem"><span class="left"><span>🚦</span><span>Triagem</span></span><span>›</span></button>
         <button class="nav-btn" data-page="medico"><span class="left"><span>👨‍⚕️</span><span>Médico do Trabalho</span></span><span>›</span></button>
         <button class="nav-btn" data-page="acompanhamento"><span class="left"><span>🗂️</span><span>Acompanhamento</span></span><span>›</span></button>
+        <button class="nav-btn" data-page="relatorios"><span class="left"><span>📑</span><span>Relatórios</span></span><span>›</span></button>
       </nav>
 
       <div class="sidebar-footer">
@@ -312,6 +372,7 @@
       <section id="page-triagem" class="content hidden"></section>
       <section id="page-medico" class="content hidden"></section>
       <section id="page-acompanhamento" class="content hidden"></section>
+      <section id="page-relatorios" class="content hidden"></section>
     </main>
   </div>
 
@@ -353,13 +414,19 @@
           </div>
           <div class="field"><label>Data de atendimento</label><input type="date" name="dataAtendimento"></div>
           <div class="field"><label>Telefone</label><input name="telefone"></div>
+          <div class="field"><label>Atendimento preferencial?</label>
+            <select name="preferencial">
+              <option value="Não">Não</option>
+              <option value="Sim">Sim</option>
+            </select>
+          </div>
           <div class="field"><label>Setor</label><input name="setor"></div>
           <div class="field"><label>Função</label><input name="funcao"></div>
         </div>
 
         <div class="field">
           <label>ASO cadastrado na recepção?</label>
-          <select name="asoCadastrado">
+          <select name="asoCadastrado" id="asoCadastradoSelect">
             <option value="true">Sim</option>
             <option value="false">Não</option>
           </select>
@@ -368,6 +435,17 @@
         <div>
           <div class="small" style="margin-bottom:8px">Exames ocupacionais em ordem de cadastro</div>
           <div class="exam-checklist" id="examChecklist"></div>
+        </div>
+
+        <div class="exam-extra-fields">
+          <div class="field hidden" id="rxTipoField">
+            <label>Tipo de RX</label>
+            <textarea name="rxTipo" placeholder="Descreva o tipo de RX solicitado."></textarea>
+          </div>
+          <div class="field hidden" id="labTipoField">
+            <label>Tipo de Exame Laboratorial</label>
+            <textarea name="labTipo" placeholder="Descreva o(s) exame(s) laboratoriais solicitado(s)."></textarea>
+          </div>
         </div>
 
         <div class="field">
@@ -402,7 +480,8 @@
       exames: ['Exames Ocupacionais', 'Fila em linha seguindo a ordem de cadastro.'],
       triagem: ['Triagem', 'Somente pacientes com ASO cadastrado e exames concluídos.'],
       medico: ['Médico do Trabalho', 'Fila em linha para atendimento final e decisão do ASO.'],
-      acompanhamento: ['Acompanhamento', 'Visão moderna dos exames realizados, pendentes e bloqueios.']
+      acompanhamento: ['Acompanhamento', 'Visão moderna dos exames realizados, pendentes e bloqueios.'],
+      relatorios: ['Relatórios', 'Consolidação dos atendimentos com exportação para Excel.']
     };
 
     let patients = loadPatients();
@@ -415,10 +494,22 @@
 
     function loadPatients() {
       const saved = localStorage.getItem(STORAGE_KEY);
+      let data = null;
       if (saved) {
-        try { return JSON.parse(saved); } catch (e) {}
+        try { data = JSON.parse(saved); } catch (e) {}
       }
-      return clone(INITIAL_PATIENTS);
+      if (!Array.isArray(data)) data = clone(INITIAL_PATIENTS);
+      return data.map(patient => ({
+        ...patient,
+        preferencial: patient.preferencial === 'Sim' ? 'Sim' : 'Não'
+      }));
+    }
+
+    function compareQueueOrder(a, b) {
+      const aPreferencial = a.preferencial === 'Sim' ? 1 : 0;
+      const bPreferencial = b.preferencial === 'Sim' ? 1 : 0;
+      if (aPreferencial !== bPreferencial) return bPreferencial - aPreferencial;
+      return (a.ordem || 0) - (b.ordem || 0);
     }
 
     function savePatients() {
@@ -462,6 +553,15 @@
       return 'Pendente';
     }
 
+    function getAttendanceType(patient) {
+      return patient.asoCadastrado ? 'Com ASO' : 'Somente exames';
+    }
+
+    function attendanceChip(patient) {
+      const withAso = patient.asoCadastrado;
+      return `<span class="chip ${withAso ? 'chip-flow-aso' : 'chip-flow-exames'}">${withAso ? '🩺 Com ASO' : '🧪 Somente exames'}</span>`;
+    }
+
     function badge(status) {
       const map = {
         'Pendente': ['🟡', 'st-pendente'],
@@ -474,6 +574,19 @@
       };
       const [emoji, css] = map[status] || ['🔵', 'st-andamento'];
       return `<span class="status ${css}">${emoji} ${status}</span>`;
+    }
+
+
+    function examSignal(status) {
+      const map = {
+        'Pendente': 'signal-pendente',
+        'Em andamento': 'signal-andamento',
+        'Concluído': 'signal-concluido',
+        'Bloqueado': 'signal-bloqueado'
+      };
+      const css = map[status] || 'signal-empty';
+      const title = status === 'Não se aplica' || !status ? '' : status;
+      return `<span class="signal-dot ${css}" title="${title}" aria-label="${title}"></span>`;
     }
 
     function updateFlow(patient) {
@@ -562,25 +675,52 @@
     function patientRow(page, patient) {
       const counts = getExamCounts(patient);
       const blockedTriagem = !patient.asoCadastrado ? 'ASO não cadastrado na recepção' : (counts.done !== counts.total ? 'Exames pendentes' : 'Liberado');
+      const examDetails = [];
+      if (page === 'exames') {
+        const rxExam = patient.exames.find(ex => ex.key === 'rx');
+        const labExam = patient.exames.find(ex => ex.key === 'lab');
+        if (rxExam && rxExam.status !== 'Não se aplica' && patient.rxTipo) {
+          examDetails.push(`<div class="small" style="margin-top:6px"><strong>RX:</strong> ${maskText(patient.rxTipo)}</div>`);
+        }
+        if (labExam && labExam.status !== 'Não se aplica' && patient.labTipo) {
+          examDetails.push(`<div class="small" style="margin-top:6px"><strong>Exames laboratoriais:</strong> ${maskText(patient.labTipo)}</div>`);
+        }
+      }
       return `
         <tr>
           <td>
             <div class="row-title">${patient.nome}</div>
             <div class="small mono">${patient.id} • ${maskText(patient.cpf)}</div>
+            <div class="small">${maskText(patient.setor)} • ${maskText(patient.funcao)}</div>
+            <div class="chips" style="margin-top:8px">
+              ${attendanceChip(patient)}
+              ${patient.preferencial === 'Sim' ? '<span class="chip">⭐ Preferencial</span>' : ''}
+            </div>
           </td>
           <td>
             <div>${maskText(patient.empresa)}</div>
             <div class="small">${maskText(patient.tipoAtendimento)}</div>
+            <div class="small">${maskText(patient.setor)} • ${maskText(patient.funcao)}</div>
           </td>
           <td>${badge(getStageStatus(patient))}</td>
-          <td>${progressHtml(patient)}</td>
+          <td>
+            ${attendanceChip(patient)}
+            <div class="small" style="margin-top:6px">${patient.asoCadastrado ? 'Fluxo completo com triagem e médico' : 'Fluxo apenas de exames ocupacionais'}</div>
+          </td>
+          <td>
+            ${progressHtml(patient)}
+            ${examDetails.join('')}
+          </td>
           <td>
             <div class="chips">
               <span class="chip">ASO recepção: ${badge(patient.asoCadastrado ? 'Concluído' : 'Bloqueado')}</span>
               <span class="chip">Triagem: ${badge(patient.triagem.status)}</span>
             </div>
           </td>
-          <td><div class="small">${blockedTriagem}</div></td>
+          <td>
+            <div class="small">${blockedTriagem}</div>
+            ${page === 'exames' && examDetails.length ? `<div class="small" style="margin-top:8px">Detalhes do cadastro exibidos para RX e laboratório.</div>` : ''}
+          </td>
           <td>${actionButtonsFor(page, patient)}</td>
         </tr>
       `;
@@ -656,10 +796,17 @@
                   </tr>
                 </thead>
                 <tbody>
-                  ${patients.slice().sort((a,b) => a.ordem - b.ordem).map(p => `
+                  ${patients.slice().sort(compareQueueOrder).map(p => `
                     <tr>
-                      <td><div class="row-title">${p.nome}</div><div class="small mono">${p.id}</div></td>
-                      <td>${maskText(p.empresa)}</td>
+                      <td>
+                        <div class="row-title">${p.nome}</div>
+                        <div class="small mono">${p.id}</div>
+                        <div class="small">${maskText(p.setor)} • ${maskText(p.funcao)}</div>
+                      </td>
+                      <td>
+                        <div>${maskText(p.empresa)}</div>
+                        <div class="small">${attendanceChip(p)}</div>
+                      </td>
                       <td>${badge(getStageStatus(p))}</td>
                       <td>${progressHtml(p)}</td>
                       <td><div class="chips"><span class="chip">Triagem: ${badge(p.triagem.status)}</span><span class="chip">ASO recepção: ${badge(p.asoCadastrado ? 'Concluído' : 'Bloqueado')}</span></div></td>
@@ -728,7 +875,7 @@
 
     function renderQueuePage(pageId, pageKey, filterFn, extraColumns = '') {
       const page = document.getElementById(pageId);
-      const queue = patients.slice().sort((a,b) => a.ordem - b.ordem).filter(filterFn);
+      const queue = patients.slice().sort(compareQueueOrder).filter(filterFn);
       page.innerHTML = `
         <div class="card">
           <div class="filters">
@@ -741,13 +888,14 @@
                   <th>Paciente</th>
                   <th>Empresa / Tipo</th>
                   <th>Status</th>
+                  <th>Fluxo</th>
                   <th>Progresso</th>
                   <th>Regras do fluxo</th>
                   <th>Ações</th>
                 </tr>
               </thead>
               <tbody id="tbody-${pageKey}">
-                ${queue.length ? queue.map(p => patientRow(pageKey, p)).join('') : `<tr><td colspan="6"><div class="small">Nenhum paciente nesta etapa.</div></td></tr>`}
+                ${queue.length ? queue.map(p => patientRow(pageKey, p)).join('') : `<tr><td colspan="7"><div class="small">Nenhum paciente nesta etapa.</div></td></tr>`}
               </tbody>
             </table>
           </div>
@@ -755,13 +903,13 @@
       `;
       document.getElementById(`search-${pageKey}`).addEventListener('input', (e) => {
         const term = e.target.value.toLowerCase();
-        const filtered = queue.filter(p => [p.nome, p.id, p.cpf, p.empresa].some(v => (v || '').toLowerCase().includes(term)));
-        document.getElementById(`tbody-${pageKey}`).innerHTML = filtered.length ? filtered.map(p => patientRow(pageKey, p)).join('') : `<tr><td colspan="6"><div class="small">Nenhum resultado encontrado.</div></td></tr>`;
+        const filtered = queue.filter(p => [p.nome, p.id, p.cpf, p.empresa, p.setor, p.funcao].some(v => (v || '').toLowerCase().includes(term)));
+        document.getElementById(`tbody-${pageKey}`).innerHTML = filtered.length ? filtered.map(p => patientRow(pageKey, p)).join('') : `<tr><td colspan="7"><div class="small">Nenhum resultado encontrado.</div></td></tr>`;
       });
     }
 
     function renderRecepcao() {
-      renderQueuePage('page-recepcao', 'recepcao', p => p.etapa === 'Recepção');
+      renderQueuePage('page-recepcao', 'recepcao', () => true);
     }
 
     function renderExames() {
@@ -777,87 +925,242 @@
     }
 
     function renderAcompanhamento() {
-      const items = patients.slice().sort((a,b) => a.ordem - b.ordem);
+      const items = patients.slice().sort(compareQueueOrder);
       document.getElementById('page-acompanhamento').innerHTML = `
         <div class="card">
           <div class="filters">
             <div class="search"><span>🔎</span><input id="search-acompanhamento" placeholder="Buscar paciente para acompanhamento"></div>
+            <div class="chips">
+              <span class="chip"><span class="signal-dot signal-pendente"></span> Vai ser realizado</span>
+              <span class="chip"><span class="signal-dot signal-andamento"></span> Em andamento</span>
+              <span class="chip"><span class="signal-dot signal-concluido"></span> Realizado</span>
+              <span class="chip"><span class="signal-dot signal-bloqueado"></span> Bloqueado</span>
+            </div>
           </div>
-          <div id="acompanhamentoList" class="summary-list">
-            ${items.map(renderFollowItem).join('')}
+          <div class="table-wrap matrix-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Paciente</th>
+                  <th>Empresa / Setor / Função</th>
+                  <th>Fluxo</th>
+                  <th>Etapa</th>
+                  <th>Audiometria</th>
+                  <th>Acuidade Visual</th>
+                  <th>Espirometria</th>
+                  <th>ECG</th>
+                  <th>EEG</th>
+                  <th>RX</th>
+                  <th>Exames Laboratoriais</th>
+                  <th>Avaliação Psicossocial</th>
+                  <th>Triagem</th>
+                  <th>Médico</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-acompanhamento">
+                ${items.length ? items.map(renderFollowRow).join('') : `<tr><td colspan="15"><div class="small">Nenhum paciente cadastrado.</div></td></tr>`}
+              </tbody>
+            </table>
           </div>
         </div>
       `;
       document.getElementById('search-acompanhamento').addEventListener('input', (e) => {
         const term = e.target.value.toLowerCase();
-        const filtered = items.filter(p => [p.nome, p.id, p.cpf, p.empresa].some(v => (v || '').toLowerCase().includes(term)));
-        document.getElementById('acompanhamentoList').innerHTML = filtered.length ? filtered.map(renderFollowItem).join('') : `<div class="small">Nenhum resultado encontrado.</div>`;
+        const filtered = items.filter(p => [p.nome, p.id, p.cpf, p.empresa, p.setor, p.funcao].some(v => (v || '').toLowerCase().includes(term)));
+        document.getElementById('tbody-acompanhamento').innerHTML = filtered.length ? filtered.map(renderFollowRow).join('') : `<tr><td colspan="15"><div class="small">Nenhum resultado encontrado.</div></td></tr>`;
       });
     }
 
-    function renderFollowItem(patient) {
-      const counts = getExamCounts(patient);
-      const realizados = patient.exames.filter(ex => ex.status === 'Concluído');
-      const pendentes = patient.exames.filter(ex => ex.status === 'Pendente');
-      const naoAplicaveis = patient.exames.filter(ex => ex.status === 'Não se aplica');
+    function renderFollowRow(patient) {
+      const examCell = (key) => {
+        const ex = patient.exames.find(item => item.key === key);
+        return `<td class="status-dot-cell">${examSignal(ex?.status || 'Não se aplica')}</td>`;
+      };
+      const medicalStatus = patient.medico.resultado
+        ? (patient.medico.resultado === 'Pendente' ? 'Bloqueado' : 'Concluído')
+        : (patient.etapa === 'Médico' ? 'Em andamento' : 'Pendente');
+      const triagemStatus = patient.triagem?.status || 'Pendente';
       return `
-        <div class="card" style="padding:16px">
-          <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start">
-            <div>
-              <div class="row-title">${patient.nome}</div>
-              <div class="small mono">${patient.id} • ${maskText(patient.cpf)} • ${maskText(patient.empresa)}</div>
-            </div>
-            <div class="chips">
-              <span class="chip">Etapa: ${badge(getStageStatus(patient))}</span>
-              <span class="chip">Triagem: ${badge(patient.triagem.status)}</span>
-              <span class="chip">ASO recepção: ${badge(patient.asoCadastrado ? 'Concluído' : 'Bloqueado')}</span>
-            </div>
+        <tr>
+          <td>
+            <div class="row-title">${patient.nome}</div>
+            <div class="small mono">${patient.id} • ${maskText(patient.cpf)}</div>
+            <div class="small">${maskText(patient.setor)} • ${maskText(patient.funcao)}</div>
+          </td>
+          <td>
+            <div>${maskText(patient.empresa)}</div>
+            <div class="small">${maskText(patient.tipoAtendimento)}</div>
+            <div class="small">${maskText(patient.setor)} • ${maskText(patient.funcao)}</div>
+          </td>
+          <td>${attendanceChip(patient)}</td>
+          <td>${badge(getStageStatus(patient))}</td>
+          ${examCell('audiometria')}
+          ${examCell('acuidade')}
+          ${examCell('espirometria')}
+          ${examCell('ecg')}
+          ${examCell('eeg')}
+          ${examCell('rx')}
+          ${examCell('lab')}
+          ${examCell('psicossocial')}
+          <td class="status-dot-cell">${examSignal(triagemStatus)}</td>
+          <td class="status-dot-cell">${examSignal(medicalStatus)}</td>
+        </tr>
+      `;
+    }
+
+    function getMedicalStatus(patient) {
+      return patient.medico.resultado
+        ? (patient.medico.resultado === 'Pendente' ? 'Bloqueado' : 'Concluído')
+        : (patient.etapa === 'Médico' ? 'Em andamento' : 'Pendente');
+    }
+
+    function getReportsData() {
+      return patients.slice().sort(compareQueueOrder).map(patient => {
+        const counts = getExamCounts(patient);
+        const examesAplicaveis = patient.exames.filter(ex => ex.status !== 'Não se aplica');
+        const examesRealizados = examesAplicaveis.filter(ex => ex.status === 'Concluído').map(ex => ex.nome).join(', ');
+        const examesPendentes = examesAplicaveis.filter(ex => ex.status !== 'Concluído').map(ex => ex.nome).join(', ');
+        return {
+          'Ordem': patient.ordem,
+          'ID Atendimento': patient.id,
+          'Data Atendimento': patient.dataAtendimento || '',
+          'Paciente': patient.nome || '',
+          'CPF': patient.cpf || '',
+          'Empresa': patient.empresa || '',
+          'Setor': patient.setor || '',
+          'Função': patient.funcao || '',
+          'Preferencial': patient.preferencial || 'Não',
+          'Tipo Atendimento': patient.tipoAtendimento || '',
+          'ASO Recepção': patient.asoCadastrado ? 'Sim' : 'Não',
+          'Etapa Atual': patient.etapa || '',
+          'Status Atendimento': patient.statusAtendimento || '',
+          'Exames Aplicáveis': examesAplicaveis.map(ex => ex.nome).join(', '),
+          'Exames Realizados': examesRealizados,
+          'Exames Pendentes': examesPendentes,
+          'Qtde Exames': counts.total,
+          'Qtde Concluídos': counts.done,
+          'Qtde Pendentes': counts.pending,
+          'Triagem Status': patient.triagem?.status || '',
+          'Triagem Data': patient.triagem?.data || '',
+          'Observação Triagem': patient.triagem?.observacoes || '',
+          'Médico Status': getMedicalStatus(patient),
+          'Médico Nome': patient.medico?.nome || '',
+          'Resultado ASO': patient.medico?.resultado || '',
+          'Data Médico': patient.medico?.data || '',
+          'Pendência Médico': patient.medico?.pendencia || '',
+          'Observação Médico': patient.medico?.observacoes || '',
+          'Observação Cadastro': patient.obsCadastro || '',
+          'RX Tipo': patient.rxTipo || '',
+          'Laboratorial Tipo': patient.labTipo || ''
+        };
+      });
+    }
+
+    function exportReportsExcel() {
+      const rows = getReportsData();
+      if (!rows.length) {
+        alert('Não há dados para exportar.');
+        return;
+      }
+      if (typeof XLSX === 'undefined') {
+        alert('Biblioteca de exportação não carregada.');
+        return;
+      }
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Relatórios');
+      const filename = `relatorios_atendimento_ocupacional_${new Date().toISOString().slice(0,10)}.xlsx`;
+      XLSX.writeFile(workbook, filename);
+    }
+
+    function renderReports() {
+      const rows = getReportsData();
+      const total = rows.length;
+      const concluidos = patients.filter(p => p.etapa === 'Concluído').length;
+      const emAndamento = patients.filter(p => ['Exames','Triagem','Médico'].includes(p.etapa)).length;
+      const bloqueados = patients.filter(p => p.statusAtendimento === 'Bloqueado').length;
+      document.getElementById('page-relatorios').innerHTML = `
+        <div class="grid-4">
+          <div class="card kpi"><div class="label">Atendimentos</div><div class="value">${total}</div><div class="hint">Todos os registros consolidados</div></div>
+          <div class="card kpi"><div class="label">Concluídos</div><div class="value">${concluidos}</div><div class="hint">ASO finalizado pelo médico</div></div>
+          <div class="card kpi"><div class="label">Em andamento</div><div class="value">${emAndamento}</div><div class="hint">Fluxos ativos no atendimento</div></div>
+          <div class="card kpi"><div class="label">Bloqueados</div><div class="value">${bloqueados}</div><div class="hint">Aguardando regularização do fluxo</div></div>
+        </div>
+        <div class="card">
+          <div class="filters">
+            <div class="search"><span>🔎</span><input id="search-relatorios" placeholder="Buscar por paciente, ID, CPF, empresa ou médico"></div>
+            <button class="btn btn-success" id="btnExportarExcel">Exportar Excel</button>
           </div>
-
-          <div style="margin:14px 0 10px">${progressHtml(patient)}</div>
-
-          <div class="split">
-            <div>
-              <div class="small" style="margin-bottom:8px">Exames realizados</div>
-              <div class="chips">${realizados.length ? realizados.map(ex => `<span class="chip">${badge('Concluído')} ${ex.nome}</span>`).join('') : '<span class="chip">Nenhum realizado</span>'}</div>
-            </div>
-            <div>
-              <div class="small" style="margin-bottom:8px">Exames pendentes / bloqueios</div>
-              <div class="chips">
-                ${pendentes.length ? pendentes.map(ex => `<span class="chip">${badge('Pendente')} ${ex.nome}</span>`).join('') : ''}
-                ${!patient.asoCadastrado ? `<span class="chip">${badge('Bloqueado')} Sem ASO cadastrado na recepção</span>` : ''}
-                ${!pendentes.length && patient.asoCadastrado ? `<span class="chip">${badge('Concluído')} Sem pendências</span>` : ''}
-                ${naoAplicaveis.slice(0,3).map(ex => `<span class="chip">${badge('Não se aplica')} ${ex.nome}</span>`).join('')}
-              </div>
-            </div>
-          </div>
-
-          <div class="timeline" style="margin-top:14px">
-            <div class="timeline-item">
-              <div class="small">Recepção</div>
-              <div>
-                <div>${patient.asoCadastrado ? badge('Concluído') : badge('Bloqueado')}</div>
-                <div class="small">Cadastro em ${formatDate(patient.dataAtendimento)} • Tipo: ${maskText(patient.tipoAtendimento)}</div>
-              </div>
-            </div>
-            <div class="timeline-item">
-              <div class="small">Triagem</div>
-              <div>
-                <div>${badge(patient.triagem.status)}</div>
-                <div class="small">${patient.triagem.observacoes || (patient.triagem.status === 'Concluído' ? 'Paciente liberado para médico.' : 'Aguardando requisitos do fluxo.')}</div>
-              </div>
-            </div>
-            <div class="timeline-item">
-              <div class="small">Médico</div>
-              <div>
-                <div>${badge(patient.medico.resultado ? (patient.medico.resultado === 'Pendente' ? 'Bloqueado' : 'Concluído') : (patient.etapa === 'Médico' ? 'Em andamento' : 'Pendente'))}</div>
-                <div class="small">${patient.medico.resultado ? `Resultado: ${patient.medico.resultado}` : 'Ainda não finalizado.'} ${patient.medico.pendencia ? '• ' + patient.medico.pendencia : ''}</div>
-              </div>
-            </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Paciente</th>
+                  <th>Empresa</th>
+                  <th>Atendimento</th>
+                  <th>Etapa</th>
+                  <th>Exames</th>
+                  <th>Triagem</th>
+                  <th>Médico</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-relatorios">
+                ${rows.length ? rows.map((row, index) => renderReportRow(patients.slice().sort(compareQueueOrder)[index], row)).join('') : `<tr><td colspan="7"><div class="small">Nenhum relatório disponível.</div></td></tr>`}
+              </tbody>
+            </table>
           </div>
         </div>
       `;
+      document.getElementById('btnExportarExcel').addEventListener('click', exportReportsExcel);
+      document.getElementById('search-relatorios').addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        const ordered = patients.slice().sort(compareQueueOrder);
+        const filtered = ordered.filter(p => [p.nome, p.id, p.cpf, p.empresa, p.medico?.nome, p.setor, p.funcao].some(v => (v || '').toLowerCase().includes(term)));
+        document.getElementById('tbody-relatorios').innerHTML = filtered.length ? filtered.map(p => renderReportRow(p)).join('') : `<tr><td colspan="7"><div class="small">Nenhum resultado encontrado.</div></td></tr>`;
+      });
     }
+
+    function renderReportRow(patient, row = null) {
+      row = row || getReportsData().find(item => item['ID Atendimento'] === patient.id);
+      const examSummary = row['Exames Realizados'] ? `${row['Qtde Concluídos']}/${row['Qtde Exames']} concluídos` : `${row['Qtde Concluídos']}/${row['Qtde Exames']} concluídos`;
+      return `
+        <tr>
+          <td>
+            <div class="row-title">${patient.nome}</div>
+            <div class="small mono">${patient.id} • ${maskText(patient.cpf)}</div>
+          </td>
+          <td>
+            <div>${maskText(patient.empresa)}</div>
+            <div class="small">${maskText(patient.setor)} • ${maskText(patient.funcao)}</div>
+          </td>
+          <td>
+            <div>${maskText(patient.tipoAtendimento)}</div>
+            <div class="small">${patient.preferencial === 'Sim' ? '⭐ Preferencial' : 'Atendimento comum'}</div>
+            <div class="small">${formatDate(patient.dataAtendimento)}</div>
+          </td>
+          <td>
+            <div>${badge(getStageStatus(patient))}</div>
+            <div class="small" style="margin-top:6px">${attendanceChip(patient)}</div>
+            <div class="small" style="margin-top:6px">ASO recepção: ${patient.asoCadastrado ? 'Sim' : 'Não'}</div>
+          </td>
+          <td>
+            <div class="small">${examSummary}</div>
+            <div class="small" style="margin-top:6px"><strong>Realizados:</strong> ${row['Exames Realizados'] || '—'}</div>
+            <div class="small" style="margin-top:6px"><strong>Pendentes:</strong> ${row['Exames Pendentes'] || '—'}</div>
+          </td>
+          <td>
+            <div>${badge(patient.triagem?.status || 'Pendente')}</div>
+            <div class="small" style="margin-top:6px">${patient.triagem?.observacoes || 'Sem observação'}</div>
+          </td>
+          <td>
+            <div>${badge(getMedicalStatus(patient))}</div>
+            <div class="small" style="margin-top:6px">${patient.medico?.nome || '—'} ${patient.medico?.resultado ? '• ' + patient.medico.resultado : ''}</div>
+            <div class="small" style="margin-top:6px">${patient.medico?.pendencia || patient.medico?.observacoes || 'Sem observação'}</div>
+          </td>
+        </tr>
+      `;
+    }
+
 
     function findPatient(id) {
       return patients.find(p => p.id === id);
@@ -877,8 +1180,11 @@
             <div class="row-title" style="margin-bottom:10px">Dados do atendimento</div>
             <div class="summary-list">
               <div class="summary-item"><div>Empresa</div><div>${maskText(patient.empresa)}</div></div>
+              <div class="summary-item"><div>Setor</div><div>${maskText(patient.setor)}</div></div>
+              <div class="summary-item"><div>Função</div><div>${maskText(patient.funcao)}</div></div>
               <div class="summary-item"><div>Tipo</div><div>${maskText(patient.tipoAtendimento)}</div></div>
               <div class="summary-item"><div>CPF</div><div>${maskText(patient.cpf)}</div></div>
+              <div class="summary-item"><div>Fluxo</div><div>${attendanceChip(patient)}</div></div>
               <div class="summary-item"><div>ASO na recepção</div><div>${badge(patient.asoCadastrado ? 'Concluído' : 'Bloqueado')}</div></div>
               <div class="summary-item"><div>Etapa atual</div><div>${badge(getStageStatus(patient))}</div></div>
             </div>
@@ -913,7 +1219,7 @@
               </div>
             </div>
             <div class="modal-foot" style="padding:0;margin-top:16px;border-top:0">
-              <button class="btn btn-primary" onclick="saveReception('${patient.id}')">Salvar recepção</button>
+              <button type="button" class="btn btn-primary" onclick="saveReception('${patient.id}')">Salvar recepção</button>
             </div>
           </div>
         `;
@@ -924,9 +1230,16 @@
           <div class="card" style="padding:16px">
             <div class="row-title" style="margin-bottom:12px">Exames ocupacionais em linha</div>
             <div class="summary-list">
-              ${patient.exames.map(ex => `
+              ${patient.exames.map(ex => {
+                const detailText = ex.key === 'rx'
+                  ? patient.rxTipo
+                  : (ex.key === 'lab' ? patient.labTipo : '');
+                return `
                 <div class="summary-item">
-                  <div>${ex.nome}</div>
+                  <div>
+                    <div>${ex.nome}</div>
+                    ${detailText && ex.status !== 'Não se aplica' ? `<div class="small" style="margin-top:6px"><strong>${ex.key === 'rx' ? 'Tipo de RX' : 'Exames laboratoriais'}:</strong> ${maskText(detailText)}</div>` : ''}
+                  </div>
                   <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
                     <select id="exam-${patient.id}-${ex.key}">
                       <option value="Pendente" ${ex.status === 'Pendente' ? 'selected' : ''}>Pendente</option>
@@ -934,10 +1247,11 @@
                       <option value="Não se aplica" ${ex.status === 'Não se aplica' ? 'selected' : ''}>Não se aplica</option>
                     </select>
                   </div>
-                </div>`).join('')}
+                </div>`;
+              }).join('')}
             </div>
             <div class="modal-foot" style="padding:0;margin-top:16px;border-top:0">
-              <button class="btn btn-success" onclick="saveExams('${patient.id}')">Salvar exames</button>
+              <button type="button" class="btn btn-success" onclick="saveExams('${patient.id}')">Salvar exames</button>
             </div>
           </div>
         `;
@@ -962,7 +1276,7 @@
                 <textarea id="triagem-obs">${patient.triagem.observacoes || ''}</textarea>
               </div>
               <div class="modal-foot" style="padding:0;margin-top:16px;border-top:0">
-                <button class="btn btn-primary" onclick="finishTriage('${patient.id}')">Liberar para médico</button>
+                <button type="button" class="btn btn-primary" onclick="finishTriage('${patient.id}')">Liberar para médico</button>
               </div>
             `}
           </div>
@@ -974,6 +1288,10 @@
           <div class="card" style="padding:16px">
             <div class="row-title" style="margin-bottom:12px">Médico do trabalho</div>
             ${patient.etapa !== 'Médico' && !patient.medico.resultado ? `<div class="small" style="margin-bottom:14px">O paciente ainda não está liberado para o médico.</div>` : ''}
+            <div class="field" style="margin-bottom:14px">
+              <label>Observação registrada na triagem</label>
+              <div class="obs-box">${patient.triagem.observacoes ? patient.triagem.observacoes : 'Nenhuma observação registrada na triagem.'}</div>
+            </div>
             <div class="form-grid">
               <div class="field">
                 <label>Nome do médico</label>
@@ -998,7 +1316,7 @@
               </div>
             </div>
             <div class="modal-foot" style="padding:0;margin-top:16px;border-top:0">
-              <button class="btn btn-warning" onclick="finishMedical('${patient.id}')">Salvar decisão médica</button>
+              <button type="button" class="btn btn-warning" onclick="finishMedical('${patient.id}')">Salvar decisão médica</button>
             </div>
           </div>
         `;
@@ -1024,10 +1342,19 @@
 
     function saveExams(id) {
       const patient = findPatient(id);
+      if (!patient) return;
+      let updated = 0;
       patient.exames.forEach(ex => {
         const el = document.getElementById(`exam-${id}-${ex.key}`);
-        if (el) ex.status = el.value;
+        if (el) {
+          ex.status = el.value;
+          updated += 1;
+        }
       });
+      if (!updated) {
+        alert('Não foi possível localizar os campos dos exames para salvar.');
+        return;
+      }
       updateFlow(patient);
       savePatients();
       refreshAll();
@@ -1084,23 +1411,57 @@
       document.getElementById('newModal').classList.remove('open');
       document.getElementById('newAttendanceForm').reset();
       document.querySelectorAll('#examChecklist input[type="checkbox"]').forEach(i => i.checked = false);
+      document.getElementById('rxTipoField').classList.add('hidden');
+      document.getElementById('labTipoField').classList.add('hidden');
+      const asoSelect = document.getElementById('asoCadastradoSelect');
+      if (asoSelect) asoSelect.value = 'true';
+      const preferencialSelect = document.querySelector('#newAttendanceForm [name="preferencial"]');
+      if (preferencialSelect) preferencialSelect.value = 'Não';
       document.querySelector('#newAttendanceForm [name="dataAtendimento"]').value = new Date().toISOString().slice(0,10);
+    }
+
+    function syncNewAttendanceExamFields() {
+      const rxChecked = document.querySelector('#examChecklist input[value="rx"]')?.checked;
+      const labChecked = document.querySelector('#examChecklist input[value="lab"]')?.checked;
+      document.getElementById('rxTipoField').classList.toggle('hidden', !rxChecked);
+      document.getElementById('labTipoField').classList.toggle('hidden', !labChecked);
     }
 
     function setupNewAttendance() {
       document.getElementById('examChecklist').innerHTML = EXAM_ORDER.map(ex => `
         <label class="check">
           <input type="checkbox" value="${ex.key}">
-          <span>${ex.nome}</span>
+          <span>
+            <strong>${ex.nome}</strong>
+          </span>
         </label>
       `).join('');
+
+      const formEl = document.getElementById('newAttendanceForm');
+      const asoSelect = document.getElementById('asoCadastradoSelect');
+      if (asoSelect) asoSelect.value = 'true';
+      const preferencialSelect = document.querySelector('#newAttendanceForm [name="preferencial"]');
+      if (preferencialSelect) preferencialSelect.value = 'Não';
+      document.querySelectorAll('#examChecklist input[type="checkbox"]').forEach(input => {
+        input.addEventListener('change', syncNewAttendanceExamFields);
+      });
       document.querySelector('#newAttendanceForm [name="dataAtendimento"]').value = new Date().toISOString().slice(0,10);
-      document.getElementById('newAttendanceForm').addEventListener('submit', (e) => {
+      syncNewAttendanceExamFields();
+      formEl.addEventListener('submit', (e) => {
         e.preventDefault();
         const form = new FormData(e.target);
         const maxOrder = Math.max(0, ...patients.map(p => p.ordem || 0));
         const nextIdNum = Math.max(0, ...patients.map(p => Number(String(p.id).replace(/\D/g,'')) || 0)) + 1;
         const selected = new Set(Array.from(document.querySelectorAll('#examChecklist input[type="checkbox"]:checked')).map(i => i.value));
+        const rxTipo = (form.get('rxTipo') || '').toString().trim();
+        const labTipo = (form.get('labTipo') || '').toString().trim();
+        const asoSelecionado = form.get('asoCadastrado') === 'true';
+        const observacoesIniciais = (form.get('obsCadastro') || '').toString().trim();
+        const detalhesCadastro = [
+          observacoesIniciais,
+          selected.has('rx') && rxTipo ? `RX: ${rxTipo}` : '',
+          selected.has('lab') && labTipo ? `Laboratorial: ${labTipo}` : ''
+        ].filter(Boolean).join(' • ');
         const patient = {
           ordem: maxOrder + 1,
           id: 'AT-' + String(nextIdNum).padStart(4, '0'),
@@ -1111,7 +1472,7 @@
           empresa: form.get('empresa') || '',
           obra: '',
           cei: '',
-          preferencial: 'Não',
+          preferencial: form.get('preferencial') || 'Não',
           nome: form.get('nome') || '',
           nomeSocial: '',
           setor: form.get('setor') || '',
@@ -1126,10 +1487,10 @@
           tipoAtendimento: form.get('tipoAtendimento') || 'Admissional',
           grupoServico: 'EXAMES OCUPACIONAIS',
           servico: 'SERVIÇOS MÉDICOS OCUPACIONAIS',
-          rxTipo: '',
-          labTipo: '',
-          obsCadastro: form.get('obsCadastro') || '',
-          asoCadastrado: form.get('asoCadastrado') === 'true',
+          rxTipo: selected.has('rx') ? rxTipo : '',
+          labTipo: selected.has('lab') ? labTipo : '',
+          obsCadastro: detalhesCadastro,
+          asoCadastrado: asoSelecionado,
           etapa: 'Recepção',
           statusAtendimento: 'Pendente',
           exames: EXAM_ORDER.map(ex => ({
@@ -1165,6 +1526,7 @@
       if (page === 'triagem') renderTriagem();
       if (page === 'medico') renderMedico();
       if (page === 'acompanhamento') renderAcompanhamento();
+      if (page === 'relatorios') renderReports();
     }
 
     function refreshAll() {
@@ -1174,6 +1536,7 @@
       renderTriagem();
       renderMedico();
       renderAcompanhamento();
+      renderReports();
       setPage(currentPage);
     }
 
@@ -1186,6 +1549,17 @@
     document.getElementById('newModal').addEventListener('click', (e) => {
       if (e.target.id === 'newModal') closeNewModal();
     });
+
+
+    window.openPatientModal = openPatientModal;
+    window.closePatientModal = closePatientModal;
+    window.openNewModal = openNewModal;
+    window.closeNewModal = closeNewModal;
+    window.saveReception = saveReception;
+    window.saveExams = saveExams;
+    window.finishTriage = finishTriage;
+    window.finishMedical = finishMedical;
+    window.restoreBase = restoreBase;
 
     setupNewAttendance();
     syncAllFlows();
