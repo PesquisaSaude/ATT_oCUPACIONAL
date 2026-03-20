@@ -12,7 +12,7 @@
       --panel: #121a2b;
       --panel-2: #172133;
       --line: #263246;
-      --text: #78c9de;
+      --text: #ecf2ff;
       --muted: #9db0cf;
       --accent: #38bdf8;
       --accent-2: #22c55e;
@@ -141,12 +141,36 @@
       display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px;
     }
     .field input, .field select, .field textarea {
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(15, 23, 42, .92);
+      border: 1px solid rgba(148,163,184,.22);
       color: var(--text);
       padding: 12px 14px;
       border-radius: 14px;
       outline: none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+    }
+    .field input::placeholder, .field textarea::placeholder {
+      color: #94a3b8;
+    }
+    .field select,
+    select[id^="exam-"],
+    #medico-resultado,
+    #edit-aso-cadastrado,
+    #asoCadastradoSelect,
+    #filter-tipo-exame {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-image: linear-gradient(45deg, transparent 50%, #94a3b8 50%), linear-gradient(135deg, #94a3b8 50%, transparent 50%);
+      background-position: calc(100% - 18px) calc(50% - 3px), calc(100% - 12px) calc(50% - 3px);
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+      padding-right: 38px;
+      cursor: pointer;
+    }
+    select option {
+      background: #0f172a;
+      color: #e5eefc;
     }
     .field textarea { min-height: 90px; resize: vertical; }
     .form-grid {
@@ -517,6 +541,7 @@
     let patients = loadPatients();
     let currentPage = 'dashboard';
     let chart;
+    let examsFilters = { search: '', exam: '' };
 
     function clone(obj) {
       return JSON.parse(JSON.stringify(obj));
@@ -531,7 +556,11 @@
       if (!Array.isArray(data)) data = clone(INITIAL_PATIENTS);
       return data.map(patient => ({
         ...patient,
-        preferencial: patient.preferencial === 'Sim' ? 'Sim' : 'Não'
+        preferencial: patient.preferencial === 'Sim' ? 'Sim' : 'Não',
+        exames: (patient.exames || []).map(exam => ({
+          ...exam,
+          motivoNaoRealizado: exam.motivoNaoRealizado || ''
+        }))
       }));
     }
 
@@ -565,8 +594,8 @@
 
     function getExamCounts(patient) {
       const applicable = patient.exames.filter(ex => ex.status !== 'Não se aplica');
-      const concluded = applicable.filter(ex => ex.status === 'Concluído');
-      const pending = applicable.filter(ex => ex.status === 'Pendente');
+      const concluded = applicable.filter(ex => ex.status === 'Concluído' || ex.status === 'Exame liberado');
+      const pending = applicable.filter(ex => ['Pendente', 'Não realizado'].includes(ex.status));
       return {
         total: applicable.length,
         done: concluded.length,
@@ -597,6 +626,8 @@
         'Pendente': ['🟡', 'st-pendente'],
         'Em andamento': ['🔵', 'st-andamento'],
         'Concluído': ['🟢', 'st-concluido'],
+        'Exame liberado': ['🟢', 'st-concluido'],
+        'Não realizado': ['🔴', 'st-bloqueado'],
         'Bloqueado': ['🔴', 'st-bloqueado'],
         'Não se aplica': ['⚪', 'st-na'],
         'Apto': ['🟢', 'st-concluido'],
@@ -617,6 +648,8 @@
         'Pendente': 'signal-pendente',
         'Em andamento': 'signal-andamento',
         'Concluído': 'signal-concluido',
+        'Exame liberado': 'signal-concluido',
+        'Não realizado': 'signal-bloqueado',
         'Bloqueado': 'signal-bloqueado'
       };
       const css = map[status] || 'signal-empty';
@@ -668,7 +701,7 @@
 
     function pendingAsoReason(patient) {
       const reasons = [];
-      if (!patient.asoCadastrado) reasons.push('Recepção sem ASO cadastrado');
+      if (!patient.asoCadastrado) reasons.push('Atendimento sem ASO');
       const pendingNames = pendingExamNames(patient);
       if (pendingNames.length) reasons.push(`Exames pendentes: ${pendingNames.join(', ')}`);
       if (patient.medico?.resultado === 'Pendente' && patient.medico?.pendencia) reasons.push(`Pendência médica: ${patient.medico.pendencia}`);
@@ -787,19 +820,22 @@
       return `<button class="btn btn-ghost" onclick="openPatientModal('${patient.id}','acompanhamento')">Detalhes</button>`;
     }
 
-    function patientRow(page, patient) {
+    function patientRow(page, patient, selectedExamKey = '') {
       const counts = getExamCounts(patient);
-      const blockedTriagem = !patient.asoCadastrado ? 'ASO não cadastrado na recepção' : (counts.done !== counts.total ? 'Exames pendentes' : 'Liberado');
+      const blockedTriagem = !patient.asoCadastrado ? 'Atendimento sem ASO' : (counts.done !== counts.total ? 'Exames pendentes' : 'Liberado');
       const examDetails = [];
       if (page === 'exames') {
-        const rxExam = patient.exames.find(ex => ex.key === 'rx');
-        const labExam = patient.exames.find(ex => ex.key === 'lab');
-        if (rxExam && rxExam.status !== 'Não se aplica' && patient.rxTipo) {
-          examDetails.push(`<div class="small" style="margin-top:6px"><strong>RX:</strong> ${maskText(patient.rxTipo)}</div>`);
-        }
-        if (labExam && labExam.status !== 'Não se aplica' && patient.labTipo) {
-          examDetails.push(`<div class="small" style="margin-top:6px"><strong>Exames laboratoriais:</strong> ${maskText(patient.labTipo)}</div>`);
-        }
+        const visibleExamKeys = selectedExamKey ? [selectedExamKey] : ['rx', 'lab'];
+        visibleExamKeys.forEach(examKey => {
+          const exam = patient.exames.find(ex => ex.key === examKey);
+          if (!exam || exam.status === 'Não se aplica') return;
+          if (examKey === 'rx' && patient.rxTipo) {
+            examDetails.push(`<div class="small" style="margin-top:6px"><strong>RX:</strong> ${maskText(patient.rxTipo)}</div>`);
+          }
+          if (examKey === 'lab' && patient.labTipo) {
+            examDetails.push(`<div class="small" style="margin-top:6px"><strong>Exames laboratoriais:</strong> ${maskText(patient.labTipo)}</div>`);
+          }
+        });
       }
       return `
         <tr>
@@ -834,7 +870,7 @@
           </td>
           <td>
             <div class="small">${blockedTriagem}</div>
-            ${page === 'exames' && examDetails.length ? `<div class="small" style="margin-top:8px">Detalhes do cadastro exibidos para RX e laboratório.</div>` : ''}
+            ${page === 'exames' && examDetails.length ? `<div class="small" style="margin-top:8px">Detalhes do cadastro exibidos conforme o tipo de exame selecionado.</div>` : ''}
           </td>
           <td>${actionButtonsFor(page, patient)}</td>
         </tr>
@@ -891,7 +927,7 @@
               <div class="summary-item"><div>Exames</div><div>${badge(exames ? 'Em andamento' : 'Concluído')} ${exames} paciente(s)</div></div>
               <div class="summary-item"><div>Triagem</div><div>${badge(triagem ? 'Em andamento' : 'Concluído')} ${triagem} paciente(s)</div></div>
               <div class="summary-item"><div>Médico</div><div>${badge(medico ? 'Em andamento' : 'Concluído')} ${medico} paciente(s)</div></div>
-              <div class="summary-item"><div>Bloqueados</div><div>${badge(bloqueados ? 'Bloqueado' : 'Concluído')} ${bloqueados} sem ASO cadastrado</div></div>
+              <div class="summary-item"><div>Bloqueados</div><div>${badge(bloqueados ? 'Bloqueado' : 'Concluído')} ${bloqueados} sem ASO</div></div>
             </div>
           </div>
         </div>
@@ -1028,7 +1064,73 @@
     }
 
     function renderExames() {
-      renderQueuePage('page-exames', 'exames', p => p.etapa === 'Exames' || (getExamCounts(p).pending > 0 && p.etapa !== 'Concluído'));
+      const queue = patients
+        .slice()
+        .sort(compareQueueOrder)
+        .filter(p => p.etapa === 'Exames' || (getExamCounts(p).pending > 0 && p.etapa !== 'Concluído'));
+
+      const examOptions = EXAM_ORDER.map(ex => `<option value="${ex.key}">${ex.nome}</option>`).join('');
+      const page = document.getElementById('page-exames');
+      page.innerHTML = `
+        <div class="card">
+          <div class="filters">
+            <div class="search"><span>🔎</span><input id="search-exames" placeholder="Buscar por nome, ID, CPF ou empresa" value="${(examsFilters.search || '').replace(/"/g, '&quot;')}"></div>
+            <div class="field" style="flex:0 0 280px;min-width:240px;margin-bottom:0">
+              <label for="filter-tipo-exame">Tipo de exame</label>
+              <select id="filter-tipo-exame">
+                <option value="">Todos os exames</option>
+                ${examOptions}
+              </select>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Paciente</th>
+                  <th>Empresa / Tipo</th>
+                  <th>Status</th>
+                  <th>Fluxo</th>
+                  <th>Progresso</th>
+                  <th>Regras do fluxo</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-exames">
+                ${queue.length ? queue.map(p => patientRow('exames', p)).join('') : `<tr><td colspan="7"><div class="small">Nenhum paciente nesta etapa.</div></td></tr>`}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+
+      const searchInput = document.getElementById('search-exames');
+      const examFilter = document.getElementById('filter-tipo-exame');
+      const tbody = document.getElementById('tbody-exames');
+      examFilter.value = examsFilters.exam || '';
+
+      function applyExamFilters() {
+        const term = (searchInput.value || '').toLowerCase().trim();
+        const selectedExam = examFilter.value;
+        examsFilters = {
+          search: searchInput.value || '',
+          exam: selectedExam || ''
+        };
+        const filtered = queue.filter(p => {
+          const matchesText = !term || [p.nome, p.id, p.cpf, p.empresa, p.setor, p.funcao].some(v => (v || '').toLowerCase().includes(term));
+          const matchesExam = !selectedExam
+            ? true
+            : p.exames.some(ex => ex.key === selectedExam && ex.status !== 'Não se aplica' && ex.status !== 'Concluído');
+          return matchesText && matchesExam;
+        });
+        tbody.innerHTML = filtered.length
+          ? filtered.map(p => patientRow('exames', p, selectedExam)).join('')
+          : `<tr><td colspan="7"><div class="small">Nenhum resultado encontrado.</div></td></tr>`;
+      }
+
+      searchInput.addEventListener('input', applyExamFilters);
+      examFilter.addEventListener('change', applyExamFilters);
+      applyExamFilters();
     }
 
     function renderTriagem() {
@@ -1133,8 +1235,8 @@
       return patients.slice().sort(compareQueueOrder).map(patient => {
         const counts = getExamCounts(patient);
         const examesAplicaveis = patient.exames.filter(ex => ex.status !== 'Não se aplica');
-        const examesRealizados = examesAplicaveis.filter(ex => ex.status === 'Concluído').map(ex => ex.nome).join(', ');
-        const examesPendentes = examesAplicaveis.filter(ex => ex.status !== 'Concluído').map(ex => ex.nome).join(', ');
+        const examesRealizados = examesAplicaveis.filter(ex => ex.status === 'Concluído' || ex.status === 'Exame liberado').map(ex => ex.status === 'Exame liberado' ? `${ex.nome} (liberado)` : ex.nome).join(', ');
+        const examesPendentes = examesAplicaveis.filter(ex => !['Concluído', 'Exame liberado'].includes(ex.status)).map(ex => ex.status === 'Não realizado' && ex.motivoNaoRealizado ? `${ex.nome} (não realizado: ${ex.motivoNaoRealizado})` : ex.nome).join(', ');
         return {
           'Ordem': patient.ordem,
           'ID Atendimento': patient.id,
@@ -1606,7 +1708,7 @@
             <div class="row-title" style="margin-bottom:12px">Ajustes de recepção</div>
             <div class="form-grid">
               <div class="field">
-                <label>ASO cadastrado</label>
+                <label>Atendimento Possui ASO?</label>
                 <select id="edit-aso-cadastrado">
                   <option value="true" ${patient.asoCadastrado ? 'selected' : ''}>Sim</option>
                   <option value="false" ${!patient.asoCadastrado ? 'selected' : ''}>Não</option>
@@ -1633,16 +1735,23 @@
                 const detailText = ex.key === 'rx'
                   ? patient.rxTipo
                   : (ex.key === 'lab' ? patient.labTipo : '');
+                const showReason = ex.status === 'Não realizado';
                 return `
-                <div class="summary-item">
+                <div class="summary-item exam-editor-item" data-exam-item="${patient.id}-${ex.key}">
                   <div>
                     <div>${ex.nome}</div>
                     ${detailText && ex.status !== 'Não se aplica' ? `<div class="small" style="margin-top:6px"><strong>${ex.key === 'rx' ? 'Tipo de RX' : 'Exames laboratoriais'}:</strong> ${maskText(detailText)}</div>` : ''}
+                    <div class="field exam-reason-field ${showReason ? '' : 'hidden'}" id="reason-wrap-${patient.id}-${ex.key}" style="margin-top:10px;min-width:280px">
+                      <label>Motivo do exame não realizado</label>
+                      <textarea id="reason-${patient.id}-${ex.key}" placeholder="Descreva o motivo do exame não ter sido realizado.">${ex.motivoNaoRealizado || ''}</textarea>
+                    </div>
                   </div>
                   <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
-                    <select id="exam-${patient.id}-${ex.key}">
+                    <select id="exam-${patient.id}-${ex.key}" onchange="toggleExamReasonField('${patient.id}','${ex.key}')">
                       <option value="Pendente" ${ex.status === 'Pendente' ? 'selected' : ''}>Pendente</option>
                       <option value="Concluído" ${ex.status === 'Concluído' ? 'selected' : ''}>Concluído</option>
+                      <option value="Não realizado" ${ex.status === 'Não realizado' ? 'selected' : ''}>Não realizado</option>
+                      <option value="Exame liberado" ${ex.status === 'Exame liberado' ? 'selected' : ''}>Exame liberado</option>
                       <option value="Não se aplica" ${ex.status === 'Não se aplica' ? 'selected' : ''}>Não se aplica</option>
                     </select>
                   </div>
@@ -1667,7 +1776,7 @@
                 <div>${badge('Bloqueado')}</div>
               </div>
               <div class="small" style="margin-top:12px">
-                ${!patient.asoCadastrado ? 'ASO não cadastrado pela recepção.' : 'Ainda existem exames pendentes.'}
+                ${!patient.asoCadastrado ? 'Atendimento sem ASO.' : 'Ainda existem exames pendentes.'}
               </div>
             ` : `
               <div class="field">
@@ -1753,17 +1862,35 @@
       openPatientModal(id, 'recepcao');
     }
 
+    function toggleExamReasonField(id, examKey) {
+      const select = document.getElementById(`exam-${id}-${examKey}`);
+      const wrapper = document.getElementById(`reason-wrap-${id}-${examKey}`);
+      const textarea = document.getElementById(`reason-${id}-${examKey}`);
+      if (!select || !wrapper) return;
+      const shouldShow = select.value === 'Não realizado';
+      wrapper.classList.toggle('hidden', !shouldShow);
+      if (!shouldShow && textarea) textarea.value = '';
+    }
+
     function saveExams(id) {
       const patient = findPatient(id);
       if (!patient) return;
       let updated = 0;
-      patient.exames.forEach(ex => {
+      for (const ex of patient.exames) {
         const el = document.getElementById(`exam-${id}-${ex.key}`);
-        if (el) {
-          ex.status = el.value;
-          updated += 1;
+        const reasonEl = document.getElementById(`reason-${id}-${ex.key}`);
+        if (!el) continue;
+        const selectedStatus = el.value;
+        const motivoNaoRealizado = reasonEl ? reasonEl.value.trim() : '';
+        if (selectedStatus === 'Não realizado' && !motivoNaoRealizado) {
+          alert(`Informe o motivo do exame não realizado para ${ex.nome}.`);
+          if (reasonEl) reasonEl.focus();
+          return;
         }
-      });
+        ex.status = selectedStatus;
+        ex.motivoNaoRealizado = selectedStatus === 'Não realizado' ? motivoNaoRealizado : '';
+        updated += 1;
+      }
       if (!updated) {
         alert('Não foi possível localizar os campos dos exames para salvar.');
         return;
