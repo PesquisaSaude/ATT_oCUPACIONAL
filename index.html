@@ -12,7 +12,7 @@
       --panel: #121a2b;
       --panel-2: #172133;
       --line: #263246;
-      --text: #ecf2ff;
+      --text: #78c9de;
       --muted: #9db0cf;
       --accent: #38bdf8;
       --accent-2: #22c55e;
@@ -266,6 +266,33 @@
       padding: 14px; border-radius: 16px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.05);
     }
 
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+    .toolbar-inline { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+    .pill-alert {
+      display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px;
+      font-size:12px; font-weight:700; background: rgba(239,68,68,.12); color:#fca5a5; border:1px solid rgba(239,68,68,.18);
+    }
+    .mini-card {
+      padding: 16px; border-radius: 18px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.05);
+    }
+    .mini-card .title { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+    .mini-card .big { font-size: 28px; font-weight: 700; line-height: 1; }
+    .kanban-grid { display:grid; grid-template-columns: repeat(4, 1fr); gap:16px; }
+    .kanban-col { background: rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); border-radius: 20px; padding: 14px; min-height: 220px; }
+    .kanban-head { display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:12px; }
+    .kanban-list { display:grid; gap:10px; }
+    .task-card { background: rgba(11,18,32,.8); border:1px solid rgba(255,255,255,.06); border-radius:16px; padding:12px; }
+    .task-card .top { display:flex; justify-content:space-between; gap:8px; margin-bottom:8px; }
+    .task-card .name { font-weight:700; }
+    .task-card .meta { font-size:12px; color: var(--muted); }
+    .task-card .foot { display:flex; justify-content:space-between; gap:8px; align-items:center; margin-top:10px; }
+    .risk-high { color:#fca5a5; }
+    .risk-medium { color:#fcd34d; }
+    .risk-low { color:#86efac; }
+    .table-tight table { min-width: 1100px; }
+    .sticky-note { padding:12px 14px; border-radius:16px; background: rgba(250, 204, 21, .1); border: 1px solid rgba(250, 204, 21, .16); color:#fde68a; font-size:13px; }
+
 
     .matrix-table table { min-width: 1400px; }
     .matrix-table th:first-child,
@@ -308,8 +335,8 @@
     }
 
     @media (max-width: 1200px) {
-      .grid-4 { grid-template-columns: repeat(2, 1fr); }
-      .grid-2, .split { grid-template-columns: 1fr; }
+      .grid-4, .grid-5 { grid-template-columns: repeat(2, 1fr); }
+      .grid-3, .grid-2, .split, .kanban-grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 980px) {
       .app { grid-template-columns: 1fr; }
@@ -320,7 +347,7 @@
     }
     @media (max-width: 720px) {
       .main { padding: 14px; }
-      .grid-4, .form-grid, .form-grid-3, .exam-checklist, .exam-extra-fields { grid-template-columns: 1fr; }
+      .grid-4, .grid-3, .grid-5, .form-grid, .form-grid-3, .exam-checklist, .exam-extra-fields, .kanban-grid { grid-template-columns: 1fr; }
       .timeline-item { grid-template-columns: 1fr; }
       .topbar h2 { font-size: 22px; }
       table { min-width: 760px; }
@@ -345,6 +372,7 @@
         <button class="nav-btn" data-page="triagem"><span class="left"><span>🚦</span><span>Triagem</span></span><span>›</span></button>
         <button class="nav-btn" data-page="medico"><span class="left"><span>👨‍⚕️</span><span>Médico do Trabalho</span></span><span>›</span></button>
         <button class="nav-btn" data-page="acompanhamento"><span class="left"><span>🗂️</span><span>Acompanhamento</span></span><span>›</span></button>
+        <button class="nav-btn" data-page="gestao-aso"><span class="left"><span>📋</span><span>Gestão de ASO e Exames</span></span><span>›</span></button>
         <button class="nav-btn" data-page="relatorios"><span class="left"><span>📑</span><span>Relatórios</span></span><span>›</span></button>
       </nav>
 
@@ -372,6 +400,7 @@
       <section id="page-triagem" class="content hidden"></section>
       <section id="page-medico" class="content hidden"></section>
       <section id="page-acompanhamento" class="content hidden"></section>
+      <section id="page-gestao-aso" class="content hidden"></section>
       <section id="page-relatorios" class="content hidden"></section>
     </main>
   </div>
@@ -425,7 +454,7 @@
         </div>
 
         <div class="field">
-          <label>ASO cadastrado na recepção?</label>
+          <label>Atendimento Possui ASO?</label>
           <select name="asoCadastrado" id="asoCadastradoSelect">
             <option value="true">Sim</option>
             <option value="false">Não</option>
@@ -481,6 +510,7 @@
       triagem: ['Triagem', 'Somente pacientes com ASO cadastrado e exames concluídos.'],
       medico: ['Médico do Trabalho', 'Fila em linha para atendimento final e decisão do ASO.'],
       acompanhamento: ['Acompanhamento', 'Visão moderna dos exames realizados, pendentes e bloqueios.'],
+      'gestao-aso': ['Gestão de ASO e Exames', 'Painel gerencial para acompanhar ASOs, pendências, criticidade e fila operacional de exames.'],
       relatorios: ['Relatórios', 'Consolidação dos atendimentos com exportação para Excel.']
     };
 
@@ -570,7 +600,12 @@
         'Bloqueado': ['🔴', 'st-bloqueado'],
         'Não se aplica': ['⚪', 'st-na'],
         'Apto': ['🟢', 'st-concluido'],
-        'Pendente ASO': ['🟡', 'st-pendente']
+        'Pendente ASO': ['🟡', 'st-pendente'],
+        'ASO Concluído': ['🟢', 'st-concluido'],
+        'ASO Inapto': ['🔴', 'st-bloqueado'],
+        'ASO Pendente': ['🟡', 'st-pendente'],
+        'ASO Cadastrado': ['🔵', 'st-andamento'],
+        'Sem ASO': ['🔴', 'st-bloqueado']
       };
       const [emoji, css] = map[status] || ['🔵', 'st-andamento'];
       return `<span class="status ${css}">${emoji} ${status}</span>`;
@@ -587,6 +622,83 @@
       const css = map[status] || 'signal-empty';
       const title = status === 'Não se aplica' || !status ? '' : status;
       return `<span class="signal-dot ${css}" title="${title}" aria-label="${title}"></span>`;
+    }
+
+
+    function daysOpen(patient) {
+      if (!patient?.dataAtendimento) return 0;
+      const start = new Date(patient.dataAtendimento + 'T00:00:00');
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const diff = Math.round((today - start) / 86400000);
+      return Number.isFinite(diff) ? Math.max(0, diff) : 0;
+    }
+
+    function getAsoStatus(patient) {
+      if (patient.medico?.resultado === 'Apto') return 'ASO Concluído';
+      if (patient.medico?.resultado === 'Inapto') return 'ASO Inapto';
+      if (patient.medico?.resultado === 'Pendente') return 'ASO Pendente';
+      if (patient.asoCadastrado) return 'ASO Cadastrado';
+      return 'Sem ASO';
+    }
+
+    function getCriticality(patient) {
+      const counts = getExamCounts(patient);
+      const openDays = daysOpen(patient);
+      if (!patient.asoCadastrado && counts.pending > 0) return 'Alta';
+      if (patient.medico?.resultado === 'Pendente') return 'Alta';
+      if (counts.pending >= 3 || openDays >= 3) return 'Alta';
+      if (counts.pending >= 1 || openDays >= 1) return 'Média';
+      return 'Baixa';
+    }
+
+    function criticalityChip(level) {
+      const map = {
+        'Alta': ['🔥', 'risk-high'],
+        'Média': ['⚠️', 'risk-medium'],
+        'Baixa': ['✅', 'risk-low']
+      };
+      const [icon, css] = map[level] || ['•', ''];
+      return `<span class="chip ${css}">${icon} ${level}</span>`;
+    }
+
+    function pendingExamNames(patient) {
+      return patient.exames.filter(ex => ex.status === 'Pendente').map(ex => ex.nome);
+    }
+
+    function pendingAsoReason(patient) {
+      const reasons = [];
+      if (!patient.asoCadastrado) reasons.push('Recepção sem ASO cadastrado');
+      const pendingNames = pendingExamNames(patient);
+      if (pendingNames.length) reasons.push(`Exames pendentes: ${pendingNames.join(', ')}`);
+      if (patient.medico?.resultado === 'Pendente' && patient.medico?.pendencia) reasons.push(`Pendência médica: ${patient.medico.pendencia}`);
+      if (!reasons.length) reasons.push('Sem bloqueios');
+      return reasons.join(' • ');
+    }
+
+    function renderGestaoCard(patient) {
+      const counts = getExamCounts(patient);
+      const criticality = getCriticality(patient);
+      return `
+        <div class="task-card">
+          <div class="top">
+            <div>
+              <div class="name">${patient.nome}</div>
+              <div class="meta mono">${patient.id} • ${maskText(patient.empresa)}</div>
+            </div>
+            ${criticalityChip(criticality)}
+          </div>
+          <div class="chips">
+            ${attendanceChip(patient)}
+            <span class="chip">${getAsoStatus(patient)}</span>
+          </div>
+          <div class="meta" style="margin-top:10px">${pendingAsoReason(patient)}</div>
+          <div class="foot">
+            <span class="chip">${counts.done}/${counts.total} exames</span>
+            <button class="btn btn-ghost" onclick="openPatientModal('${patient.id}','gestao-aso')">Gerir</button>
+          </div>
+        </div>
+      `;
     }
 
     function updateFlow(patient) {
@@ -668,6 +780,9 @@
       }
       if (page === 'medico') {
         return `<button class="btn btn-warning" onclick="openPatientModal('${patient.id}','medico')">Atender médico</button>`;
+      }
+      if (page === 'gestao-aso') {
+        return `<button class="btn btn-ghost" onclick="openPatientModal('${patient.id}','gestao-aso')">Gerir caso</button>`;
       }
       return `<button class="btn btn-ghost" onclick="openPatientModal('${patient.id}','acompanhamento')">Detalhes</button>`;
     }
@@ -1056,6 +1171,33 @@
       });
     }
 
+    const gestaoAsoFilters = { empresa: '', trabalhador: '', cpf: '', statusExame: '', statusAtendimento: '' };
+
+    function getExamFilterStatus(patient) {
+      const counts = getExamCounts(patient);
+      if (!counts.total) return 'Sem exame aplicável';
+      if (counts.pending > 0) return 'Com pendência';
+      if (counts.done === counts.total) return 'Todos concluídos';
+      return 'Parcial';
+    }
+
+    function filterGestaoAsoItems(items) {
+      const trabalhador = (gestaoAsoFilters.trabalhador || '').trim().toLowerCase();
+      const cpf = (gestaoAsoFilters.cpf || '').replace(/\D/g, '');
+      return items.filter(patient => {
+        const empresa = ((patient.empresa || 'Não informado').trim() || 'Não informado');
+        const patientCpf = (patient.cpf || '').replace(/\D/g, '');
+        const examStatus = getExamFilterStatus(patient);
+        const atendimentoStatus = patient.statusAtendimento || 'Não informado';
+        const matchEmpresa = !gestaoAsoFilters.empresa || empresa === gestaoAsoFilters.empresa;
+        const matchTrabalhador = !trabalhador || (patient.nome || '').toLowerCase().includes(trabalhador);
+        const matchCpf = !cpf || patientCpf.includes(cpf);
+        const matchExam = !gestaoAsoFilters.statusExame || examStatus === gestaoAsoFilters.statusExame;
+        const matchAtendimento = !gestaoAsoFilters.statusAtendimento || atendimentoStatus === gestaoAsoFilters.statusAtendimento;
+        return matchEmpresa && matchTrabalhador && matchCpf && matchExam && matchAtendimento;
+      });
+    }
+
     function exportReportsExcel() {
       const rows = getReportsData();
       if (!rows.length) {
@@ -1071,6 +1213,263 @@
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Relatórios');
       const filename = `relatorios_atendimento_ocupacional_${new Date().toISOString().slice(0,10)}.xlsx`;
       XLSX.writeFile(workbook, filename);
+    }
+
+
+    function renderGestaoAso() {
+      syncAllFlows();
+      const baseItems = patients.slice().sort(compareQueueOrder);
+      const empresasDisponiveis = [...new Set(baseItems.map(p => (p.empresa || 'Não informado').trim() || 'Não informado'))].sort((a,b) => a.localeCompare(b, 'pt-BR'));
+      const statusAtendimentoDisponiveis = [...new Set(baseItems.map(p => p.statusAtendimento || 'Não informado'))].sort((a,b) => a.localeCompare(b, 'pt-BR'));
+      const statusExameDisponiveis = ['Com pendência', 'Todos concluídos', 'Sem exame aplicável'];
+
+      function renderContent() {
+        const items = filterGestaoAsoItems(baseItems);
+        const totalBase = baseItems.length;
+        const total = items.length;
+        const semAso = items.filter(p => !p.asoCadastrado).length;
+        const asoConcluido = items.filter(p => ['Apto','Inapto'].includes(p.medico?.resultado)).length;
+        const asoPendente = items.filter(p => p.medico?.resultado === 'Pendente').length;
+        const examesPendentes = items.filter(p => getExamCounts(p).pending > 0).length;
+        const criticos = items.filter(p => getCriticality(p) === 'Alta');
+        const proximasAcoes = {
+          semAso: items.filter(p => !p.asoCadastrado),
+          exames: items.filter(p => p.asoCadastrado && getExamCounts(p).pending > 0),
+          medico: items.filter(p => p.etapa === 'Médico' || p.medico?.resultado === 'Pendente'),
+          concluidos: items.filter(p => ['Apto','Inapto'].includes(p.medico?.resultado))
+        };
+
+        const empresas = [...new Set(items.map(p => (p.empresa || 'Não informado').trim() || 'Não informado'))].map(nome => {
+          const grupo = items.filter(p => ((p.empresa || 'Não informado').trim() || 'Não informado') === nome);
+          return {
+            nome,
+            total: grupo.length,
+            semAso: grupo.filter(p => !p.asoCadastrado).length,
+            pendentes: grupo.filter(p => getExamCounts(p).pending > 0).length,
+            concluidos: grupo.filter(p => ['Apto','Inapto'].includes(p.medico?.resultado)).length
+          };
+        }).sort((a,b) => (b.pendentes + b.semAso) - (a.pendentes + a.semAso)).slice(0,8);
+
+        document.getElementById('page-gestao-aso').innerHTML = `
+          <div class="card">
+            <div class="filters" style="grid-template-columns:repeat(5,minmax(0,1fr));align-items:end">
+              <div class="field" style="margin:0">
+                <label>Empresa</label>
+                <select id="filter-gestao-empresa">
+                  <option value="">Todas</option>
+                  ${empresasDisponiveis.map(empresa => `<option value="${empresa}" ${gestaoAsoFilters.empresa === empresa ? 'selected' : ''}>${empresa}</option>`).join('')}
+                </select>
+              </div>
+              <div class="field" style="margin:0">
+                <label>Nome do trabalhador</label>
+                <input id="filter-gestao-trabalhador" placeholder="Digite o nome" value="${gestaoAsoFilters.trabalhador}">
+              </div>
+              <div class="field" style="margin:0">
+                <label>CPF</label>
+                <input id="filter-gestao-cpf" placeholder="Buscar CPF" value="${gestaoAsoFilters.cpf}">
+              </div>
+              <div class="field" style="margin:0">
+                <label>Status dos exames</label>
+                <select id="filter-gestao-status-exame">
+                  <option value="">Todos</option>
+                  ${statusExameDisponiveis.map(status => `<option value="${status}" ${gestaoAsoFilters.statusExame === status ? 'selected' : ''}>${status}</option>`).join('')}
+                </select>
+              </div>
+              <div class="field" style="margin:0">
+                <label>Status dos atendimentos</label>
+                <select id="filter-gestao-status-atendimento">
+                  <option value="">Todos</option>
+                  ${statusAtendimentoDisponiveis.map(status => `<option value="${status}" ${gestaoAsoFilters.statusAtendimento === status ? 'selected' : ''}>${status}</option>`).join('')}
+                </select>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:14px;flex-wrap:wrap">
+              <div class="small">Mostrando <strong>${total}</strong> de <strong>${totalBase}</strong> registros monitorados.</div>
+              <button class="btn btn-ghost" id="btn-limpar-filtros-gestao">Limpar filtros</button>
+            </div>
+          </div>
+
+          <div class="grid-5">
+            <div class="card kpi"><div class="label">Base monitorada</div><div class="value">${total}</div><div class="hint">Pacientes após aplicação dos filtros</div></div>
+            <div class="card kpi"><div class="label">Sem ASO cadastrado</div><div class="value">${semAso}</div><div class="hint">Bloqueiam sequência do fluxo</div></div>
+            <div class="card kpi"><div class="label">Exames pendentes</div><div class="value">${examesPendentes}</div><div class="hint">Demandam atuação operacional</div></div>
+            <div class="card kpi"><div class="label">ASO pendente</div><div class="value">${asoPendente}</div><div class="hint">Em espera de decisão médica</div></div>
+            <div class="card kpi"><div class="label">ASO concluído</div><div class="value">${asoConcluido}</div><div class="hint">Aptos ou inaptos finalizados</div></div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:14px">
+                <div>
+                  <div class="row-title">Radar operacional de criticidade</div>
+                  <div class="small">Pacientes com maior risco de atraso por ausência de ASO, pendências médicas ou vários exames em aberto.</div>
+                </div>
+                ${criticos.length ? `<span class="pill-alert">${criticos.length} casos críticos</span>` : '<span class="chip">Operação estabilizada</span>'}
+              </div>
+              <div class="summary-list">
+                ${criticos.slice(0,6).map(p => `
+                  <div class="summary-item">
+                    <div>
+                      <div class="row-title">${p.nome}</div>
+                      <div class="small">${maskText(p.empresa)} • ${pendingAsoReason(p)}</div>
+                    </div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+                      ${criticalityChip(getCriticality(p))}
+                      <button class="btn btn-ghost" onclick="openPatientModal('${p.id}','gestao-aso')">Tratar</button>
+                    </div>
+                  </div>
+                `).join('') || '<div class="sticky-note">Nenhum caso crítico identificado no momento.</div>'}
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="row-title" style="margin-bottom:14px">Ferramentas gerenciais</div>
+              <div class="grid-3">
+                <div class="mini-card">
+                  <div class="title">Pendência média</div>
+                  <div class="big">${Math.round((items.reduce((acc,p)=>acc+getExamCounts(p).pending,0) / Math.max(total,1))*10)/10}</div>
+                  <div class="small" style="margin-top:8px">exames pendentes por paciente</div>
+                </div>
+                <div class="mini-card">
+                  <div class="title">Tempo médio em aberto</div>
+                  <div class="big">${Math.round(items.reduce((acc,p)=>acc+daysOpen(p),0) / Math.max(total,1))}</div>
+                  <div class="small" style="margin-top:8px">dias desde o atendimento</div>
+                </div>
+                <div class="mini-card">
+                  <div class="title">Liberados para médico</div>
+                  <div class="big">${items.filter(p => p.etapa === 'Médico').length}</div>
+                  <div class="small" style="margin-top:8px">prontos para decisão médica</div>
+                </div>
+              </div>
+              <div class="sticky-note" style="margin-top:14px">Ferramentas adicionadas: filtros por empresa, trabalhador, CPF, status dos exames e status dos atendimentos, além do radar de criticidade, fila por estágio, ranking por empresa e tempo em aberto.</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px">
+              <div>
+                <div class="row-title">Quadro de gestão operacional</div>
+                <div class="small">Organiza os pacientes por ação imediata para a equipe administrativa e clínica.</div>
+              </div>
+            </div>
+            <div class="kanban-grid">
+              <div class="kanban-col">
+                <div class="kanban-head"><div class="row-title">Recepção / ASO</div><span class="chip">${proximasAcoes.semAso.length}</span></div>
+                <div class="kanban-list">${proximasAcoes.semAso.slice(0,8).map(renderGestaoCard).join('') || '<div class="small">Nenhum paciente nesta coluna.</div>'}</div>
+              </div>
+              <div class="kanban-col">
+                <div class="kanban-head"><div class="row-title">Exames em aberto</div><span class="chip">${proximasAcoes.exames.length}</span></div>
+                <div class="kanban-list">${proximasAcoes.exames.slice(0,8).map(renderGestaoCard).join('') || '<div class="small">Nenhum paciente nesta coluna.</div>'}</div>
+              </div>
+              <div class="kanban-col">
+                <div class="kanban-head"><div class="row-title">Decisão médica</div><span class="chip">${proximasAcoes.medico.length}</span></div>
+                <div class="kanban-list">${proximasAcoes.medico.slice(0,8).map(renderGestaoCard).join('') || '<div class="small">Nenhum paciente nesta coluna.</div>'}</div>
+              </div>
+              <div class="kanban-col">
+                <div class="kanban-head"><div class="row-title">Concluídos</div><span class="chip">${proximasAcoes.concluidos.length}</span></div>
+                <div class="kanban-list">${proximasAcoes.concluidos.slice(0,8).map(renderGestaoCard).join('') || '<div class="small">Nenhum paciente nesta coluna.</div>'}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card table-tight">
+              <div class="row-title" style="margin-bottom:12px">Ranking por empresa</div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Empresa</th>
+                      <th>Total</th>
+                      <th>Sem ASO</th>
+                      <th>Exames pendentes</th>
+                      <th>ASO concluído</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${empresas.length ? empresas.map(item => `
+                      <tr>
+                        <td class="row-title">${item.nome}</td>
+                        <td>${item.total}</td>
+                        <td>${item.semAso}</td>
+                        <td>${item.pendentes}</td>
+                        <td>${item.concluidos}</td>
+                      </tr>
+                    `).join('') : '<tr><td colspan="5"><div class="small">Nenhum registro encontrado para os filtros selecionados.</div></td></tr>'}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card table-tight">
+              <div class="row-title" style="margin-bottom:12px">Controle detalhado de ASO e exames</div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Paciente</th>
+                      <th>Status do ASO</th>
+                      <th>Status dos exames</th>
+                      <th>Pendências</th>
+                      <th>Criticidade</th>
+                      <th>Dias em aberto</th>
+                      <th>Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${items.length ? items.map(patient => `
+                      <tr>
+                        <td>
+                          <div class="row-title">${patient.nome}</div>
+                          <div class="small">${maskText(patient.empresa)} • ${maskText(patient.tipoAtendimento)}</div>
+                          <div class="small mono">${maskText(patient.cpf)}</div>
+                        </td>
+                        <td>${badge(getAsoStatus(patient).replace('ASO ','ASO '))}</td>
+                        <td>${badge(getExamFilterStatus(patient))}</td>
+                        <td><div class="small">${pendingAsoReason(patient)}</div></td>
+                        <td>${criticalityChip(getCriticality(patient))}</td>
+                        <td>${daysOpen(patient)} dia(s)</td>
+                        <td><button class="btn btn-ghost" onclick="openPatientModal('${patient.id}','gestao-aso')">Abrir</button></td>
+                      </tr>
+                    `).join('') : '<tr><td colspan="7"><div class="small">Nenhum registro encontrado para os filtros selecionados.</div></td></tr>'}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+
+        document.getElementById('filter-gestao-empresa').addEventListener('change', (e) => {
+          gestaoAsoFilters.empresa = e.target.value;
+          renderContent();
+        });
+        document.getElementById('filter-gestao-trabalhador').addEventListener('input', (e) => {
+          gestaoAsoFilters.trabalhador = e.target.value;
+          renderContent();
+        });
+        document.getElementById('filter-gestao-cpf').addEventListener('input', (e) => {
+          gestaoAsoFilters.cpf = e.target.value;
+          renderContent();
+        });
+        document.getElementById('filter-gestao-status-exame').addEventListener('change', (e) => {
+          gestaoAsoFilters.statusExame = e.target.value;
+          renderContent();
+        });
+        document.getElementById('filter-gestao-status-atendimento').addEventListener('change', (e) => {
+          gestaoAsoFilters.statusAtendimento = e.target.value;
+          renderContent();
+        });
+        document.getElementById('btn-limpar-filtros-gestao').addEventListener('click', () => {
+          gestaoAsoFilters.empresa = '';
+          gestaoAsoFilters.trabalhador = '';
+          gestaoAsoFilters.cpf = '';
+          gestaoAsoFilters.statusExame = '';
+          gestaoAsoFilters.statusAtendimento = '';
+          renderContent();
+        });
+      }
+
+      renderContent();
     }
 
     function renderReports() {
@@ -1201,7 +1600,7 @@
         </div>
       `;
 
-      if (context === 'recepcao' || context === 'acompanhamento') {
+      if (context === 'recepcao' || context === 'acompanhamento' || context === 'gestao-aso') {
         content += `
           <div class="card" style="padding:16px">
             <div class="row-title" style="margin-bottom:12px">Ajustes de recepção</div>
@@ -1225,7 +1624,7 @@
         `;
       }
 
-      if (context === 'exames' || context === 'acompanhamento') {
+      if (context === 'exames' || context === 'acompanhamento' || context === 'gestao-aso') {
         content += `
           <div class="card" style="padding:16px">
             <div class="row-title" style="margin-bottom:12px">Exames ocupacionais em linha</div>
@@ -1257,7 +1656,7 @@
         `;
       }
 
-      if (context === 'triagem' || context === 'acompanhamento') {
+      if (context === 'triagem' || context === 'acompanhamento' || context === 'gestao-aso') {
         const triageBlocked = !patient.asoCadastrado || counts.done !== counts.total;
         content += `
           <div class="card" style="padding:16px">
@@ -1283,7 +1682,7 @@
         `;
       }
 
-      if (context === 'medico' || context === 'acompanhamento') {
+      if (context === 'medico' || context === 'acompanhamento' || context === 'gestao-aso') {
         content += `
           <div class="card" style="padding:16px">
             <div class="row-title" style="margin-bottom:12px">Médico do trabalho</div>
@@ -1317,6 +1716,20 @@
             </div>
             <div class="modal-foot" style="padding:0;margin-top:16px;border-top:0">
               <button type="button" class="btn btn-warning" onclick="finishMedical('${patient.id}')">Salvar decisão médica</button>
+            </div>
+          </div>
+        `;
+      }
+
+      if (context === 'gestao-aso') {
+        content += `
+          <div class="card" style="padding:16px">
+            <div class="row-title" style="margin-bottom:12px">Painel de gestão do caso</div>
+            <div class="summary-list">
+              <div class="summary-item"><div>Status atual do ASO</div><div>${badge(getAsoStatus(patient))}</div></div>
+              <div class="summary-item"><div>Criticidade</div><div>${criticalityChip(getCriticality(patient))}</div></div>
+              <div class="summary-item"><div>Dias em aberto</div><div>${daysOpen(patient)} dia(s)</div></div>
+              <div class="summary-item"><div>Pendência consolidada</div><div class="small" style="max-width:360px;text-align:right">${pendingAsoReason(patient)}</div></div>
             </div>
           </div>
         `;
@@ -1526,6 +1939,7 @@
       if (page === 'triagem') renderTriagem();
       if (page === 'medico') renderMedico();
       if (page === 'acompanhamento') renderAcompanhamento();
+      if (page === 'gestao-aso') renderGestaoAso();
       if (page === 'relatorios') renderReports();
     }
 
@@ -1536,6 +1950,7 @@
       renderTriagem();
       renderMedico();
       renderAcompanhamento();
+      renderGestaoAso();
       renderReports();
       setPage(currentPage);
     }
