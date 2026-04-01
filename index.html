@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>SESI Saúde Paulista • Fluxo Ocupacional</title>
-<script type="text/javascript" src="https://gc.kes.v2.scr.kaspersky-labs.com/7EA5E9BB-55E1-4C31-9C21-4943DDFED2E4/main.js?attr=Sj55ZeKBtjZNf3xkREeMHfW_OAUAYQ4JutzDubqqIrIvtN6pUH6x72D6BoXzhK4jRumPPmCTEw180riAVRIMusW0osFCt_Om-XZwbZFHwkMuaj8nSnem_M03lkDj3Yl7el6Cy0NdrVnvJ0hfmQ3Aya4iOYEoDHKlOivOhFyJDByM_fFw7VKdqJWwAtckR0S-fFmkLTBw3XDzUQsZ6hQ7sEnB_7yakZdbnwUJaCXB9EtTdL6zJSnQdg7UrZNwfENpM6_7uA3fbYyldQs5HhfIPA" charset="UTF-8"></script><script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script type="text/javascript" src="https://gc.kes.v2.scr.kaspersky-labs.com/7EA5E9BB-55E1-4C31-9C21-4943DDFED2E4/main.js?attr=rsOlWC23snBg3Zb_OsZqNRIjuJ1xuzYQUQt5Cp215DhX6n7-qORRDxI-nt8Iz5ANsxFqfvZyB5t5hFM-jae6nUEsVfEMFTNEv1T4Y1vAX9P9SMgCRsIVXukpsvRhNQRvirL30DrTyw6e6M04AVI4f4XpC-i1C_pC1ozApcj7hFBt_-Krs_cXM039jz9gedv8jzuKWMOKTeHOJADi047iQnjlpCOXrceP44iFVuiWvWBACzxX6XHgJUaWx1gicxE2NZkRnJXvHpa-uLqjSAgZQQ" charset="UTF-8"></script><script type="text/javascript" src="https://gc.kes.v2.scr.kaspersky-labs.com/7EA5E9BB-55E1-4C31-9C21-4943DDFED2E4/main.js?attr=mbc7TuXMAc6saK-mmWuy22A8vrmCMLQYZrm05ZbrdZcHBbuiKsedY9prK4rNijdz0ZeGWshXlEaASBIkvg7dez4jk66Sln7zdaObGQShn0dRJiTjXzVNFftEGfQ5xlEukDwG3TE8MBVHco4LkyhPFadMIW79J7xFKI5mC8T9CgK8Og7e4hJpJaV2XY1yDc2JzPinueH5emt9i_aANxBDymy0oNdmVMgdUFF_KSXVsYj3bqKCFX0QuS4bgxuufKm4_UbMYixwAnQkWv04A5Q1gQ" charset="UTF-8"></script><script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
     :root {
@@ -527,6 +527,83 @@
       font-size: 11px;
       color: var(--muted);
     }
+
+    .logo-sesi-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+    }
+    .logo-sesi-inline svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      overflow: visible;
+    }
+    .logo-sesi-inline.sidebar-logo {
+      margin-top: 12px;
+      width: 170px;
+      opacity: .96;
+    }
+    .logo-sesi-inline.topbar-logo {
+      width: 156px;
+      padding: 10px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.06);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    .logo-sesi-inline.modal-logo {
+      width: 140px;
+      padding: 10px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.035);
+      border: 1px solid rgba(255,255,255,.06);
+    }
+    .logo-sesi-inline .sesi-pill {
+      fill: rgba(255,255,255,.08);
+      stroke: rgba(255,255,255,.16);
+      stroke-width: 1.2;
+    }
+    .logo-sesi-inline .sesi-core {
+      fill: url(#sesiGradient);
+      filter: drop-shadow(0 8px 18px rgba(14,165,233,.18));
+      transform-origin: 46px 24px;
+      animation: sesiFloat 4.2s ease-in-out infinite;
+    }
+    .logo-sesi-inline .sesi-glow {
+      fill: rgba(56,189,248,.22);
+      filter: blur(10px);
+      transform-origin: center;
+      animation: sesiPulse 3.8s ease-in-out infinite;
+    }
+    .logo-sesi-inline .sesi-text-main {
+      fill: #f8fbff;
+      letter-spacing: 1.4px;
+      font-weight: 800;
+    }
+    .logo-sesi-inline .sesi-text-sub {
+      fill: #9db0cf;
+      letter-spacing: .8px;
+      font-weight: 600;
+    }
+    .logo-sesi-inline .sesi-spark {
+      fill: #7dd3fc;
+      opacity: .9;
+      animation: sesiBlink 2.4s ease-in-out infinite;
+    }
+    @keyframes sesiFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-2px); }
+    }
+    @keyframes sesiPulse {
+      0%, 100% { opacity: .55; transform: scale(1); }
+      50% { opacity: .95; transform: scale(1.08); }
+    }
+    @keyframes sesiBlink {
+      0%, 100% { opacity: .35; transform: scale(.92); }
+      50% { opacity: 1; transform: scale(1.06); }
+    }
     .unit-modal-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -769,22 +846,564 @@
       font-size: 16px;
       background: rgba(255,255,255,.02);
     }
+    .attendance-tv-layout {
+      display: grid;
+      gap: 20px;
+    }
+    .attendance-tv-hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: 28px;
+      padding: 28px;
+      background: linear-gradient(135deg, rgba(37,99,235,.22), rgba(14,165,233,.18), rgba(34,197,94,.14));
+      border: 1px solid rgba(125,211,252,.24);
+      box-shadow: 0 24px 60px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.08);
+      animation: attendanceHeroPulse 6s ease-in-out infinite;
+    }
+    .attendance-tv-hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,.08) 45%, transparent 70%);
+      transform: translateX(-120%);
+      animation: attendanceHeroSweep 4.8s linear infinite;
+      pointer-events: none;
+    }
+    .attendance-tv-hero-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 20px;
+      align-items: center;
+    }
+    .attendance-tv-hero-icon {
+      width: 96px;
+      height: 96px;
+      border-radius: 28px;
+      display: grid;
+      place-items: center;
+      font-size: 44px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
+    }
+    .attendance-tv-hero-title {
+      font-size: 13px;
+      color: #dbeafe;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+    .attendance-tv-hero-patient {
+      font-size: clamp(28px, 4.4vw, 54px);
+      font-weight: 900;
+      line-height: 1.05;
+      margin-bottom: 16px;
+      text-shadow: 0 4px 24px rgba(0,0,0,.22);
+    }
+    .attendance-tv-meta {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .attendance-tv-meta-card {
+      border-radius: 20px;
+      padding: 16px 18px;
+      background: rgba(9,15,26,.36);
+      border: 1px solid rgba(255,255,255,.08);
+      backdrop-filter: blur(10px);
+    }
+    .attendance-tv-meta-card .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      color: #bfdbfe;
+      margin-bottom: 8px;
+    }
+    .attendance-tv-meta-card .value {
+      font-size: clamp(18px, 2.4vw, 30px);
+      line-height: 1.15;
+      font-weight: 800;
+    }
+    .attendance-tv-marquee {
+      display: flex;
+      gap: 14px;
+      overflow: hidden;
+      mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    }
+    .attendance-tv-marquee-track {
+      display: flex;
+      gap: 14px;
+      min-width: max-content;
+      animation: attendanceTickerScroll 28s linear infinite;
+    }
+    .attendance-tv-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.08);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    .attendance-screen-card.is-spotlight {
+      transform: scale(1.03);
+      border-color: rgba(125,211,252,.28);
+      box-shadow: 0 24px 60px rgba(0,0,0,.28), inset 0 0 0 1px rgba(125,211,252,.16);
+    }
+    .attendance-screen-card {
+      transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease;
+      animation: attendanceCardFloat 5s ease-in-out infinite;
+    }
+    .sound-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(56,189,248,.12);
+      border: 1px solid rgba(56,189,248,.18);
+      color: #7dd3fc;
+    }
+    @keyframes attendanceHeroPulse {
+      0%, 100% { transform: translateY(0); box-shadow: 0 24px 60px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.08); }
+      50% { transform: translateY(-2px); box-shadow: 0 28px 70px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.12); }
+    }
+    @keyframes attendanceHeroSweep {
+      0% { transform: translateX(-120%); }
+      100% { transform: translateX(120%); }
+    }
+    @keyframes attendanceTickerScroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    @keyframes attendanceCardFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
 
+
+
+    .dashboard-hero {
+      position: relative;
+      overflow: hidden;
+      padding: 24px 26px;
+      border-radius: 26px;
+      background: linear-gradient(135deg, rgba(37,99,235,.20), rgba(14,165,233,.16), rgba(34,197,94,.12));
+      border: 1px solid rgba(125,211,252,.18);
+      box-shadow: var(--shadow);
+    }
+    .dashboard-hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at top right, rgba(255,255,255,.10), transparent 30%);
+    }
+    .dashboard-hero-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1.3fr .9fr;
+      gap: 18px;
+      align-items: start;
+    }
+    .dashboard-hero h3 { margin: 0 0 8px; font-size: 30px; }
+    .dashboard-hero p { margin: 0; color: #dbeafe; }
+    .dashboard-hero-chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+    .dashboard-hero-note {
+      display:grid; gap:12px;
+      padding:18px; border-radius:20px;
+      background: rgba(9,15,26,.34);
+      border: 1px solid rgba(255,255,255,.08);
+      backdrop-filter: blur(8px);
+    }
+    .dashboard-hero-note .big { font-size: 18px; font-weight: 800; line-height: 1.3; }
+    .kpi-grid-5 { display:grid; grid-template-columns: repeat(5, 1fr); gap:16px; }
+    .kpi-card-clear { position:relative; overflow:hidden; }
+    .kpi-card-clear::before {
+      content:'';
+      position:absolute; inset:0 auto 0 0; width:4px; border-radius:999px;
+      background: linear-gradient(180deg, #38bdf8, #22c55e);
+    }
+    .kpi-card-clear .trend { margin-top:10px; font-size:12px; color: var(--muted); }
+    .attention-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; }
+    .attention-card {
+      padding:18px; border-radius:20px; background: rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06);
+      display:grid; gap:10px;
+    }
+    .attention-card .title { font-size:13px; color: var(--muted); }
+    .attention-card .value { font-size:28px; font-weight:800; line-height:1; }
+    .attention-card .desc { font-size:13px; color:#d7e3fb; line-height:1.45; }
+    .step-grid { display:grid; grid-template-columns: repeat(4, 1fr); gap:14px; }
+    .step-card {
+      padding:16px; border-radius:18px; background: rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); display:grid; gap:12px;
+    }
+    .step-card-top { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
+    .step-card .icon { width:42px; height:42px; border-radius:14px; display:grid; place-items:center; background: rgba(255,255,255,.06); font-size:20px; }
+    .step-card .name { font-weight:700; }
+    .step-card .count { font-size:30px; font-weight:800; line-height:1; }
+    .step-card .help { font-size:12px; color: var(--muted); }
+    .dashboard-table td .chips { margin-top:8px; }
+    .mini-progress { height:8px; border-radius:999px; background: rgba(255,255,255,.07); overflow:hidden; }
+    .mini-progress > span { display:block; height:100%; border-radius:inherit; background: linear-gradient(90deg, #38bdf8, #22c55e); }
+    .exam-summary-row { display:grid; gap:8px; }
+    .exam-summary-top { display:flex; justify-content:space-between; gap:12px; align-items:center; }
+
+
+    .dashboard-chart-stack {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+    .dashboard-chart-card-tv {
+      position: relative;
+      overflow: hidden;
+    }
+    .dashboard-chart-card-tv::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,.04) 48%, transparent 74%);
+      transform: translateX(-120%);
+      animation: dashboardChartSweep 7s linear infinite;
+    }
+    .dashboard-chart-head {
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      margin-bottom:14px;
+      flex-wrap:wrap;
+    }
+    .dashboard-tv-actions {
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
+    }
+    .dashboard-ranking-list {
+      display:grid;
+      gap:12px;
+    }
+    .dashboard-ranking-item {
+      display:grid;
+      grid-template-columns: auto minmax(0,1fr) auto;
+      gap:14px;
+      align-items:center;
+      padding:14px 16px;
+      border-radius:18px;
+      background: rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.06);
+    }
+    .dashboard-ranking-pos {
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      font-weight:800;
+      background: rgba(56,189,248,.14);
+      border:1px solid rgba(56,189,248,.18);
+      color:#7dd3fc;
+    }
+    .dashboard-ranking-name {
+      font-weight:700;
+      margin-bottom:4px;
+    }
+    .dashboard-ranking-metric {
+      text-align:right;
+      min-width: 110px;
+    }
+    .dashboard-ranking-metric .big {
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .dashboard-tv-modal .modal-card {
+      width: min(1380px, 100%);
+      max-height: 96vh;
+    }
+    .dashboard-tv-modal.fullscreen {
+      padding: 0;
+    }
+    .dashboard-tv-modal.fullscreen .modal-card {
+      width: 100vw;
+      max-width: 100vw;
+      height: 100vh;
+      max-height: 100vh;
+      border-radius: 0;
+    }
+    .dashboard-tv-body {
+      display:grid;
+      gap:18px;
+    }
+    .dashboard-tv-hero {
+      position:relative;
+      overflow:hidden;
+      padding:24px;
+      border-radius:26px;
+      background: linear-gradient(135deg, rgba(37,99,235,.24), rgba(14,165,233,.16), rgba(34,197,94,.14));
+      border:1px solid rgba(125,211,252,.24);
+      box-shadow: 0 24px 60px rgba(0,0,0,.28);
+    }
+    .dashboard-tv-hero::after {
+      content:'';
+      position:absolute;
+      inset:0;
+      background: linear-gradient(110deg, transparent 0%, rgba(255,255,255,.08) 46%, transparent 72%);
+      transform: translateX(-120%);
+      animation: dashboardChartSweep 5.2s linear infinite;
+    }
+    .dashboard-tv-hero-grid {
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:18px;
+      align-items:center;
+    }
+    .dashboard-tv-kpis {
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap:12px;
+      margin-top:16px;
+    }
+    .dashboard-tv-kpi {
+      padding:14px 16px;
+      border-radius:18px;
+      background: rgba(9,15,26,.34);
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .dashboard-tv-kpi .label {
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      color:#bfdbfe;
+      margin-bottom:8px;
+    }
+    .dashboard-tv-kpi .value {
+      font-size:28px;
+      font-weight:800;
+      line-height:1;
+    }
+    .dashboard-tv-grid {
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:18px;
+    }
+    .dashboard-tv-grid .chart-box {
+      height: 42vh !important;
+      min-height: 320px;
+    }
+    .dashboard-tv-footer {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    @keyframes dashboardChartSweep {
+      0% { transform: translateX(-120%); }
+      100% { transform: translateX(120%); }
+    }
+
+    
+    .room-queue-toolbar {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:8px;
+    }
+    .room-queue-count {
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      background: rgba(56,189,248,.12);
+      border:1px solid rgba(56,189,248,.18);
+      color:#7dd3fc;
+      font-size:12px;
+      font-weight:700;
+    }
+    .room-next-preview {
+      padding:12px 14px;
+      border-radius:16px;
+      background: rgba(56,189,248,.08);
+      border:1px solid rgba(56,189,248,.16);
+      margin-bottom:10px;
+    }
+    .room-next-preview .label {
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      color:#bae6fd;
+      margin-bottom:6px;
+    }
+    .room-next-preview .value {
+      font-size:15px;
+      font-weight:700;
+      line-height:1.35;
+    }
+    .queue-item-highlight {
+      border-color: rgba(34,197,94,.18);
+      background: rgba(34,197,94,.08);
+    }
+    .call-actions .btn[disabled] {
+      opacity:.55;
+      cursor:not-allowed;
+      transform:none;
+      filter:saturate(.75);
+    }
+    .attendance-screen-side-list {
+      display:grid;
+      gap:12px;
+    }
+    .attendance-screen-side-item {
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      padding:14px 16px;
+      border-radius:18px;
+      background: rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.06);
+    }
+    .attendance-screen-side-item .name {
+      font-size:16px;
+      font-weight:700;
+      line-height:1.25;
+    }
+    .attendance-screen-side-item .meta {
+      font-size:12px;
+      color: var(--muted);
+      margin-top:4px;
+      line-height:1.4;
+    }
+
+
+    .report-hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: 26px;
+      padding: 24px 26px;
+      background: linear-gradient(135deg, rgba(14,165,233,.18), rgba(37,99,235,.16), rgba(34,197,94,.12));
+      border: 1px solid rgba(125,211,252,.2);
+      box-shadow: var(--shadow);
+    }
+    .report-hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at top right, rgba(255,255,255,.1), transparent 28%);
+    }
+    .report-hero-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 18px;
+      align-items: start;
+    }
+    .report-hero h3 { margin: 0 0 8px; font-size: 28px; }
+    .report-hero p { margin: 0; color: #dbeafe; }
+    .report-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 16px;
+    }
+    .report-panel-grid {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 18px;
+    }
+    .report-highlight-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .report-highlight-card {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
+      display: grid;
+      gap: 8px;
+    }
+    .report-highlight-card .value {
+      font-size: 26px;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .report-list {
+      display: grid;
+      gap: 12px;
+    }
+    .report-list-item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
+    }
+    .report-list-item .metric {
+      text-align: right;
+      min-width: 120px;
+    }
+    .report-list-item .metric .big {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .report-filter-grid {
+      display: grid;
+      grid-template-columns: 1.2fr repeat(4, minmax(0, 1fr)) auto;
+      gap: 12px;
+      align-items: end;
+    }
+    .report-badge-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .report-table table {
+      min-width: 1450px;
+    }
 
     @media (max-width: 1200px) {
-      .grid-4, .grid-5 { grid-template-columns: repeat(2, 1fr); }
-      .grid-3, .grid-2, .split, .kanban-grid { grid-template-columns: 1fr; }
+      .grid-4, .grid-5, .kpi-grid-5 { grid-template-columns: repeat(2, 1fr); }
+      .grid-3, .grid-2, .split, .kanban-grid, .dashboard-hero-grid, .attention-grid, .step-grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 980px) {
       .app { grid-template-columns: 1fr; }
       .sidebar { position: static; height: auto; }
       .topbar { flex-direction: column; align-items: stretch; }
+      .topbar .topbar-logo { width: 100%; max-width: 220px; }
       .topbar-actions { justify-content: stretch; }
       .topbar-actions .btn { flex: 1; }
     }
     @media (max-width: 720px) {
       .main { padding: 14px; }
-      .grid-4, .grid-3, .grid-5, .form-grid, .form-grid-3, .exam-checklist, .exam-extra-fields, .kanban-grid, .unit-modal-grid, .room-grid, .repeater-row { grid-template-columns: 1fr; }
+      .grid-4, .grid-3, .grid-5, .kpi-grid-5, .form-grid, .form-grid-3, .exam-checklist, .exam-extra-fields, .kanban-grid, .unit-modal-grid, .room-grid, .repeater-row, .attention-grid, .step-grid, .dashboard-hero-grid { grid-template-columns: 1fr; }
       .timeline-item { grid-template-columns: 1fr; }
       .topbar h2 { font-size: 22px; }
       table { min-width: 760px; }
@@ -828,8 +1447,25 @@
 <h2 id="pageTitle">Dashboard</h2>
 <p id="pageSubtitle">Visão geral do atendimento ocupacional desde a recepção até o médico do trabalho.</p>
 </div>
+<div class="logo-sesi-inline topbar-logo" aria-hidden="true">
+  <svg viewBox="0 0 220 64" role="img">
+    <defs>
+      <linearGradient id="sesiGradient" x1="0%" x2="100%" y1="0%" y2="100%">
+        <stop offset="0%" stop-color="#67e8f9"></stop>
+        <stop offset="55%" stop-color="#38bdf8"></stop>
+        <stop offset="100%" stop-color="#2563eb"></stop>
+      </linearGradient>
+    </defs>
+    <ellipse class="sesi-glow" cx="42" cy="24" rx="26" ry="18"></ellipse>
+    <rect class="sesi-pill" x="8" y="8" rx="20" ry="20" width="68" height="32"></rect>
+    <path class="sesi-core" d="M17 23.5c4.4-10 17.8-13.8 28.4-12.2 4.6.7 8.6 2.3 12.1 4.8l-5.2 6.2c-2.8-1.8-6-2.9-9.6-3.2-7.3-.7-14.7 1.7-18.5 7.8-1 1.7-1.6 3.7-1.8 5.6l-8.4-2.1c.4-2.3 1.2-4.7 3-6.9Z"></path>
+    <path class="sesi-core" d="M58.7 19.5c-3.3 8.9-12.5 14.8-22.1 15.9-6.7.8-13.7-.8-19.2-4.7l5-6.1c3.8 2.5 8.6 3.5 13.2 2.8 5.9-.8 11.5-4.4 14-10l9.1 2.1Z" opacity=".96"></path>
+    <circle class="sesi-spark" cx="63" cy="15" r="2.5"></circle>
+    <text class="sesi-text-main" x="90" y="28" font-size="24" font-family="Inter, Arial, sans-serif">SESI</text>
+    <text class="sesi-text-sub" x="90" y="46" font-size="11" font-family="Inter, Arial, sans-serif">SAÚDE OCUPACIONAL</text>
+  </svg>
+</div>
 <div class="topbar-actions">
-<button class="btn btn-ghost" id="btnRestaurar">Restaurar base inicial</button>
 <button class="btn btn-primary" id="btnNovoAtendimento">+ Novo Atendimento</button>
 </div>
 </header>
@@ -863,6 +1499,24 @@
 <div>
 <div class="small">Cadastro inicial da recepção</div>
 <div style="font-size:22px;font-weight:700">Novo Atendimento</div>
+</div>
+<div class="logo-sesi-inline modal-logo" aria-hidden="true">
+  <svg viewBox="0 0 220 64" role="img">
+    <defs>
+      <linearGradient id="sesiGradient" x1="0%" x2="100%" y1="0%" y2="100%">
+        <stop offset="0%" stop-color="#67e8f9"></stop>
+        <stop offset="55%" stop-color="#38bdf8"></stop>
+        <stop offset="100%" stop-color="#2563eb"></stop>
+      </linearGradient>
+    </defs>
+    <ellipse class="sesi-glow" cx="42" cy="24" rx="26" ry="18"></ellipse>
+    <rect class="sesi-pill" x="8" y="8" rx="20" ry="20" width="68" height="32"></rect>
+    <path class="sesi-core" d="M17 23.5c4.4-10 17.8-13.8 28.4-12.2 4.6.7 8.6 2.3 12.1 4.8l-5.2 6.2c-2.8-1.8-6-2.9-9.6-3.2-7.3-.7-14.7 1.7-18.5 7.8-1 1.7-1.6 3.7-1.8 5.6l-8.4-2.1c.4-2.3 1.2-4.7 3-6.9Z"></path>
+    <path class="sesi-core" d="M58.7 19.5c-3.3 8.9-12.5 14.8-22.1 15.9-6.7.8-13.7-.8-19.2-4.7l5-6.1c3.8 2.5 8.6 3.5 13.2 2.8 5.9-.8 11.5-4.4 14-10l9.1 2.1Z" opacity=".96"></path>
+    <circle class="sesi-spark" cx="63" cy="15" r="2.5"></circle>
+    <text class="sesi-text-main" x="90" y="28" font-size="24" font-family="Inter, Arial, sans-serif">SESI</text>
+    <text class="sesi-text-sub" x="90" y="46" font-size="11" font-family="Inter, Arial, sans-serif">SAÚDE OCUPACIONAL</text>
+  </svg>
 </div>
 <button class="btn btn-ghost" onclick="closeNewModal()">Fechar</button>
 </div>
@@ -909,7 +1563,7 @@
 <div class="row-title">Tipos de RX</div>
 <div class="small">Selecione um ou mais tipos de RX para este atendimento.</div>
 </div>
-<button class="btn btn-ghost" onclick="addExamDetailRow('rx')" type="button">+ Adicionar RX</button>
+<button class="btn btn-ghost" onclick="addExamDetailRow('rx')" type="button">Adicionar</button>
 </div>
 <div class="repeater-list" id="rxRepeaterList"></div>
 </div>
@@ -919,7 +1573,7 @@
 <div class="row-title">Exames laboratoriais</div>
 <div class="small">Selecione um ou mais exames laboratoriais para este atendimento.</div>
 </div>
-<button class="btn btn-ghost" onclick="addExamDetailRow('lab')" type="button">+ Adicionar exame</button>
+<button class="btn btn-ghost" onclick="addExamDetailRow('lab')" type="button">Adicionar</button>
 </div>
 <div class="repeater-list" id="labRepeaterList"></div>
 </div>
@@ -960,12 +1614,30 @@
 <div class="small">Papa Fila</div>
 <div style="font-size:22px;font-weight:700">Tela de Atendimento</div>
 </div>
-<div style="display:flex;gap:10px;flex-wrap:wrap">
+<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+<span class="sound-status" id="soundStatusBadge">🔊 Som de chamada ativo</span>
 <button class="btn btn-ghost" id="toggleAttendanceScreenBtn" onclick="toggleAttendanceScreenFullscreen()">Tela cheia</button>
 <button class="btn btn-ghost" onclick="closeAttendanceScreen()">Fechar</button>
 </div>
 </div>
 <div class="modal-body" id="attendanceScreenBody"></div>
+</div>
+</div>
+
+
+<div class="modal dashboard-tv-modal" id="dashboardTvModal">
+<div class="modal-card">
+<div class="modal-head">
+<div>
+<div class="small">Dashboard</div>
+<div style="font-size:22px;font-weight:700">Painel TV dos Indicadores</div>
+</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap">
+<button class="btn btn-ghost" id="toggleDashboardTvBtn" onclick="toggleDashboardTvFullscreen()">Tela cheia</button>
+<button class="btn btn-ghost" onclick="closeDashboardTvModal()">Fechar</button>
+</div>
+</div>
+<div class="modal-body dashboard-tv-body" id="dashboardTvBody"></div>
 </div>
 </div>
 
@@ -1037,6 +1709,36 @@
       { key: 'exames-02', label: 'Sala Exames 02', stage: 'Exames', icon: '🧪', description: 'Sala de apoio para absorver pico da fila de exames.' }
     ];
 
+    const PAPA_FILA_QUEUE_OPTIONS = [
+      { value: 'Audiometria', stage: 'Exames', icon: '🎧' },
+      { value: 'Acuidade Visual', stage: 'Exames', icon: '👁️' },
+      { value: 'Espirometria', stage: 'Exames', icon: '🌬️' },
+      { value: 'ECG', stage: 'Exames', icon: '🫀' },
+      { value: 'EEG', stage: 'Exames', icon: '🧠' },
+      { value: 'RX', stage: 'Exames', icon: '🩻' },
+      { value: 'Exames Laboratoriais', stage: 'Exames', icon: '🧪' },
+      { value: 'Avaliação Psicossocial', stage: 'Exames', icon: '💬' },
+      { value: 'Triagem', stage: 'Triagem', icon: '🚦' },
+      { value: 'Atendimento médico', stage: 'Médico', icon: '👨‍⚕️' }
+    ];
+
+    function getQueueOptionByValue(value) {
+      return PAPA_FILA_QUEUE_OPTIONS.find(option => option.value === value) || null;
+    }
+
+    function getRoomDefaultQueueType(room) {
+      if (room.stage === 'Triagem') return 'Triagem';
+      if (room.stage === 'Médico') return 'Atendimento médico';
+      return 'Audiometria';
+    }
+
+    function getQueueStage(queueType, fallbackStage = 'Exames') {
+      return getQueueOptionByValue(queueType)?.stage || fallbackStage;
+    }
+
+    function getQueueIcon(queueType, fallbackIcon = '📣') {
+      return getQueueOptionByValue(queueType)?.icon || fallbackIcon;
+    }
 
     function normalizeExamTypeList(value) {
       if (Array.isArray(value)) {
@@ -1235,12 +1937,69 @@
       'santo-amaro': buildSantoAmaroBase(INITIAL_PATIENTS_PAULISTA)
     };
 
+    function getDefaultExamForStage(stage) {
+      if (stage === 'Triagem') return 'Triagem';
+      if (stage === 'Médico') return 'Atendimento médico';
+      return 'Exame ocupacional';
+    }
+
+    function getDefaultDisplayRoomForRoom(room) {
+      return room.label;
+    }
+
+    function getDefaultDisplayExamForRoom(room) {
+      return getRoomDefaultQueueType(room);
+    }
+
+    function getPapaFilaSettingsStorageKey(unitKey = selectedUnit) {
+      return `${STORAGE_KEY_PREFIX}-${unitKey}-papa-fila-settings`;
+    }
+
+    function buildDefaultPapaFilaRoomSettings() {
+      return PAPA_FILA_ROOMS.reduce((acc, room) => {
+        acc[room.key] = {
+          queueType: getRoomDefaultQueueType(room),
+          displayRoomLabel: getDefaultDisplayRoomForRoom(room),
+          displayExamLabel: getDefaultDisplayExamForRoom(room)
+        };
+        return acc;
+      }, {});
+    }
+
+    function loadPapaFilaRoomSettings(unitKey = selectedUnit) {
+      const defaults = buildDefaultPapaFilaRoomSettings();
+      try {
+        const raw = localStorage.getItem(getPapaFilaSettingsStorageKey(unitKey));
+        if (!raw) return defaults;
+        const parsed = JSON.parse(raw);
+        return Object.keys(defaults).reduce((acc, roomKey) => {
+          const current = parsed?.[roomKey] || {};
+          const queueType = sanitizeText(current.queueType) || sanitizeText(current.examType) || defaults[roomKey].queueType;
+          acc[roomKey] = {
+            queueType: getQueueOptionByValue(queueType)?.value || defaults[roomKey].queueType,
+            displayRoomLabel: sanitizeText(current.displayRoomLabel) || sanitizeText(current.label) || defaults[roomKey].displayRoomLabel,
+            displayExamLabel: sanitizeText(current.displayExamLabel) || sanitizeText(current.examType) || defaults[roomKey].displayExamLabel
+          };
+          return acc;
+        }, {});
+      } catch (error) {
+        return defaults;
+      }
+    }
+
+    function savePapaFilaRoomSettings() {
+      localStorage.setItem(getPapaFilaSettingsStorageKey(), JSON.stringify(papaFilaRoomSettings));
+    }
+
     let selectedUnit = loadSelectedUnit();
     let patients = loadPatients();
     let currentPage = 'dashboard';
     let chart;
+    let dashboardSummaryChart;
+    let dashboardTvStatusChart;
+    let dashboardTvSummaryChart;
     let examsFilters = { search: '', exam: '' };
-    let papaFilaCall = { sala: '', exame: '' };
+    let papaFilaRoomSettings = loadPapaFilaRoomSettings();
 
     function clone(obj) {
       return JSON.parse(JSON.stringify(obj));
@@ -1294,20 +2053,29 @@
       return clone(INITIAL_PATIENTS_BY_UNIT[unitKey] || fallback);
     }
 
-    function loadPatients() {
-      const saved = localStorage.getItem(getStorageKey());
-      let data = null;
-      if (saved) {
-        try { data = JSON.parse(saved); } catch (e) {}
-      }
-      if (!Array.isArray(data)) data = getInitialPatientsForUnit();
-      return data.map(patient => sanitizePatientRecord({
+    function hydratePatientsData(data, unitKey = selectedUnit) {
+      const fallback = getInitialPatientsForUnit(unitKey);
+      const source = Array.isArray(data) ? data : fallback;
+      return source.map(patient => sanitizePatientRecord({
         ...patient,
         exames: (patient.exames || []).map(exam => ({
           ...exam,
           motivoNaoRealizado: exam.motivoNaoRealizado || ''
         }))
       }));
+    }
+
+    function loadPatientsForUnit(unitKey = selectedUnit) {
+      const saved = localStorage.getItem(getStorageKey(unitKey));
+      let data = null;
+      if (saved) {
+        try { data = JSON.parse(saved); } catch (e) {}
+      }
+      return hydratePatientsData(data, unitKey);
+    }
+
+    function loadPatients() {
+      return loadPatientsForUnit(selectedUnit);
     }
 
     function compareQueueOrder(a, b) {
@@ -1325,7 +2093,9 @@
     function restoreBase() {
       if (!confirm('Deseja restaurar a base original da planilha e descartar alterações locais?')) return;
       patients = getInitialPatientsForUnit();
+      papaFilaRoomSettings = buildDefaultPapaFilaRoomSettings();
       savePatients();
+      savePapaFilaRoomSettings();
       refreshAll();
     }
 
@@ -1377,6 +2147,7 @@
       selectedUnit = unitKey;
       saveSelectedUnit();
       patients = loadPatients();
+      papaFilaRoomSettings = loadPapaFilaRoomSettings();
       syncAllFlows();
       refreshAll();
       updateUnitUI();
@@ -1391,7 +2162,8 @@
         roomLabel: data.roomLabel || '',
         calledAt: data.calledAt || '',
         callCount: Number(data.callCount || 0),
-        history: Array.isArray(data.history) ? data.history : []
+        history: Array.isArray(data.history) ? data.history : [],
+        completedQueues: data.completedQueues && typeof data.completedQueues === 'object' ? data.completedQueues : {}
       };
     }
 
@@ -1411,7 +2183,102 @@
     }
 
     function getRoomConfig(roomKey) {
-      return PAPA_FILA_ROOMS.find(room => room.key === roomKey) || null;
+      const room = PAPA_FILA_ROOMS.find(item => item.key === roomKey);
+      if (!room) return null;
+      const settings = papaFilaRoomSettings?.[roomKey] || {};
+      const queueType = getQueueOptionByValue(sanitizeText(settings.queueType))?.value || getRoomDefaultQueueType(room);
+      return {
+        ...room,
+        queueType,
+        queueStage: getQueueStage(queueType, room.stage),
+        queueIcon: getQueueIcon(queueType, room.icon),
+        displayRoomLabel: sanitizeText(settings.displayRoomLabel) || room.label,
+        displayExamLabel: sanitizeText(settings.displayExamLabel) || queueType
+      };
+    }
+
+    function hasCompletedQueueCall(patient, queueType) {
+      const normalizedQueue = sanitizeText(queueType);
+      if (!normalizedQueue) return false;
+      const call = ensurePapaFila(patient);
+      return Boolean(call.completedQueues?.[normalizedQueue]);
+    }
+
+    function markQueueAsCompleted(patient, queueType) {
+      const normalizedQueue = sanitizeText(queueType);
+      if (!normalizedQueue) return;
+      const call = ensurePapaFila(patient);
+      call.completedQueues = call.completedQueues && typeof call.completedQueues === 'object' ? call.completedQueues : {};
+      call.completedQueues[normalizedQueue] = nowIso();
+    }
+
+    function clearQueueCompletion(patient, queueType) {
+      const normalizedQueue = sanitizeText(queueType);
+      if (!normalizedQueue) return;
+      const call = ensurePapaFila(patient);
+      if (call.completedQueues && call.completedQueues[normalizedQueue]) {
+        delete call.completedQueues[normalizedQueue];
+      }
+    }
+
+    function clearCompletedQueuesByStage(patient, stage) {
+      const call = ensurePapaFila(patient);
+      if (!call.completedQueues || typeof call.completedQueues !== 'object') return;
+      Object.keys(call.completedQueues).forEach(queueType => {
+        if (getQueueStage(queueType) === stage) delete call.completedQueues[queueType];
+      });
+    }
+
+    function completePatientQueueStep(patient, queueType) {
+      const normalizedQueue = sanitizeText(queueType);
+      if (!normalizedQueue) return;
+      if (normalizedQueue === 'Triagem') {
+        patient.triagem = patient.triagem || {};
+        patient.triagem.status = 'Concluído';
+        patient.triagem.data = patient.triagem.data || new Date().toISOString().slice(0, 10);
+        clearCompletedQueuesByStage(patient, 'Triagem');
+        markQueueAsCompleted(patient, normalizedQueue);
+        updateFlow(patient);
+        return;
+      }
+      if (normalizedQueue === 'Atendimento médico') {
+        patient.medico = patient.medico || {};
+        patient.medico.data = patient.medico.data || new Date().toISOString().slice(0, 10);
+        clearCompletedQueuesByStage(patient, 'Médico');
+        markQueueAsCompleted(patient, normalizedQueue);
+        updateFlow(patient);
+        return;
+      }
+      const exam = (patient.exames || []).find(item => item.nome === normalizedQueue);
+      if (exam) {
+        exam.status = 'Concluído';
+        exam.motivoNaoRealizado = '';
+      }
+      clearCompletedQueuesByStage(patient, 'Exames');
+      markQueueAsCompleted(patient, normalizedQueue);
+      updateFlow(patient);
+    }
+
+    function isPatientEligibleForQueueType(patient, queueType) {
+      const normalizedQueue = sanitizeText(queueType);
+      if (!normalizedQueue) return false;
+      if (normalizedQueue === 'Triagem') return patient.etapa === 'Triagem';
+      if (normalizedQueue === 'Atendimento médico') return patient.etapa === 'Médico';
+      if (patient.etapa !== 'Exames') return false;
+      const exam = (patient.exames || []).find(item => item.nome === normalizedQueue);
+      if (!exam) return false;
+      return !['Concluído', 'Não se aplica'].includes(exam.status);
+    }
+
+    function getEligibleQueueByType(queueType) {
+      return patients
+        .filter(patient => isPatientEligibleForQueueType(patient, queueType))
+        .filter(patient => !hasCompletedQueueCall(patient, queueType))
+        .filter(patient => {
+          const call = ensurePapaFila(patient);
+          return !['Chamado', 'Em atendimento'].includes(call.status);
+        })
+        .sort(compareQueueOrder);
     }
 
     function getEligibleQueueByStage(stage) {
@@ -1456,35 +2323,68 @@
       call.history.unshift({
         action,
         roomKey,
-        roomLabel: room?.label || call.roomLabel || '',
+        roomLabel: room?.displayRoomLabel || room?.label || call.roomLabel || '',
         timestamp: nowIso(),
         stage: patient.etapa,
         ...extra
       });
-      call.history = call.history.slice(0, 20);
+      call.history = call.history.slice(0, 30);
+    }
+
+
+    function assignPatientToRoom(patient, room, action = 'called', extra = {}) {
+      if (!patient || !room) return null;
+      clearQueueCompletion(patient, room.queueType);
+      const call = ensurePapaFila(patient);
+      call.status = 'Chamado';
+      call.roomKey = room.key;
+      call.roomLabel = room.displayRoomLabel;
+      call.calledAt = nowIso();
+      call.callCount += 1;
+      registerCallEvent(patient, action, room.key, {
+        queueType: room.queueType,
+        displayExamLabel: room.displayExamLabel,
+        ...extra
+      });
+      return call;
+    }
+
+    function getRoomQueueSnapshot(roomKey) {
+      const room = getRoomConfig(roomKey);
+      if (!room) return { room: null, queue: [], activePatient: null, nextPatient: null };
+      const activePatient = getRoomActivePatient(roomKey);
+      const queue = getEligibleQueueByType(room.queueType);
+      return { room, queue, activePatient, nextPatient: queue[0] || null };
+    }
+
+    function autoCallNextPatientForRoom(roomKey, options = {}) {
+      const room = getRoomConfig(roomKey);
+      if (!room) return null;
+      const nextPatient = getEligibleQueueByType(room.queueType)[0];
+      if (!nextPatient) return null;
+      assignPatientToRoom(nextPatient, room, 'called', options.extra || {});
+      savePatients();
+      refreshAll();
+      announcePatientCall(nextPatient, room, 'called');
+      return nextPatient;
     }
 
     function callNextPatient(roomKey) {
       const room = getRoomConfig(roomKey);
       if (!room) return;
       if (getRoomActivePatient(roomKey)) {
-        alert('Esta sala já possui um paciente chamado ou em atendimento.');
+        alert('Esta sala já possui um paciente chamado ou em atendimento. Finalize ou libere a sala antes de uma nova chamada.');
         return;
       }
-      const nextPatient = getEligibleQueueByStage(room.stage)[0];
+      const nextPatient = getEligibleQueueByType(room.queueType)[0];
       if (!nextPatient) {
         alert('Não há pacientes elegíveis nesta fila no momento.');
         return;
       }
-      const call = ensurePapaFila(nextPatient);
-      call.status = 'Chamado';
-      call.roomKey = room.key;
-      call.roomLabel = room.label;
-      call.calledAt = nowIso();
-      call.callCount += 1;
-      registerCallEvent(nextPatient, 'called', room.key);
+      assignPatientToRoom(nextPatient, room, 'called');
       savePatients();
       refreshAll();
+      announcePatientCall(nextPatient, room, 'called');
     }
 
     function recallRoomPatient(roomKey) {
@@ -1493,13 +2393,17 @@
         alert('Não há paciente ativo nesta sala para rechamar.');
         return;
       }
+      const room = getRoomConfig(roomKey);
       const call = ensurePapaFila(patient);
       call.status = 'Chamado';
+      call.roomKey = roomKey;
+      call.roomLabel = room?.displayRoomLabel || call.roomLabel;
       call.calledAt = nowIso();
       call.callCount += 1;
-      registerCallEvent(patient, 'recalled', roomKey);
+      registerCallEvent(patient, 'recalled', roomKey, { queueType: room?.queueType || '', displayExamLabel: room?.displayExamLabel || '' });
       savePatients();
       refreshAll();
+      announcePatientCall(patient, room, 'recalled');
     }
 
     function startRoomAttendance(roomKey) {
@@ -1510,51 +2414,197 @@
       }
       const call = ensurePapaFila(patient);
       call.status = 'Em atendimento';
-      registerCallEvent(patient, 'started', roomKey);
+      call.roomKey = roomKey;
+      if (!call.calledAt) call.calledAt = nowIso();
+      registerCallEvent(patient, 'started', roomKey, { queueType: getRoomConfig(roomKey)?.queueType || '' });
       savePatients();
       refreshAll();
     }
 
-    function releaseRoom(roomKey) {
+    function releaseRoom(roomKey, options = {}) {
+      const { suppressAlert = false, skipRefresh = false, keepHistory = true } = options;
       const patient = getRoomActivePatient(roomKey);
       if (!patient) {
-        alert('Não há atendimento ativo nesta sala.');
-        return;
+        if (!suppressAlert) alert('Não há atendimento ativo nesta sala.');
+        return null;
       }
       const call = ensurePapaFila(patient);
-      registerCallEvent(patient, 'released', roomKey);
+      if (keepHistory) registerCallEvent(patient, 'released', roomKey, { queueType: getRoomConfig(roomKey)?.queueType || '' });
       call.status = '';
       call.roomKey = '';
       call.roomLabel = '';
       call.calledAt = '';
       savePatients();
+      if (!skipRefresh) refreshAll();
+      return patient;
+    }
+
+    function finalizeRoomAttendance(roomKey) {
+      const room = getRoomConfig(roomKey);
+      const currentPatient = getRoomActivePatient(roomKey);
+      if (!room || !currentPatient) {
+        alert('Não há atendimento ativo nesta sala.');
+        return;
+      }
+
+      completePatientQueueStep(currentPatient, room.queueType);
+      registerCallEvent(currentPatient, 'completed', roomKey, {
+        queueType: room.queueType,
+        displayExamLabel: room.displayExamLabel,
+        finalizedFromRoom: true
+      });
+      releaseRoom(roomKey, { skipRefresh: true, suppressAlert: true, keepHistory: false });
+
+      const nextPatient = getEligibleQueueByType(room.queueType)[0];
+      if (nextPatient) {
+        assignPatientToRoom(nextPatient, room, 'called', { autoCalledAfterFinalize: true });
+        savePatients();
+        refreshAll();
+        announcePatientCall(nextPatient, room, 'called');
+        return;
+      }
+
+      savePatients();
       refreshAll();
     }
 
+    let papaFilaAudioContext = null;
+    let papaFilaAudioEnabled = true;
+    let lastAnnouncementSignature = '';
+    let attendanceSpotlightIndex = 0;
+    let attendanceSpotlightTimer = null;
+
+    function updateSoundStatusBadge() {
+      const badge = document.getElementById('soundStatusBadge');
+      if (!badge) return;
+      badge.textContent = papaFilaAudioEnabled ? '🔊 Som de chamada ativo' : '🔇 Som de chamada indisponível';
+    }
+
+    function ensurePapaFilaAudioContext() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return null;
+        if (!papaFilaAudioContext) papaFilaAudioContext = new AudioCtx();
+        if (papaFilaAudioContext.state === 'suspended') papaFilaAudioContext.resume().catch(() => {});
+        return papaFilaAudioContext;
+      } catch (error) {
+        papaFilaAudioEnabled = false;
+        updateSoundStatusBadge();
+        return null;
+      }
+    }
+
+    function playToneSequence() {
+      const ctx = ensurePapaFilaAudioContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      [880, 1174, 1567].forEach((freq, index) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.0001, now);
+        const start = now + (index * 0.18);
+        gain.gain.exponentialRampToValueAtTime(0.08, start + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.16);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(start);
+        osc.stop(start + 0.18);
+      });
+    }
+
+    function speakCallMessage(message) {
+      if (!('speechSynthesis' in window) || !message) return;
+      try {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(message);
+        utterance.lang = 'pt-BR';
+        utterance.rate = 1;
+        utterance.pitch = 1;
+        setTimeout(() => window.speechSynthesis.speak(utterance), 420);
+      } catch (error) {}
+    }
+
+    function announcePatientCall(patient, room, action = 'called') {
+      if (!patient || !room) return;
+      playToneSequence();
+      const examLabel = getPatientExamSummary(patient, room);
+      const roomLabel = maskText(room.displayRoomLabel);
+      const patientName = maskText(patient.nome);
+      const verb = action === 'recalled' ? 'comparecer novamente' : 'dirigir-se';
+      speakCallMessage(`${patientName}, favor ${verb} à ${roomLabel} para ${examLabel}.`);
+    }
+
+    function syncAttendanceScreenSpotlight(activeCalls) {
+      const cards = Array.from(document.querySelectorAll('.attendance-screen-card[data-spotlight-index]'));
+      cards.forEach(card => card.classList.remove('is-spotlight'));
+      if (!cards.length) return;
+      if (attendanceSpotlightIndex >= cards.length) attendanceSpotlightIndex = 0;
+      cards[attendanceSpotlightIndex]?.classList.add('is-spotlight');
+      if (attendanceSpotlightTimer) clearInterval(attendanceSpotlightTimer);
+      if (cards.length > 1) {
+        attendanceSpotlightTimer = setInterval(() => {
+          const refreshCards = Array.from(document.querySelectorAll('.attendance-screen-card[data-spotlight-index]'));
+          if (!refreshCards.length) return;
+          refreshCards.forEach(card => card.classList.remove('is-spotlight'));
+          attendanceSpotlightIndex = (attendanceSpotlightIndex + 1) % refreshCards.length;
+          refreshCards[attendanceSpotlightIndex]?.classList.add('is-spotlight');
+        }, 4000);
+      } else {
+        attendanceSpotlightTimer = null;
+      }
+    }
+
     function resetCallBoard() {
-      if (!confirm('Deseja limpar todas as chamadas ativas do Papa Fila desta unidade?')) return;
-      patients.forEach(patient => {
+      const activePatients = patients.filter(patient => {
         const call = ensurePapaFila(patient);
-        if (call.roomKey || call.status) {
-          registerCallEvent(patient, 'reset', call.roomKey || '');
-        }
+        return Boolean(call.roomKey || call.status || call.calledAt);
+      });
+      if (!activePatients.length) {
+        alert('Não há chamadas ativas para limpar nesta unidade.');
+        return;
+      }
+      if (!confirm('Deseja limpar todas as chamadas ativas do Papa Fila desta unidade?')) return;
+
+      activePatients.forEach(patient => {
+        const call = ensurePapaFila(patient);
+        registerCallEvent(patient, 'reset', call.roomKey || '', {
+          queueType: call.history?.[0]?.queueType || '',
+          displayExamLabel: call.history?.[0]?.displayExamLabel || ''
+        });
         call.status = '';
         call.roomKey = '';
         call.roomLabel = '';
         call.calledAt = '';
       });
+
+      if ('speechSynthesis' in window) {
+        try { window.speechSynthesis.cancel(); } catch (error) {}
+      }
+      if (attendanceSpotlightTimer) {
+        clearInterval(attendanceSpotlightTimer);
+        attendanceSpotlightTimer = null;
+      }
+      attendanceSpotlightIndex = 0;
+
       savePatients();
-      refreshAll();
+      renderPapaFila();
+      renderAttendanceScreen();
+      const papaFilaInfo = document.getElementById('papafila-call-info');
+      if (papaFilaInfo) papaFilaInfo.textContent = getPapaFilaHeader();
+      alert('Chamadas ativas limpas com sucesso.');
     }
 
-    function renderCallQueueItem(patient, index) {
+    function renderCallQueueItem(patient, index, room = null) {
       const counts = getExamCounts(patient);
+      const examSummary = room ? getPatientExamSummary(patient, room) : (patient.etapa === 'Exames' ? `${counts.done}/${counts.total} exames concluídos` : patient.etapa);
       return `
-        <div class="queue-item">
+        <div class="queue-item ${index === 0 ? 'queue-item-highlight' : ''}">
           <div>
             <div class="title">${patient.nome}</div>
             <div class="meta">${maskText(patient.empresa)} • ${maskText(patient.tipoAtendimento)} • ${patient.preferencial === 'Sim' ? 'Preferencial' : 'Ordem padrão'}</div>
-            <div class="meta" style="margin-top:6px">Etapa: ${patient.etapa} • ${counts.done}/${counts.total} exames concluídos • Ordem ${patient.ordem || '—'}</div>
+            <div class="meta" style="margin-top:6px">${room ? `Previsto: ${maskText(examSummary)}` : `Etapa: ${patient.etapa}`} • Ordem ${patient.ordem || '—'} • ${patient.id}</div>
           </div>
           <div class="queue-order">#${index + 1}</div>
         </div>
@@ -1566,6 +2616,7 @@
         called: 'Paciente chamado',
         recalled: 'Paciente rechamado',
         started: 'Atendimento iniciado',
+        completed: 'Etapa concluída na sala',
         released: 'Sala liberada',
         reset: 'Chamada removida'
       };
@@ -1582,78 +2633,153 @@
     }
 
     function getPapaFilaHeader() {
-      const sala = (papaFilaCall?.sala || '').trim();
-      const exame = (papaFilaCall?.exame || '').trim();
-      if (sala && exame) return `${maskText(sala)} • ${maskText(exame)}`;
-      if (sala) return maskText(sala);
-      if (exame) return maskText(exame);
-      return 'Configure a sala e o tipo de exame para exibir na chamada.';
+      const configuredRooms = PAPA_FILA_ROOMS.map(room => getRoomConfig(room.key))
+        .filter(Boolean)
+        .map(room => `${maskText(room.displayRoomLabel)} • ${maskText(room.displayExamLabel)} • fila: ${maskText(room.queueType)}`);
+      return configuredRooms.length
+        ? configuredRooms.join(' | ')
+        : 'Configure as filas, salas e tipos de atendimento para exibir na chamada.';
     }
 
     function bindPapaFilaInputs() {
-      const salaInput = document.getElementById('papafila-sala');
-      const exameInput = document.getElementById('papafila-exame');
-      const info = document.getElementById('papafila-call-info');
-
-      function sync() {
-        papaFilaCall.sala = salaInput ? salaInput.value : '';
-        papaFilaCall.exame = exameInput ? exameInput.value : '';
-        if (info) info.textContent = getPapaFilaHeader();
-      }
-
-      if (salaInput) salaInput.addEventListener('input', sync);
-      if (exameInput) exameInput.addEventListener('input', sync);
+      const inputs = document.querySelectorAll('[data-papafila-room-key]');
+      inputs.forEach(input => {
+        const eventName = 'change';
+        input.addEventListener(eventName, event => {
+          const roomKey = event.currentTarget.dataset.papafilaRoomKey;
+          const field = event.currentTarget.dataset.papafilaField;
+          if (!roomKey || !field || !papaFilaRoomSettings[roomKey]) return;
+          const rawValue = event.currentTarget.value;
+          papaFilaRoomSettings[roomKey][field] = field === 'queueType'
+            ? (getQueueOptionByValue(rawValue)?.value || getRoomDefaultQueueType(PAPA_FILA_ROOMS.find(item => item.key === roomKey) || { stage: 'Exames' }))
+            : sanitizeText(rawValue);
+          if (field === 'queueType' && !sanitizeText(papaFilaRoomSettings[roomKey].displayExamLabel)) {
+            papaFilaRoomSettings[roomKey].displayExamLabel = papaFilaRoomSettings[roomKey].queueType;
+          }
+          savePapaFilaRoomSettings();
+          renderPapaFila();
+          renderAttendanceScreenContent();
+        });
+      });
     }
 
+    function renderRoomQueueList(room) {
+      const queue = getEligibleQueueByType(room.queueType).slice(0, 6);
+      if (!queue.length) return '<div class="small">Nenhum paciente aguardando nesta fila.</div>';
+      return `<div class="queue-list">${queue.map((patient, index) => renderCallQueueItem(patient, index, room)).join('')}</div>`;
+    }
 
     function getPatientExamSummary(patient, room) {
       if (!patient) return '—';
-      const configuredExam = (papaFilaCall?.exame || '').trim();
+      const configuredExam = sanitizeText(room?.displayExamLabel || room?.queueType || '');
+      if (configuredExam) return configuredExam;
       const lab = formatExamTypeDisplay(patient, 'lab');
       const rx = formatExamTypeDisplay(patient, 'rx');
       const examNames = (patient.exames || [])
         .filter(ex => ex.status !== 'Não se aplica')
         .map(ex => ex.nome);
-      if (room?.stage === 'Exames') {
-        return configuredExam || lab || rx || examNames.join(', ') || patient.tipoAtendimento || 'Exame ocupacional';
-      }
-      if (room?.stage === 'Triagem') return configuredExam || 'Triagem';
-      if (room?.stage === 'Médico') return configuredExam || 'Consulta Médica';
-      return configuredExam || patient.tipoAtendimento || examNames.join(', ') || 'Atendimento';
+      return lab || rx || examNames.join(', ') || patient.tipoAtendimento || 'Atendimento';
     }
 
     function renderAttendanceScreenContent() {
-      const activeCalls = PAPA_FILA_ROOMS.map(room => ({ room, patient: getRoomActivePatient(room.key) }))
+      const activeCalls = PAPA_FILA_ROOMS.map(baseRoom => ({ room: getRoomConfig(baseRoom.key), patient: getRoomActivePatient(baseRoom.key) }))
         .filter(item => item.patient);
       const container = document.getElementById('attendanceScreenBody');
       if (!container) return;
+      updateSoundStatusBadge();
       if (!activeCalls.length) {
+        if (attendanceSpotlightTimer) {
+          clearInterval(attendanceSpotlightTimer);
+          attendanceSpotlightTimer = null;
+        }
         container.innerHTML = `
           <div class="attendance-screen-empty">Nenhum paciente está em chamada ativa neste momento.</div>
         `;
         return;
       }
+      const heroIndex = attendanceSpotlightIndex >= activeCalls.length ? 0 : attendanceSpotlightIndex;
+      const heroItem = activeCalls[heroIndex];
+      const marqueeItems = activeCalls.map(({ room, patient }) => `
+        <div class="attendance-tv-pill">
+          <span>${room.queueIcon || room.icon}</span>
+          <strong>${maskText(patient.nome)}</strong>
+          <span>•</span>
+          <span>${maskText(room.displayRoomLabel)}</span>
+          <span>•</span>
+          <span>${maskText(getPatientExamSummary(patient, room))}</span>
+        </div>
+      `).join('');
+      const recentCalls = patients
+        .flatMap(patient => ensurePapaFila(patient).history.map(item => ({ patient, item })))
+        .filter(({ item }) => ['called', 'recalled', 'started', 'completed'].includes(item.action))
+        .sort((a, b) => new Date(b.item.timestamp || 0) - new Date(a.item.timestamp || 0))
+        .slice(0, 6);
       container.innerHTML = `
-        <div class="attendance-screen-grid">
-          ${activeCalls.map(({ room, patient }) => `
-            <div class="attendance-screen-card">
-              <div class="attendance-screen-icon">${room.icon}</div>
+        <div class="attendance-tv-layout">
+          <div class="attendance-tv-hero">
+            <div class="attendance-tv-hero-grid">
+              <div class="attendance-tv-hero-icon">${heroItem.room.queueIcon || heroItem.room.icon}</div>
               <div>
-                <div class="attendance-screen-label">Sala</div>
-                <div class="attendance-screen-value">${maskText(room.label)}</div>
-              </div>
-              <div>
-                <div class="attendance-screen-label">Tipo de exame</div>
-                <div class="attendance-screen-value">${maskText(getPatientExamSummary(patient, room))}</div>
-              </div>
-              <div>
-                <div class="attendance-screen-label">Paciente</div>
-                <div class="attendance-screen-highlight">${maskText(patient.nome)}</div>
+                <div class="attendance-tv-hero-title">Chamada atual</div>
+                <div class="attendance-tv-hero-patient">${maskText(heroItem.patient.nome)}</div>
+                <div class="attendance-tv-meta">
+                  <div class="attendance-tv-meta-card">
+                    <div class="label">Sala</div>
+                    <div class="value">${maskText(heroItem.room.displayRoomLabel)}</div>
+                  </div>
+                  <div class="attendance-tv-meta-card">
+                    <div class="label">Tipo de atendimento</div>
+                    <div class="value">${maskText(getPatientExamSummary(heroItem.patient, heroItem.room))}</div>
+                  </div>
+                </div>
               </div>
             </div>
-          `).join('')}
+          </div>
+          <div class="attendance-tv-marquee">
+            <div class="attendance-tv-marquee-track">${marqueeItems}${marqueeItems}</div>
+          </div>
+          <div class="grid-2">
+            <div class="attendance-screen-grid">
+              ${activeCalls.map(({ room, patient }, index) => `
+                <div class="attendance-screen-card ${index === heroIndex ? 'is-spotlight' : ''}" data-spotlight-index="${index}">
+                  <div class="attendance-screen-icon">${room.queueIcon || room.icon}</div>
+                  <div>
+                    <div class="attendance-screen-label">Sala</div>
+                    <div class="attendance-screen-value">${maskText(room.displayRoomLabel)}</div>
+                  </div>
+                  <div>
+                    <div class="attendance-screen-label">Tipo de exame</div>
+                    <div class="attendance-screen-value">${maskText(getPatientExamSummary(patient, room))}</div>
+                  </div>
+                  <div>
+                    <div class="attendance-screen-label">Paciente</div>
+                    <div class="attendance-screen-highlight">${maskText(patient.nome)}</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+            <div class="card">
+              <div class="row-title" style="margin-bottom:12px">Últimas chamadas</div>
+              <div class="attendance-screen-side-list">
+                ${recentCalls.map(({ patient, item }) => `
+                  <div class="attendance-screen-side-item">
+                    <div>
+                      <div class="name">${maskText(patient.nome)}</div>
+                      <div class="meta">${maskText(item.roomLabel)} • ${maskText(item.displayExamLabel || item.queueType || patient.etapa)}</div>
+                    </div>
+                    <div class="small mono">${formatDateTime(item.timestamp)}</div>
+                  </div>
+                `).join('') || '<div class="small">Nenhuma chamada recente.</div>'}
+              </div>
+            </div>
+          </div>
         </div>
       `;
+      syncAttendanceScreenSpotlight(activeCalls);
+      const heroSignature = `${heroItem.room.key}|${heroItem.patient.id}|${ensurePapaFila(heroItem.patient).calledAt}`;
+      if (heroSignature !== lastAnnouncementSignature) {
+        lastAnnouncementSignature = heroSignature;
+      }
     }
 
     function openAttendanceScreen() {
@@ -1666,6 +2792,10 @@
       if (!modal) return;
       modal.classList.remove('open');
       modal.classList.remove('fullscreen');
+      if (attendanceSpotlightTimer) {
+        clearInterval(attendanceSpotlightTimer);
+        attendanceSpotlightTimer = null;
+      }
       const btn = document.getElementById('toggleAttendanceScreenBtn');
       if (btn) btn.textContent = 'Tela cheia';
     }
@@ -1682,8 +2812,9 @@
       syncAllFlows();
       const summary = getCallBoardSummary();
       const activeCalls = PAPA_FILA_ROOMS.map(room => {
+        const config = getRoomConfig(room.key);
         const patient = getRoomActivePatient(room.key);
-        return { room, patient };
+        return { room: config, patient };
       });
       const waitingQueues = {
         Exames: getEligibleQueueByStage('Exames'),
@@ -1698,7 +2829,7 @@
             <div style="font-size:30px">${item.room.icon}</div>
             <div>
               <div class="big">${patient.nome}</div>
-              <div class="sub">${item.room.label} • ${maskText(patient.empresa)} • Última chamada em ${formatDateTime(call.calledAt)}</div>
+              <div class="sub">${item.room.displayRoomLabel} • ${maskText(getPatientExamSummary(patient, item.room))} • Última chamada em ${formatDateTime(call.calledAt)}</div>
             </div>
           </div>
         `;
@@ -1715,18 +2846,9 @@
             <button class="btn btn-primary btn-icon" id="btn-open-attendance-screen">🖥️ Tela de Atendimento</button>
           </div>
           <div class="card" style="margin-bottom:16px">
-            <div class="row-title" style="margin-bottom:12px">Configuração da chamada do enfermeiro</div>
-            <div class="small" style="margin-bottom:14px">Informe a sala e o tipo de exame que será chamado no Papa Fila.</div>
-            <div class="form-grid">
-              <div class="field">
-                <label>Nome da sala</label>
-                <input id="papafila-sala" placeholder="Ex.: Sala 02" value="${maskText(papaFilaCall?.sala || '')}">
-              </div>
-              <div class="field">
-                <label>Tipo de exame</label>
-                <input id="papafila-exame" placeholder="Ex.: Audiometria" value="${maskText(papaFilaCall?.exame || '')}">
-              </div>
-            </div>
+            <div class="row-title" style="margin-bottom:12px">Configuração das salas de atendimento</div>
+            <div class="small" style="margin-bottom:14px">Selecione a fila de atendimento de cada sala usando os nomes dos exames, incluindo triagem e atendimento médico. A lista de pacientes abaixo do cartão será atualizada conforme a fila escolhida.</div>
+            <div class="sticky-note">Use a seleção para definir qual fila a sala atende. Nos campos de exibição, preencha o nome ou número da sala e o tipo de exame que deverão aparecer na Tela de Atendimento.</div>
           </div>
 
           <div class="grid-4">
@@ -1744,7 +2866,7 @@
                   <div class="small">Exibe em destaque o paciente atualmente chamado para cada sala de atendimento.</div>
                   <div class="small" id="papafila-call-info" style="margin-top:6px">${getPapaFilaHeader()}</div>
                 </div>
-                <button class="btn btn-ghost" id="btn-reset-papa-fila">Limpar chamadas ativas</button>
+                <button class="btn btn-ghost" id="btn-reset-papa-fila" onclick="resetCallBoard()">Limpar chamadas ativas</button>
               </div>
               ${liveTicker}
             </div>
@@ -1754,7 +2876,7 @@
               <div class="summary-list">
                 <div class="summary-item"><div><div class="row-title">1. Chame apenas pacientes elegíveis</div><div class="small">As filas já respeitam etapa, ordem e preferencialidade do fluxo.</div></div><span class="chip">Automático</span></div>
                 <div class="summary-item"><div><div class="row-title">2. Inicie o atendimento ao receber o paciente</div><div class="small">O status da sala muda para “Em atendimento” sem alterar a etapa clínica.</div></div><span class="chip">Rastreável</span></div>
-                <div class="summary-item"><div><div class="row-title">3. Libere a sala ao finalizar</div><div class="small">A liberação mantém histórico de chamadas e prepara a sala para o próximo paciente.</div></div><span class="chip">Auditável</span></div>
+                <div class="summary-item"><div><div class="row-title">3. Finalize o atendimento ao concluir</div><div class="small">A finalização mantém histórico de chamadas e prepara a sala para o próximo paciente.</div></div><span class="chip">Auditável</span></div>
               </div>
             </div>
           </div>
@@ -1762,31 +2884,61 @@
           <div class="room-grid">
             ${activeCalls.map(({ room, patient }) => {
               const call = patient ? ensurePapaFila(patient) : null;
+              const queueOptions = PAPA_FILA_QUEUE_OPTIONS.map(option => `<option value="${option.value}" ${room.queueType === option.value ? 'selected' : ''}>${option.value}</option>`).join('');
+              const queueSnapshot = getRoomQueueSnapshot(room.key);
+              const nextPatient = queueSnapshot.nextPatient;
+              const hasActive = Boolean(patient);
               return `
                 <div class="room-card">
                   <div class="room-head">
-                    <div>
-                      <div class="room-name">${room.icon} ${room.label}</div>
+                    <div style="flex:1;min-width:0">
+                      <div class="field" style="margin-bottom:10px">
+                        <label>Fila / exame da sala</label>
+                        <select data-papafila-room-key="${room.key}" data-papafila-field="queueType">${queueOptions}</select>
+                      </div>
+                      <div class="form-grid" style="margin-bottom:10px">
+                        <div class="field">
+                          <label>Sala exibida na Tela de Atendimento</label>
+                          <input data-papafila-room-key="${room.key}" data-papafila-field="displayRoomLabel" value="${room.displayRoomLabel || ""}" placeholder="Ex.: Sala 02 ou Consultório 1">
+                        </div>
+                        <div class="field">
+                          <label>Tipo exibido na Tela de Atendimento</label>
+                          <input data-papafila-room-key="${room.key}" data-papafila-field="displayExamLabel" value="${room.displayExamLabel || ""}" placeholder="Ex.: Audiometria, Triagem ou Atendimento médico">
+                        </div>
+                      </div>
                       <div class="room-type">${room.description}</div>
+                      <div class="small" style="margin-top:8px">Fila selecionada: ${maskText(room.queueType)} • Etapa: ${maskText(room.queueStage)}</div>
                     </div>
-                    <span class="chip">${room.stage}</span>
+                    <span class="chip">${room.queueStage}</span>
                   </div>
                   <div class="call-patient ${patient ? '' : 'empty'}">
                     ${patient ? `
                       <div class="name">${patient.nome}</div>
                       <div class="meta">${maskText(patient.empresa)} • ${maskText(patient.tipoAtendimento)} • ${patient.preferencial === 'Sim' ? 'Preferencial' : 'Ordem padrão'}</div>
                       <div class="meta" style="margin-top:6px">${patient.id} • ${maskText(patient.cpf)} • ${formatDateTime(call.calledAt)}</div>
+                      <div class="meta" style="margin-top:6px">Tela: ${maskText(room.displayRoomLabel)} • ${maskText(getPatientExamSummary(patient, room))}</div>
                       <div style="margin-top:10px">${call.status === 'Em atendimento' ? '<span class="call-status-live">● Em atendimento</span>' : '<span class="status st-andamento">🔔 Chamado na sala</span>'}</div>
                     ` : `
                       <div class="name" style="font-size:18px">Sala disponível</div>
                       <div class="meta">Nenhum paciente em chamada ativa nesta sala.</div>
                     `}
                   </div>
+                  <div>
+                    <div class="room-queue-toolbar">
+                      <div class="row-title">Lista de pacientes desta fila</div>
+                      <span class="room-queue-count">${queueSnapshot.queue.length} aguardando</span>
+                    </div>
+                    <div class="room-next-preview">
+                      <div class="label">Próximo previsto</div>
+                      <div class="value">${nextPatient ? `${maskText(nextPatient.nome)} • ${maskText(nextPatient.empresa)}` : 'Nenhum paciente elegível nesta fila agora.'}</div>
+                    </div>
+                    ${renderRoomQueueList(room)}
+                  </div>
                   <div class="call-actions">
-                    <button class="btn btn-primary" onclick="callNextPatient('${room.key}')">Chamar próximo</button>
-                    <button class="btn btn-ghost" onclick="recallRoomPatient('${room.key}')">Rechamar</button>
-                    <button class="btn btn-success" onclick="startRoomAttendance('${room.key}')">Iniciar atendimento</button>
-                    <button class="btn btn-warning" onclick="releaseRoom('${room.key}')">Liberar sala</button>
+                    <button class="btn btn-primary" onclick="callNextPatient('${room.key}')" ${hasActive ? 'disabled' : ''}>Chamar próximo</button>
+                    <button class="btn btn-ghost" onclick="recallRoomPatient('${room.key}')" ${hasActive ? '' : 'disabled'}>Rechamar</button>
+                    <button class="btn btn-success" onclick="startRoomAttendance('${room.key}')" ${(hasActive && call?.status === 'Chamado') ? '' : 'disabled'}>Iniciar atendimento</button>
+                    <button class="btn btn-warning" onclick="finalizeRoomAttendance('${room.key}')" ${hasActive ? '' : 'disabled'}>Finalizar atendimento</button>
                   </div>
                 </div>
               `;
@@ -1896,6 +3048,7 @@
         'Bloqueado': ['🔴', 'st-bloqueado'],
         'Não se aplica': ['⚪', 'st-na'],
         'Apto': ['🟢', 'st-concluido'],
+        'Apto com Restrições': ['🟢', 'st-concluido'],
         'Pendente ASO': ['🟡', 'st-pendente'],
         'ASO Concluído': ['🟢', 'st-concluido'],
         'ASO Inapto': ['🔴', 'st-bloqueado'],
@@ -1934,6 +3087,7 @@
 
     function getAsoStatus(patient) {
       if (patient.medico?.resultado === 'Apto') return 'ASO Concluído';
+      if (patient.medico?.resultado === 'Apto com Restrições') return 'ASO Concluído';
       if (patient.medico?.resultado === 'Inapto') return 'ASO Inapto';
       if (patient.medico?.resultado === 'Pendente') return 'ASO Pendente';
       if (patient.asoCadastrado) return 'ASO Cadastrado';
@@ -2227,81 +3381,258 @@
       const medico = patients.filter(p => p.etapa === 'Médico').length;
       const concluidos = patients.filter(p => p.etapa === 'Concluído').length;
       const bloqueados = patients.filter(p => !p.asoCadastrado).length;
+      const emAtendimento = total - concluidos;
+      const preferenciais = patients.filter(p => p.preferencial === 'Sim' && p.etapa !== 'Concluído').length;
+      const pendenciaMedica = patients.filter(p => p.medico?.resultado === 'Pendente').length;
+      const avgProgress = total ? Math.round(patients.reduce((sum, patient) => sum + getExamCounts(patient).progress, 0) / total) : 0;
+      const todayAdmissions = patients.filter(p => p.dataAtendimento === new Date().toISOString().slice(0,10)).length;
 
       const examTotals = EXAM_ORDER.map(ex => {
         const statuses = patients.map(p => p.exames.find(e => e.key === ex.key)?.status || 'Não se aplica');
         return {
+          key: ex.key,
           nome: ex.nome,
           pendente: statuses.filter(s => s === 'Pendente').length,
           andamento: statuses.filter(s => s === 'Em andamento').length,
-          concluido: statuses.filter(s => s === 'Concluído').length,
+          concluido: statuses.filter(s => s === 'Concluído' || s === 'Exame liberado').length,
         };
       });
 
+      const totalExamPending = examTotals.reduce((sum, item) => sum + item.pendente + item.andamento, 0);
+      const totalExamDone = examTotals.reduce((sum, item) => sum + item.concluido, 0);
+      const triagemStats = {
+        pendente: patients.filter(p => ['Pendente', 'Em andamento', 'Bloqueado'].includes(p.triagem?.status)).length,
+        concluido: patients.filter(p => p.triagem?.status === 'Concluído').length
+      };
+      const medicoStats = {
+        pendente: patients.filter(p => !['Apto', 'Apto com Restrições', 'Inapto'].includes(p.medico?.resultado || '')).length,
+        concluido: patients.filter(p => ['Apto', 'Apto com Restrições', 'Inapto'].includes(p.medico?.resultado || '')).length
+      };
+
+      const bottleneckStage = [
+        { nome: 'Recepção', count: recepcao, hint: 'cadastro e validação inicial' },
+        { nome: 'Exames', count: exames, hint: 'execução dos exames ocupacionais' },
+        { nome: 'Triagem', count: triagem, hint: 'pré-atendimento da equipe clínica' },
+        { nome: 'Médico', count: medico, hint: 'liberação final do ASO' }
+      ].sort((a, b) => b.count - a.count)[0];
+
+      const urgentPatients = patients
+        .filter(p => p.etapa !== 'Concluído')
+        .map(p => ({ patient: p, counts: getExamCounts(p), criticality: getCriticality(p) }))
+        .sort((a, b) => {
+          const weight = { 'Alta': 3, 'Média': 2, 'Baixa': 1 };
+          if (weight[b.criticality] !== weight[a.criticality]) return weight[b.criticality] - weight[a.criticality];
+          if (daysOpen(b.patient) !== daysOpen(a.patient)) return daysOpen(b.patient) - daysOpen(a.patient);
+          return compareQueueOrder(a.patient, b.patient);
+        })
+        .slice(0, 8);
+
+      const unit = UNIT_OPTIONS[selectedUnit] || UNIT_OPTIONS.paulista;
+      const completionRate = total ? Math.round((concluidos / total) * 100) : 0;
+
       document.getElementById('page-dashboard').innerHTML = `
-        <div class="grid-4">
-          <div class="card kpi"><div class="label">Total de pacientes</div><div class="value">${total}</div><div class="hint">Base carregada da planilha</div></div>
-          <div class="card kpi"><div class="label">Fila de exames</div><div class="value">${exames}</div><div class="hint">Pacientes aguardando execução dos exames</div></div>
-          <div class="card kpi"><div class="label">Triagem pronta</div><div class="value">${triagem}</div><div class="hint">Com ASO cadastrado e exames concluídos</div></div>
-          <div class="card kpi"><div class="label">ASO concluído</div><div class="value">${concluidos}</div><div class="hint">Atendimento finalizado pelo médico</div></div>
+        <div class="dashboard-hero">
+          <div class="dashboard-hero-grid">
+            <div>
+              <div class="small" style="letter-spacing:.08em;text-transform:uppercase;color:#bfdbfe;margin-bottom:8px">Visão operacional da unidade</div>
+              <h3>${unit.shortName} • fluxo do dia mais claro</h3>
+              <p>O painel abaixo resume o que está em atendimento, onde há fila e quais pacientes precisam de ação primeiro.</p>
+              <div class="dashboard-hero-chips">
+                <span class="chip">Unidade ativa: ${unit.shortName}</span>
+                <span class="chip">${emAtendimento} em andamento</span>
+                <span class="chip">${completionRate}% do fluxo concluído</span>
+                <span class="chip">${preferenciais} preferenciais aguardando</span>
+              </div>
+            </div>
+            <div class="dashboard-hero-note">
+              <div class="title">Leitura rápida para a equipe</div>
+              <div class="big">Maior concentração está em <strong>${bottleneckStage.nome}</strong> com <strong>${bottleneckStage.count}</strong> paciente(s).</div>
+              <div class="small">Foco sugerido: ${bottleneckStage.hint}. ${pendenciaMedica ? `Há ${pendenciaMedica} pendência(s) médicas que precisam de acompanhamento.` : 'Não há pendências médicas abertas neste momento.'}</div>
+            </div>
+          </div>
         </div>
 
-        <div class="grid-2">
-          <div class="card">
-            <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px">
+        <div class="kpi-grid-5">
+          <div class="card kpi kpi-card-clear"><div class="label">Pacientes em atendimento</div><div class="value">${emAtendimento}</div><div class="trend">Total ainda não concluído</div></div>
+          <div class="card kpi kpi-card-clear"><div class="label">Concluídos</div><div class="value">${concluidos}</div><div class="trend">${completionRate}% da base atual</div></div>
+          <div class="card kpi kpi-card-clear"><div class="label">Sem ASO</div><div class="value">${bloqueados}</div><div class="trend">Podem exigir ação fora do fluxo clínico</div></div>
+          <div class="card kpi kpi-card-clear"><div class="label">Preferenciais</div><div class="value">${preferenciais}</div><div class="trend">Atendimentos com prioridade</div></div>
+          <div class="card kpi kpi-card-clear"><div class="label">Progresso médio</div><div class="value">${avgProgress}%</div><div class="trend">Média dos exames concluídos</div></div>
+        </div>
+
+        <div class="attention-grid">
+          <div class="attention-card">
+            <div class="title">Atenção imediata</div>
+            <div class="value">${bottleneckStage.count}</div>
+            <div class="desc">Paciente(s) concentrados em <strong>${bottleneckStage.nome}</strong>. Esta é a etapa com maior fila agora.</div>
+            <div>${badge(bottleneckStage.count ? 'Em andamento' : 'Concluído')}</div>
+          </div>
+          <div class="attention-card">
+            <div class="title">Pendências médicas</div>
+            <div class="value">${pendenciaMedica}</div>
+            <div class="desc">Atendimentos com resultado médico pendente e necessidade de retorno ou acompanhamento.</div>
+            <div>${badge(pendenciaMedica ? 'Pendente' : 'Concluído')}</div>
+          </div>
+          <div class="attention-card">
+            <div class="title">Cadastros do dia</div>
+            <div class="value">${todayAdmissions}</div>
+            <div class="desc">Novos atendimentos registrados na data atual da base local.</div>
+            <div>${badge(todayAdmissions ? 'Em andamento' : 'Concluído')}</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
+            <div>
+              <div class="row-title">Fluxo por etapa</div>
+              <div class="small">Cada bloco mostra quantos pacientes estão em cada ponto do atendimento.</div>
+            </div>
+            <div class="chips">
+              <span class="chip">Recepção → Exames → Triagem → Médico</span>
+            </div>
+          </div>
+          <div class="step-grid">
+            <div class="step-card"><div class="step-card-top"><div><div class="name">Recepção</div><div class="help">Cadastro e conferência</div></div><div class="icon">🧾</div></div><div class="count">${recepcao}</div><div>${badge(recepcao ? 'Pendente' : 'Concluído')}</div></div>
+            <div class="step-card"><div class="step-card-top"><div><div class="name">Exames</div><div class="help">Execução dos exames</div></div><div class="icon">🔬</div></div><div class="count">${exames}</div><div>${badge(exames ? 'Em andamento' : 'Concluído')}</div></div>
+            <div class="step-card"><div class="step-card-top"><div><div class="name">Triagem</div><div class="help">Pré-atendimento clínico</div></div><div class="icon">🚦</div></div><div class="count">${triagem}</div><div>${badge(triagem ? 'Em andamento' : 'Concluído')}</div></div>
+            <div class="step-card"><div class="step-card-top"><div><div class="name">Médico</div><div class="help">Liberação final do ASO</div></div><div class="icon">👨‍⚕️</div></div><div class="count">${medico}</div><div>${badge(medico ? 'Em andamento' : 'Concluído')}</div></div>
+          </div>
+        </div>
+
+        <div class="dashboard-chart-stack">
+          <div class="card dashboard-chart-card-tv">
+            <div class="dashboard-chart-head">
               <div>
                 <div class="row-title">Status por exame</div>
-                <div class="small">Gráfico corrigido com altura fixa e sem esticar a tela</div>
+                <div class="small">Todos os exames aparecem no eixo do gráfico, com comparação entre pendentes/em andamento e concluídos.</div>
               </div>
-              <div class="chips">
-                <span class="chip">${badge('Pendente')}</span>
-                <span class="chip">${badge('Concluído')}</span>
+              <div class="dashboard-tv-actions">
+                <div class="chips">
+                  <span class="chip">${badge('Pendente')}</span>
+                  <span class="chip">${badge('Concluído')}</span>
+                </div>
+                <button class="btn btn-primary" onclick="openDashboardTvModal()">📺 Modo TV automático</button>
               </div>
             </div>
-            <div class="chart-box"><canvas id="statusChart"></canvas></div>
+            <div class="chart-box" style="height:420px"><canvas id="statusChart"></canvas></div>
           </div>
 
-          <div class="card">
-            <div class="row-title" style="margin-bottom:14px">Gargalos atuais</div>
-            <div class="summary-list">
-              <div class="summary-item"><div>Recepção</div><div>${badge(recepcao ? 'Pendente' : 'Concluído')} ${recepcao} paciente(s)</div></div>
-              <div class="summary-item"><div>Exames</div><div>${badge(exames ? 'Em andamento' : 'Concluído')} ${exames} paciente(s)</div></div>
-              <div class="summary-item"><div>Triagem</div><div>${badge(triagem ? 'Em andamento' : 'Concluído')} ${triagem} paciente(s)</div></div>
-              <div class="summary-item"><div>Médico</div><div>${badge(medico ? 'Em andamento' : 'Concluído')} ${medico} paciente(s)</div></div>
-              <div class="summary-item"><div>Bloqueados</div><div>${badge(bloqueados ? 'Bloqueado' : 'Concluído')} ${bloqueados} sem ASO</div></div>
+          <div class="card dashboard-chart-card-tv">
+            <div class="dashboard-chart-head">
+              <div>
+                <div class="row-title">Triagem, médico e volume total</div>
+                <div class="small">Resumo dos status de triagem e médico junto com o total geral de exames pendentes e concluídos.</div>
+              </div>
+              <div class="chips">
+                <span class="chip">Triagem</span>
+                <span class="chip">Médico</span>
+                <span class="chip">Exames</span>
+              </div>
             </div>
+            <div class="kpi-grid-5" style="grid-template-columns:repeat(2, minmax(0,1fr));margin-bottom:14px">
+              <div class="mini-card"><div class="title">Exames pendentes</div><div class="big">${totalExamPending}</div></div>
+              <div class="mini-card"><div class="title">Exames concluídos</div><div class="big">${totalExamDone}</div></div>
+            </div>
+            <div class="chart-box" style="height:420px"><canvas id="summaryStatusChart"></canvas></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="dashboard-chart-head">
+            <div>
+              <div class="row-title">Ranking de exames mais lentos</div>
+              <div class="small">Ordem baseada em maior volume pendente/em andamento e menor percentual de conclusão.</div>
+            </div>
+            <div class="chips"><span class="chip">Top 5</span></div>
+          </div>
+          <div class="dashboard-ranking-list">
+            ${examTotals
+              .map(item => {
+                const pendencias = item.pendente + item.andamento;
+                const totalMov = pendencias + item.concluido;
+                const progress = totalMov ? Math.round((item.concluido / totalMov) * 100) : 100;
+                return { ...item, pendencias, progress };
+              })
+              .sort((a, b) => {
+                if (b.pendencias !== a.pendencias) return b.pendencias - a.pendencias;
+                return a.progress - b.progress;
+              })
+              .slice(0, 5)
+              .map((item, index) => `
+                <div class="dashboard-ranking-item">
+                  <div class="dashboard-ranking-pos">${index + 1}</div>
+                  <div>
+                    <div class="dashboard-ranking-name">${item.nome}</div>
+                    <div class="small">Pendentes: ${item.pendente} • Em andamento: ${item.andamento} • Concluídos: ${item.concluido}</div>
+                  </div>
+                  <div class="dashboard-ranking-metric">
+                    <div class="big">${item.pendencias}</div>
+                    <div class="small">na fila • ${item.progress}% concluído</div>
+                  </div>
+                </div>
+              `).join('')}
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="row-title" style="margin-bottom:14px">Resumo por exame</div>
+          <div class="summary-list">
+            ${examTotals.map(item => {
+              const totalMov = item.pendente + item.andamento + item.concluido;
+              const progress = totalMov ? Math.round((item.concluido / totalMov) * 100) : 100;
+              return `
+                <div class="summary-item exam-summary-row">
+                  <div class="exam-summary-top">
+                    <div>
+                      <div class="row-title">${item.nome}</div>
+                      <div class="small">Pendente: ${item.pendente} • Em andamento: ${item.andamento} • Concluído: ${item.concluido}</div>
+                    </div>
+                    <div class="chips"><span class="chip">${progress}% concluído</span></div>
+                  </div>
+                  <div class="mini-progress"><span style="width:${progress}%"></span></div>
+                </div>`;
+            }).join('')}
           </div>
         </div>
 
         <div class="split">
-          <div class="card">
-            <div class="row-title" style="margin-bottom:12px">Fila geral por ordem de cadastro</div>
+          <div class="card dashboard-table">
+            <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+              <div>
+                <div class="row-title">Próximos pacientes que exigem ação</div>
+                <div class="small">Lista priorizada por criticidade, dias em aberto e ordem de chegada.</div>
+              </div>
+              <div class="chips"><span class="chip">Top ${urgentPatients.length}</span></div>
+            </div>
             <div class="table-wrap">
               <table>
                 <thead>
                   <tr>
                     <th>Paciente</th>
-                    <th>Empresa</th>
                     <th>Etapa atual</th>
-                    <th>Progresso</th>
-                    <th>Status</th>
+                    <th>Pendências</th>
+                    <th>Prioridade</th>
+                    <th>Ação rápida</th>
                   </tr>
                 </thead>
                 <tbody>
-                  ${patients.slice().sort(compareQueueOrder).map(p => `
+                  ${urgentPatients.map(({ patient, counts, criticality }) => `
                     <tr>
                       <td>
-                        <div class="row-title">${p.nome}</div>
-                        <div class="small mono">${p.id}</div>
-                        <div class="small">${maskText(p.setor)} • ${maskText(p.funcao)}</div>
+                        <div class="row-title">${patient.nome}</div>
+                        <div class="small mono">${patient.id}</div>
+                        <div class="chips">${attendanceChip(patient)} ${patient.preferencial === 'Sim' ? '<span class="chip">⭐ Preferencial</span>' : ''}</div>
                       </td>
                       <td>
-                        <div>${maskText(p.empresa)}</div>
-                        <div class="small">${attendanceChip(p)}</div>
+                        <div>${badge(getStageStatus(patient))}</div>
+                        <div class="small" style="margin-top:8px">Etapa: ${patient.etapa || 'Não informada'} • ${daysOpen(patient)} dia(s) em aberto</div>
                       </td>
-                      <td>${badge(getStageStatus(p))}</td>
-                      <td>${progressHtml(p)}</td>
-                      <td><div class="chips"><span class="chip">Triagem: ${badge(p.triagem.status)}</span><span class="chip">ASO recepção: ${badge(p.asoCadastrado ? 'Concluído' : 'Bloqueado')}</span></div></td>
+                      <td>
+                        <div class="small">${pendingAsoReason(patient)}</div>
+                        <div class="small" style="margin-top:8px">${counts.done}/${counts.total} exames concluídos</div>
+                      </td>
+                      <td>${criticalityChip(criticality)}</td>
+                      <td><button class="btn btn-ghost" onclick="openPatientModal('${patient.id}','dashboard')">Abrir ficha</button></td>
                     </tr>
                   `).join('')}
                 </tbody>
@@ -2309,27 +3640,33 @@
             </div>
           </div>
           <div class="card">
-            <div class="row-title" style="margin-bottom:12px">Resumo por exame</div>
+            <div class="row-title" style="margin-bottom:12px">Leitura rápida do status geral</div>
             <div class="summary-list">
-              ${examTotals.map(item => `
-                <div class="summary-item">
-                  <div>
-                    <div class="row-title">${item.nome}</div>
-                    <div class="small">Pendente: ${item.pendente} • Concluído: ${item.concluido}</div>
-                  </div>
-                  <div class="chips">
-                    <span class="chip">${badge(item.pendente ? 'Pendente' : 'Concluído')}</span>
-                  </div>
-                </div>`).join('')}
+              <div class="summary-item"><div>Pacientes com fluxo clínico</div><div>${patients.filter(p => p.asoCadastrado).length} ${badge('Em andamento')}</div></div>
+              <div class="summary-item"><div>Somente exames</div><div>${patients.filter(p => !p.asoCadastrado).length} ${badge(bloqueados ? 'Bloqueado' : 'Concluído')}</div></div>
+              <div class="summary-item"><div>Exames ainda pendentes</div><div>${patients.filter(p => pendingExamNames(p).length > 0).length} ${badge('Pendente')}</div></div>
+              <div class="summary-item"><div>Triagem aguardando</div><div>${triagem} ${badge(triagem ? 'Em andamento' : 'Concluído')}</div></div>
+              <div class="summary-item"><div>Médico aguardando</div><div>${medico} ${badge(medico ? 'Em andamento' : 'Concluído')}</div></div>
+              <div class="summary-item"><div>Atendimento preferencial</div><div>${preferenciais} ${badge(preferenciais ? 'Pendente' : 'Concluído')}</div></div>
             </div>
           </div>
         </div>
       `;
+      const dashboardSummary = {
+        triagem: triagemStats,
+        medico: medicoStats,
+        exames: { pendente: totalExamPending, concluido: totalExamDone }
+      };
+      window.__dashboardTvState = buildDashboardTvState();
       drawChart(examTotals);
+      drawSummaryStatusChart(dashboardSummary);
+      if (document.getElementById('dashboardTvModal')?.classList.contains('open')) {
+        renderDashboardTvModal();
+      }
     }
 
-    function drawChart(examTotals) {
-      const canvas = document.getElementById('statusChart');
+    function drawChart(examTotals, canvasId = 'statusChart', chartKey = 'chart') {
+      const canvas = document.getElementById(canvasId);
       if (!canvas) return;
       if (typeof Chart === 'undefined') {
         const chartBox = canvas.closest('.chart-box');
@@ -2338,14 +3675,14 @@
         }
         return;
       }
-      if (chart) chart.destroy();
-      chart = new Chart(canvas.getContext('2d'), {
+      if (window[chartKey]) window[chartKey].destroy();
+      window[chartKey] = new Chart(canvas.getContext('2d'), {
         type: 'bar',
         data: {
           labels: examTotals.map(i => i.nome),
           datasets: [
-            { label: 'Pendente', data: examTotals.map(i => i.pendente), backgroundColor: 'rgba(250,204,21,.8)', borderRadius: 8, maxBarThickness: 38 },
-            { label: 'Concluído', data: examTotals.map(i => i.concluido), backgroundColor: 'rgba(74,222,128,.8)', borderRadius: 8, maxBarThickness: 38 }
+            { label: 'Pendentes + em andamento', data: examTotals.map(i => i.pendente + i.andamento), backgroundColor: 'rgba(250,204,21,.8)', borderRadius: 8, maxBarThickness: 34 },
+            { label: 'Concluídos', data: examTotals.map(i => i.concluido), backgroundColor: 'rgba(74,222,128,.8)', borderRadius: 8, maxBarThickness: 34 }
           ]
         },
         options: {
@@ -2355,11 +3692,39 @@
           plugins: {
             legend: {
               labels: { color: '#d7e3fb' }
+            },
+            tooltip: {
+              callbacks: {
+                title: (items) => items?.[0]?.label || ''
+              }
             }
           },
           scales: {
             x: {
-              ticks: { color: '#9db0cf', maxRotation: 0, minRotation: 0 },
+              ticks: {
+                color: '#9db0cf',
+                autoSkip: false,
+                maxRotation: 0,
+                minRotation: 0,
+                callback: function(value) {
+                  const label = this.getLabelForValue(value) || '';
+                  if (label.length <= 16) return label;
+                  const words = label.split(' ');
+                  const lines = [];
+                  let current = '';
+                  words.forEach(word => {
+                    const next = current ? `${current} ${word}` : word;
+                    if (next.length > 16) {
+                      if (current) lines.push(current);
+                      current = word;
+                    } else {
+                      current = next;
+                    }
+                  });
+                  if (current) lines.push(current);
+                  return lines;
+                }
+              },
               grid: { display: false }
             },
             y: {
@@ -2370,6 +3735,274 @@
           }
         }
       });
+    }
+
+
+    function buildDashboardStateForUnit(unitKey) {
+      const unitPatients = loadPatientsForUnit(unitKey);
+      unitPatients.forEach(updateFlow);
+      const total = unitPatients.length;
+      const recepcao = unitPatients.filter(p => p.etapa === 'Recepção').length;
+      const exames = unitPatients.filter(p => p.etapa === 'Exames').length;
+      const triagem = unitPatients.filter(p => p.etapa === 'Triagem').length;
+      const medico = unitPatients.filter(p => p.etapa === 'Médico').length;
+      const concluidos = unitPatients.filter(p => p.etapa === 'Concluído').length;
+      const bloqueados = unitPatients.filter(p => !p.asoCadastrado).length;
+      const emAtendimento = total - concluidos;
+      const preferenciais = unitPatients.filter(p => p.preferencial === 'Sim' && p.etapa !== 'Concluído').length;
+      const pendenciaMedica = unitPatients.filter(p => p.medico?.resultado === 'Pendente').length;
+      const avgProgress = total ? Math.round(unitPatients.reduce((sum, patient) => sum + getExamCounts(patient).progress, 0) / total) : 0;
+      const todayAdmissions = unitPatients.filter(p => p.dataAtendimento === new Date().toISOString().slice(0,10)).length;
+
+      const examTotals = EXAM_ORDER.map(ex => {
+        const statuses = unitPatients.map(p => p.exames.find(e => e.key === ex.key)?.status || 'Não se aplica');
+        return {
+          key: ex.key,
+          nome: ex.nome,
+          pendente: statuses.filter(s => s === 'Pendente').length,
+          andamento: statuses.filter(s => s === 'Em andamento').length,
+          concluido: statuses.filter(s => s === 'Concluído' || s === 'Exame liberado').length,
+        };
+      });
+
+      const totalExamPending = examTotals.reduce((sum, item) => sum + item.pendente + item.andamento, 0);
+      const totalExamDone = examTotals.reduce((sum, item) => sum + item.concluido, 0);
+      const triagemStats = {
+        pendente: unitPatients.filter(p => ['Pendente', 'Em andamento', 'Bloqueado'].includes(p.triagem?.status)).length,
+        concluido: unitPatients.filter(p => p.triagem?.status === 'Concluído').length
+      };
+      const medicoStats = {
+        pendente: unitPatients.filter(p => !['Apto', 'Apto com Restrições', 'Inapto'].includes(p.medico?.resultado || '')).length,
+        concluido: unitPatients.filter(p => ['Apto', 'Apto com Restrições', 'Inapto'].includes(p.medico?.resultado || '')).length
+      };
+
+      const bottleneckStage = [
+        { nome: 'Recepção', count: recepcao, hint: 'cadastro e validação inicial' },
+        { nome: 'Exames', count: exames, hint: 'execução dos exames ocupacionais' },
+        { nome: 'Triagem', count: triagem, hint: 'pré-atendimento da equipe clínica' },
+        { nome: 'Médico', count: medico, hint: 'liberação final do ASO' }
+      ].sort((a, b) => b.count - a.count)[0];
+
+      const completionRate = total ? Math.round((concluidos / total) * 100) : 0;
+      const unit = UNIT_OPTIONS[unitKey] || UNIT_OPTIONS.paulista;
+      const summary = {
+        triagem: triagemStats,
+        medico: medicoStats,
+        exames: { pendente: totalExamPending, concluido: totalExamDone }
+      };
+
+      return {
+        unit,
+        patients: unitPatients,
+        examTotals,
+        summary,
+        totals: {
+          total,
+          recepcao,
+          exames,
+          triagem,
+          medico,
+          concluidos,
+          bloqueados,
+          emAtendimento,
+          preferenciais,
+          pendenciaMedica,
+          avgProgress,
+          todayAdmissions,
+          completionRate,
+          totalExamPending,
+          totalExamDone,
+          bottleneck: bottleneckStage.nome,
+          bottleneckCount: bottleneckStage.count,
+          bottleneckHint: bottleneckStage.hint
+        }
+      };
+    }
+
+    function buildDashboardTvState() {
+      const unitStates = Object.keys(UNIT_OPTIONS).map(buildDashboardStateForUnit);
+      const combined = unitStates.reduce((acc, state) => {
+        acc.emAtendimento += state.totals.emAtendimento;
+        acc.concluidos += state.totals.concluidos;
+        acc.preferenciais += state.totals.preferenciais;
+        acc.totalExamPending += state.totals.totalExamPending;
+        acc.totalExamDone += state.totals.totalExamDone;
+        acc.totalPacientes += state.totals.total;
+        return acc;
+      }, { emAtendimento: 0, concluidos: 0, preferenciais: 0, totalExamPending: 0, totalExamDone: 0, totalPacientes: 0 });
+      combined.completionRate = combined.totalPacientes ? Math.round((combined.concluidos / combined.totalPacientes) * 100) : 0;
+      const bottleneckState = unitStates.slice().sort((a, b) => b.totals.bottleneckCount - a.totals.bottleneckCount)[0] || unitStates[0];
+      combined.bottleneckLabel = bottleneckState ? `${bottleneckState.unit.shortName} • ${bottleneckState.totals.bottleneck}` : 'Sem fila';
+      combined.bottleneckCount = bottleneckState?.totals.bottleneckCount || 0;
+      return { units: unitStates, combined };
+    }
+
+    function drawSummaryStatusChart(summary, canvasId = 'summaryStatusChart', chartKey = 'dashboardSummaryChart') {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      if (typeof Chart === 'undefined') {
+        const chartBox = canvas.closest('.chart-box');
+        if (chartBox) {
+          chartBox.innerHTML = '<div class="obs-box">Gráfico indisponível no momento. Verifique o carregamento do Chart.js para exibir o painel visual.</div>';
+        }
+        return;
+      }
+      if (window[chartKey]) window[chartKey].destroy();
+      window[chartKey] = new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: ['Triagem pendente', 'Triagem concluída', 'Médico pendente', 'Médico concluído', 'Exames pendentes', 'Exames concluídos'],
+          datasets: [{
+            label: 'Quantidade',
+            data: [
+              summary.triagem.pendente,
+              summary.triagem.concluido,
+              summary.medico.pendente,
+              summary.medico.concluido,
+              summary.exames.pendente,
+              summary.exames.concluido
+            ],
+            backgroundColor: [
+              'rgba(250,204,21,.8)',
+              'rgba(74,222,128,.8)',
+              'rgba(250,204,21,.8)',
+              'rgba(74,222,128,.8)',
+              'rgba(250,204,21,.8)',
+              'rgba(74,222,128,.8)'
+            ],
+            borderRadius: 10,
+            maxBarThickness: 42
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#9db0cf', autoSkip: false, maxRotation: 0, minRotation: 0 },
+              grid: { display: false }
+            },
+            y: {
+              beginAtZero: true,
+              ticks: { color: '#9db0cf', precision: 0 },
+              grid: { color: 'rgba(255,255,255,.06)' }
+            }
+          }
+        }
+      });
+    }
+
+
+    function openDashboardTvModal() {
+      const modal = document.getElementById('dashboardTvModal');
+      if (!modal) return;
+      modal.classList.add('open');
+      renderDashboardTvModal();
+      setTimeout(() => {
+        try {
+          const card = modal.querySelector('.modal-card');
+          if (card?.requestFullscreen && !document.fullscreenElement) card.requestFullscreen();
+        } catch (error) {}
+      }, 120);
+    }
+
+    function closeDashboardTvModal() {
+      const modal = document.getElementById('dashboardTvModal');
+      if (!modal) return;
+      modal.classList.remove('open');
+      modal.classList.remove('fullscreen');
+      if (document.fullscreenElement) {
+        try { document.exitFullscreen(); } catch (error) {}
+      }
+      if (dashboardTvStatusChart) { dashboardTvStatusChart.destroy(); dashboardTvStatusChart = null; }
+      if (dashboardTvSummaryChart) { dashboardTvSummaryChart.destroy(); dashboardTvSummaryChart = null; }
+    }
+
+    function toggleDashboardTvFullscreen() {
+      const modal = document.getElementById('dashboardTvModal');
+      if (!modal) return;
+      const card = modal.querySelector('.modal-card');
+      if (document.fullscreenElement) {
+        try { document.exitFullscreen(); } catch (error) {}
+        modal.classList.remove('fullscreen');
+      } else {
+        modal.classList.add('fullscreen');
+        try { card?.requestFullscreen?.(); } catch (error) {}
+      }
+    }
+
+    function renderDashboardTvModal() {
+      const body = document.getElementById('dashboardTvBody');
+      const state = window.__dashboardTvState || buildDashboardTvState();
+      if (!body || !state) return;
+      const unitCards = state.units.map((unitState, index) => `
+        <div class="card dashboard-chart-card-tv" style="display:grid;gap:18px">
+          <div class="dashboard-chart-head">
+            <div>
+              <div class="row-title">${unitState.unit.shortName} • visão da unidade</div>
+              <div class="small">Dados simultâneos da unidade ${unitState.unit.city} para o mesmo gestor acompanhar na TV.</div>
+            </div>
+            <div class="chips">
+              <span class="chip">${unitState.totals.emAtendimento} em atendimento</span>
+              <span class="chip">${unitState.totals.completionRate}% concluído</span>
+            </div>
+          </div>
+          <div class="dashboard-tv-kpis" style="grid-template-columns:repeat(4, minmax(0, 1fr))">
+            <div class="dashboard-tv-kpi"><div class="label">Em atendimento</div><div class="value">${unitState.totals.emAtendimento}</div></div>
+            <div class="dashboard-tv-kpi"><div class="label">Concluídos</div><div class="value">${unitState.totals.concluidos}</div></div>
+            <div class="dashboard-tv-kpi"><div class="label">Exames pendentes</div><div class="value">${unitState.totals.totalExamPending}</div></div>
+            <div class="dashboard-tv-kpi"><div class="label">Preferenciais</div><div class="value">${unitState.totals.preferenciais}</div></div>
+          </div>
+          <div class="dashboard-tv-grid" style="grid-template-columns:1fr 1fr">
+            <div class="card dashboard-chart-card-tv">
+              <div class="dashboard-chart-head"><div><div class="row-title">Status por exame</div><div class="small">Todos os exames da unidade ${unitState.unit.shortName}.</div></div></div>
+              <div class="chart-box"><canvas id="dashboardTvStatusChart-${index}"></canvas></div>
+            </div>
+            <div class="card dashboard-chart-card-tv">
+              <div class="dashboard-chart-head"><div><div class="row-title">Triagem, médico e totais</div><div class="small">Resumo operacional da unidade ${unitState.unit.shortName}.</div></div></div>
+              <div class="chart-box"><canvas id="dashboardTvSummaryStatusChart-${index}"></canvas></div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      body.innerHTML = `
+        <div class="dashboard-tv-hero">
+          <div class="dashboard-tv-hero-grid">
+            <div>
+              <div class="small" style="letter-spacing:.12em;text-transform:uppercase;color:#dbeafe;margin-bottom:8px">Painel automático para TV</div>
+              <div style="font-size:clamp(28px,4vw,44px);font-weight:900;line-height:1.06">Paulista + Sto Amaro • Indicadores simultâneos</div>
+              <div class="small" style="margin-top:10px;color:#dbeafe">A mesma tela mostra as duas unidades ao mesmo tempo para o gestor comparar filas, exames, triagem e médico sem alternar a unidade ativa.</div>
+              <div class="dashboard-tv-kpis">
+                <div class="dashboard-tv-kpi"><div class="label">Em atendimento</div><div class="value">${state.combined.emAtendimento}</div></div>
+                <div class="dashboard-tv-kpi"><div class="label">Concluídos</div><div class="value">${state.combined.concluidos}</div></div>
+                <div class="dashboard-tv-kpi"><div class="label">Exames pendentes</div><div class="value">${state.combined.totalExamPending}</div></div>
+                <div class="dashboard-tv-kpi"><div class="label">Preferenciais</div><div class="value">${state.combined.preferenciais}</div></div>
+              </div>
+            </div>
+            <div>
+              <div class="mini-card" style="height:100%;display:grid;align-content:center;gap:10px;background:rgba(9,15,26,.34)">
+                <div class="title">Maior concentração atual</div>
+                <div class="big">${state.combined.bottleneckLabel}</div>
+                <div class="small">${state.combined.bottleneckCount} paciente(s) na maior fila entre as duas unidades.</div>
+                <div class="chips"><span class="chip">${state.combined.completionRate}% do fluxo total concluído</span><span class="chip">Painel em tela cheia automática</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="display:grid;gap:20px">${unitCards}</div>
+        <div class="dashboard-tv-footer">
+          <span>Atualização automática sempre que o Dashboard for renderizado, com leitura simultânea de Paulista e Sto Amaro.</span>
+          <span>${new Date().toLocaleString('pt-BR')}</span>
+        </div>
+      `;
+      state.units.forEach((unitState, index) => {
+        drawChart(unitState.examTotals, `dashboardTvStatusChart-${index}`, `dashboardTvStatusChart${index}`);
+        drawSummaryStatusChart(unitState.summary, `dashboardTvSummaryStatusChart-${index}`, `dashboardTvSummaryChart${index}`);
+      });
+      window.__dashboardTvState = state;
     }
 
     function renderQueuePage(pageId, pageKey, filterFn, extraColumns = '') {
@@ -2844,7 +4477,7 @@
         const totalBase = baseItems.length;
         const total = items.length;
         const semAso = items.filter(p => !p.asoCadastrado).length;
-        const asoConcluido = items.filter(p => ['Apto','Inapto'].includes(p.medico?.resultado)).length;
+        const asoConcluido = items.filter(p => ['Apto','Apto com Restrições','Inapto'].includes(p.medico?.resultado)).length;
         const asoPendente = items.filter(p => p.medico?.resultado === 'Pendente').length;
         const examesPendentes = items.filter(p => getExamCounts(p).pending > 0).length;
         const criticos = items.filter(p => getCriticality(p) === 'Alta');
@@ -2852,7 +4485,7 @@
           semAso: items.filter(p => !p.asoCadastrado),
           exames: items.filter(p => p.asoCadastrado && getExamCounts(p).pending > 0),
           medico: items.filter(p => p.etapa === 'Médico' || p.medico?.resultado === 'Pendente'),
-          concluidos: items.filter(p => ['Apto','Inapto'].includes(p.medico?.resultado))
+          concluidos: items.filter(p => ['Apto','Apto com Restrições','Inapto'].includes(p.medico?.resultado))
         };
 
         const empresas = [...new Set(items.map(p => (p.empresa || 'Não informado').trim() || 'Não informado'))].map(nome => {
@@ -2862,7 +4495,7 @@
             total: grupo.length,
             semAso: grupo.filter(p => !p.asoCadastrado).length,
             pendentes: grupo.filter(p => getExamCounts(p).pending > 0).length,
-            concluidos: grupo.filter(p => ['Apto','Inapto'].includes(p.medico?.resultado)).length
+            concluidos: grupo.filter(p => ['Apto','Apto com Restrições','Inapto'].includes(p.medico?.resultado)).length
           };
         }).sort((a,b) => (b.pendentes + b.semAso) - (a.pendentes + a.semAso)).slice(0,8);
 
@@ -2910,7 +4543,7 @@
             <div class="card kpi"><div class="label">Sem ASO cadastrado</div><div class="value">${semAso}</div><div class="hint">Bloqueiam sequência do fluxo</div></div>
             <div class="card kpi"><div class="label">Exames pendentes</div><div class="value">${examesPendentes}</div><div class="hint">Demandam atuação operacional</div></div>
             <div class="card kpi"><div class="label">ASO pendente</div><div class="value">${asoPendente}</div><div class="hint">Em espera de decisão médica</div></div>
-            <div class="card kpi"><div class="label">ASO concluído</div><div class="value">${asoConcluido}</div><div class="hint">Aptos ou inaptos finalizados</div></div>
+            <div class="card kpi"><div class="label">ASO concluído</div><div class="value">${asoConcluido}</div><div class="hint">Aptos, aptos com restrições ou inaptos finalizados</div></div>
           </div>
 
           <div class="grid-2">
@@ -3088,89 +4721,348 @@
       renderContent();
     }
 
+    function getAverageDaysOpen(list) {
+      if (!list.length) return 0;
+      return Math.round((list.reduce((acc, patient) => acc + daysOpen(patient), 0) / list.length) * 10) / 10;
+    }
+
+    function getAttendanceFlowLabel(patient) {
+      if (patient.etapa === 'Concluído') return 'Alta / ASO finalizado';
+      if (patient.etapa === 'Médico') return 'Aguardando avaliação médica';
+      if (patient.etapa === 'Triagem') return 'Aguardando triagem';
+      if (patient.etapa === 'Exames') return 'Em exames ocupacionais';
+      return maskText(patient.etapa);
+    }
+
+    function getExamPendingNames(patient) {
+      return (patient.exames || [])
+        .filter(exam => !['Concluído', 'Não se aplica', 'Exame liberado'].includes(exam.status))
+        .map(exam => exam.nome);
+    }
+
+    function getReportStatusBadgeClass(value) {
+      if (['Concluído', 'Apto', 'Apto com Restrições', 'Inapto', 'Alta / ASO finalizado'].includes(value)) return 'st-concluido';
+      if (['Em andamento', 'Em exames ocupacionais', 'Aguardando triagem', 'Aguardando avaliação médica'].includes(value)) return 'st-andamento';
+      if (['Pendente', 'Pendente de atendimento', 'Sem ASO'].includes(value)) return 'st-pendente';
+      if (['Bloqueado'].includes(value)) return 'st-bloqueado';
+      return 'st-na';
+    }
+
+
     function renderReports() {
-      const rows = getReportsData();
-      const total = rows.length;
-      const concluidos = patients.filter(p => p.etapa === 'Concluído').length;
-      const emAndamento = patients.filter(p => ['Exames','Triagem','Médico'].includes(p.etapa)).length;
-      const bloqueados = patients.filter(p => p.statusAtendimento === 'Bloqueado').length;
+      const orderedPatients = patients.slice().sort(compareQueueOrder);
+      const total = orderedPatients.length;
+      const concluidos = orderedPatients.filter(p => p.etapa === 'Concluído').length;
+      const emAndamento = orderedPatients.filter(p => ['Exames', 'Triagem', 'Médico'].includes(p.etapa)).length;
+      const bloqueados = orderedPatients.filter(p => p.statusAtendimento === 'Bloqueado').length;
+      const preferenciais = orderedPatients.filter(p => p.preferencial === 'Sim').length;
+      const semAso = orderedPatients.filter(p => !p.asoCadastrado).length;
+      const triagemPendente = orderedPatients.filter(p => (p.triagem?.status || 'Pendente') !== 'Concluído').length;
+      const medicoPendente = orderedPatients.filter(p => !['Apto', 'Apto com Restrições', 'Inapto'].includes(p.medico?.resultado || '')).length;
+      const avgDays = getAverageDaysOpen(orderedPatients);
+      const examsPendingTotal = orderedPatients.reduce((acc, patient) => acc + getExamCounts(patient).pending, 0);
+      const examsDoneTotal = orderedPatients.reduce((acc, patient) => acc + getExamCounts(patient).done, 0);
+      const completionRate = total ? Math.round((concluidos / total) * 100) : 0;
+      const empresasRanking = [...new Set(orderedPatients.map(p => (p.empresa || 'Não informado').trim() || 'Não informado'))]
+        .map(empresa => {
+          const grupo = orderedPatients.filter(p => ((p.empresa || 'Não informado').trim() || 'Não informado') === empresa);
+          return {
+            empresa,
+            total: grupo.length,
+            concluidos: grupo.filter(p => p.etapa === 'Concluído').length,
+            pendentes: grupo.filter(p => p.etapa !== 'Concluído').length,
+            bloqueados: grupo.filter(p => p.statusAtendimento === 'Bloqueado').length
+          };
+        })
+        .sort((a, b) => (b.pendentes + b.bloqueados) - (a.pendentes + a.bloqueados) || b.total - a.total)
+        .slice(0, 6);
+      const medicoRanking = [...new Set(orderedPatients.map(p => p.medico?.nome).filter(Boolean))]
+        .map(nome => {
+          const grupo = orderedPatients.filter(p => p.medico?.nome === nome);
+          return {
+            nome,
+            total: grupo.length,
+            finalizados: grupo.filter(p => ['Apto', 'Apto com Restrições', 'Inapto'].includes(p.medico?.resultado || '')).length
+          };
+        })
+        .sort((a, b) => b.total - a.total)
+        .slice(0, 5);
+      const oldestPending = orderedPatients
+        .filter(p => p.etapa !== 'Concluído')
+        .sort((a, b) => daysOpen(b) - daysOpen(a))
+        .slice(0, 6);
+
       document.getElementById('page-relatorios').innerHTML = `
-        <div class="grid-4">
-          <div class="card kpi"><div class="label">Atendimentos</div><div class="value">${total}</div><div class="hint">Todos os registros consolidados</div></div>
-          <div class="card kpi"><div class="label">Concluídos</div><div class="value">${concluidos}</div><div class="hint">ASO finalizado pelo médico</div></div>
-          <div class="card kpi"><div class="label">Em andamento</div><div class="value">${emAndamento}</div><div class="hint">Fluxos ativos no atendimento</div></div>
-          <div class="card kpi"><div class="label">Bloqueados</div><div class="value">${bloqueados}</div><div class="hint">Aguardando regularização do fluxo</div></div>
+        <div class="report-hero">
+          <div class="report-hero-grid">
+            <div>
+              <h3>Relatórios operacionais e gerenciais</h3>
+              <p>Consolidação dos atendimentos com visão para produtividade, pendências clínicas, tempo em aberto e rastreabilidade do fluxo por paciente.</p>
+              <div class="report-badge-row">
+                <span class="chip">${total} atendimentos consolidados</span>
+                <span class="chip">${completionRate}% concluídos</span>
+                <span class="chip">${examsPendingTotal} exames pendentes</span>
+                <span class="chip">${triagemPendente} triagens pendentes</span>
+                <span class="chip">${medicoPendente} decisões médicas pendentes</span>
+              </div>
+            </div>
+            <div class="dashboard-hero-note">
+              <div class="small">Resumo executivo da unidade</div>
+              <div class="big">${bloqueados ? `${bloqueados} atendimento(s) bloqueado(s) exigem atuação imediata.` : 'Operação sem bloqueios críticos neste momento.'}</div>
+              <div class="small">Tempo médio em aberto: <strong>${avgDays} dia(s)</strong> • Preferenciais na base: <strong>${preferenciais}</strong> • Sem ASO na recepção: <strong>${semAso}</strong></div>
+            </div>
+          </div>
         </div>
+
+        <div class="report-kpi-grid">
+          <div class="card kpi"><div class="label">Atendimentos</div><div class="value">${total}</div><div class="hint">Todos os registros consolidados</div></div>
+          <div class="card kpi"><div class="label">Concluídos</div><div class="value">${concluidos}</div><div class="hint">Alta com ASO finalizado</div></div>
+          <div class="card kpi"><div class="label">Em andamento</div><div class="value">${emAndamento}</div><div class="hint">Fluxos ativos na operação</div></div>
+          <div class="card kpi"><div class="label">Bloqueados</div><div class="value">${bloqueados}</div><div class="hint">Dependem de regularização</div></div>
+          <div class="card kpi"><div class="label">Exames pendentes</div><div class="value">${examsPendingTotal}</div><div class="hint">Soma das pendências clínicas</div></div>
+          <div class="card kpi"><div class="label">Exames concluídos</div><div class="value">${examsDoneTotal}</div><div class="hint">Executados na base atual</div></div>
+        </div>
+
+        <div class="report-highlight-grid">
+          <div class="report-highlight-card">
+            <div class="label">Triagem</div>
+            <div class="value">${triagemPendente}</div>
+            <div class="small">paciente(s) ainda não concluíram a triagem</div>
+          </div>
+          <div class="report-highlight-card">
+            <div class="label">Avaliação médica</div>
+            <div class="value">${medicoPendente}</div>
+            <div class="small">paciente(s) aguardando resultado médico</div>
+          </div>
+          <div class="report-highlight-card">
+            <div class="label">Tempo médio em aberto</div>
+            <div class="value">${avgDays}</div>
+            <div class="small">dia(s) entre abertura e situação atual</div>
+          </div>
+        </div>
+
+        <div class="report-panel-grid">
+          <div class="card">
+            <div class="row-title" style="margin-bottom:12px">Pacientes com maior tempo em aberto</div>
+            <div class="report-list">
+              ${oldestPending.length ? oldestPending.map(patient => {
+                const counts = getExamCounts(patient);
+                return `
+                  <div class="report-list-item">
+                    <div>
+                      <div class="row-title">${patient.nome}</div>
+                      <div class="small">${maskText(patient.empresa)} • ${maskText(patient.tipoAtendimento)} • ${getAttendanceFlowLabel(patient)}</div>
+                      <div class="small">Pendências: ${getExamPendingNames(patient).slice(0, 3).join(', ') || 'Sem exame pendente'}${getExamPendingNames(patient).length > 3 ? '…' : ''}</div>
+                    </div>
+                    <div class="metric">
+                      <div class="big">${daysOpen(patient)}</div>
+                      <div class="small">dia(s)</div>
+                      <div class="small">${counts.pending} exame(s) pendente(s)</div>
+                    </div>
+                  </div>
+                `;
+              }).join('') : '<div class="sticky-note">Não há pacientes em aberto no momento.</div>'}
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="row-title" style="margin-bottom:12px">Ranking operacional</div>
+            <div class="summary-list">
+              <div class="summary-item"><div><div class="row-title">Empresas com maior pendência</div><div class="small">Base para cobrança e priorização operacional.</div></div><span class="chip">Top 6</span></div>
+              <div class="report-list">
+                ${empresasRanking.length ? empresasRanking.map(item => `
+                  <div class="report-list-item">
+                    <div>
+                      <div class="row-title">${item.empresa}</div>
+                      <div class="small">${item.total} atendimento(s) • ${item.concluidos} concluído(s)</div>
+                    </div>
+                    <div class="metric">
+                      <div class="big">${item.pendentes}</div>
+                      <div class="small">pendente(s)</div>
+                      <div class="small">${item.bloqueados} bloqueado(s)</div>
+                    </div>
+                  </div>
+                `).join('') : '<div class="small">Sem ranking disponível.</div>'}
+              </div>
+              <div class="summary-item"><div><div class="row-title">Médicos com mais fechamentos</div><div class="small">Acompanhamento da produtividade de decisão clínica.</div></div><span class="chip">Top 5</span></div>
+              <div class="report-list">
+                ${medicoRanking.length ? medicoRanking.map(item => `
+                  <div class="report-list-item">
+                    <div>
+                      <div class="row-title">${item.nome}</div>
+                      <div class="small">${item.total} atendimento(s) vinculados</div>
+                    </div>
+                    <div class="metric">
+                      <div class="big">${item.finalizados}</div>
+                      <div class="small">finalizado(s)</div>
+                    </div>
+                  </div>
+                `).join('') : '<div class="small">Nenhuma produção médica identificada na base atual.</div>'}
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="card">
-          <div class="filters">
-            <div class="search"><span>🔎</span><input id="search-relatorios" placeholder="Buscar por paciente, ID, CPF, empresa ou médico"></div>
+          <div class="report-filter-grid">
+            <div class="search"><span>🔎</span><input id="search-relatorios" placeholder="Buscar por paciente, ID, CPF, empresa, médico, setor ou função"></div>
+            <div class="field" style="margin:0">
+              <label>Etapa</label>
+              <select id="filter-relatorio-etapa">
+                <option value="">Todas</option>
+                <option value="Exames">Exames</option>
+                <option value="Triagem">Triagem</option>
+                <option value="Médico">Médico</option>
+                <option value="Concluído">Concluído</option>
+              </select>
+            </div>
+            <div class="field" style="margin:0">
+              <label>Status do atendimento</label>
+              <select id="filter-relatorio-status">
+                <option value="">Todos</option>
+                <option value="Em andamento">Em andamento</option>
+                <option value="Concluído">Concluído</option>
+                <option value="Bloqueado">Bloqueado</option>
+              </select>
+            </div>
+            <div class="field" style="margin:0">
+              <label>Triagem</label>
+              <select id="filter-relatorio-triagem">
+                <option value="">Todas</option>
+                <option value="Concluído">Concluída</option>
+                <option value="Pendente">Pendente</option>
+              </select>
+            </div>
+            <div class="field" style="margin:0">
+              <label>Médico</label>
+              <select id="filter-relatorio-medico">
+                <option value="">Todos</option>
+                <option value="Concluído">Concluído</option>
+                <option value="Pendente">Pendente</option>
+              </select>
+            </div>
             <button class="btn btn-success" id="btnExportarExcel">Exportar Excel</button>
           </div>
-          <div class="table-wrap">
+          <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:14px;flex-wrap:wrap">
+            <div class="small" id="report-results-meta">Mostrando ${total} registro(s).</div>
+            <button class="btn btn-ghost" id="btn-limpar-filtros-relatorio">Limpar filtros</button>
+          </div>
+          <div class="table-wrap report-table" style="margin-top:14px">
             <table>
               <thead>
                 <tr>
                   <th>Paciente</th>
-                  <th>Empresa</th>
+                  <th>Empresa / Função</th>
                   <th>Atendimento</th>
-                  <th>Etapa</th>
+                  <th>Fluxo atual</th>
                   <th>Exames</th>
                   <th>Triagem</th>
                   <th>Médico</th>
+                  <th>Tempo em aberto</th>
+                  <th>Pendências principais</th>
                 </tr>
               </thead>
               <tbody id="tbody-relatorios">
-                ${rows.length ? rows.map((row, index) => renderReportRow(patients.slice().sort(compareQueueOrder)[index], row)).join('') : `<tr><td colspan="7"><div class="small">Nenhum relatório disponível.</div></td></tr>`}
+                ${orderedPatients.length ? orderedPatients.map(p => renderReportRow(p)).join('') : `<tr><td colspan="9"><div class="small">Nenhum relatório disponível.</div></td></tr>`}
               </tbody>
             </table>
           </div>
         </div>
       `;
+
       document.getElementById('btnExportarExcel').addEventListener('click', exportReportsExcel);
-      document.getElementById('search-relatorios').addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        const ordered = patients.slice().sort(compareQueueOrder);
-        const filtered = ordered.filter(p => [p.nome, p.id, p.cpf, p.empresa, p.medico?.nome, p.setor, p.funcao].some(v => (v || '').toLowerCase().includes(term)));
-        document.getElementById('tbody-relatorios').innerHTML = filtered.length ? filtered.map(p => renderReportRow(p)).join('') : `<tr><td colspan="7"><div class="small">Nenhum resultado encontrado.</div></td></tr>`;
+
+      const applyReportFilters = () => {
+        const term = (document.getElementById('search-relatorios')?.value || '').toLowerCase();
+        const etapa = document.getElementById('filter-relatorio-etapa')?.value || '';
+        const status = document.getElementById('filter-relatorio-status')?.value || '';
+        const triagem = document.getElementById('filter-relatorio-triagem')?.value || '';
+        const medico = document.getElementById('filter-relatorio-medico')?.value || '';
+
+        const filtered = orderedPatients.filter(patient => {
+          const searchMatch = !term || [patient.nome, patient.id, patient.cpf, patient.empresa, patient.medico?.nome, patient.setor, patient.funcao]
+            .some(v => (v || '').toLowerCase().includes(term));
+          const etapaMatch = !etapa || patient.etapa === etapa;
+          const statusAtual = patient.statusAtendimento || getStageStatus(patient);
+          const statusMatch = !status || statusAtual === status;
+          const triagemStatus = (patient.triagem?.status || 'Pendente') === 'Concluído' ? 'Concluído' : 'Pendente';
+          const triagemMatch = !triagem || triagemStatus === triagem;
+          const medicoStatus = ['Apto', 'Apto com Restrições', 'Inapto'].includes(patient.medico?.resultado || '') ? 'Concluído' : 'Pendente';
+          const medicoMatch = !medico || medicoStatus === medico;
+          return searchMatch && etapaMatch && statusMatch && triagemMatch && medicoMatch;
+        });
+
+        document.getElementById('tbody-relatorios').innerHTML = filtered.length
+          ? filtered.map(patient => renderReportRow(patient)).join('')
+          : `<tr><td colspan="9"><div class="small">Nenhum resultado encontrado para os filtros aplicados.</div></td></tr>`;
+        const meta = document.getElementById('report-results-meta');
+        if (meta) meta.textContent = `Mostrando ${filtered.length} de ${total} registro(s).`;
+      };
+
+      ['search-relatorios', 'filter-relatorio-etapa', 'filter-relatorio-status', 'filter-relatorio-triagem', 'filter-relatorio-medico'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener(id === 'search-relatorios' ? 'input' : 'change', applyReportFilters);
+      });
+      document.getElementById('btn-limpar-filtros-relatorio').addEventListener('click', () => {
+        document.getElementById('search-relatorios').value = '';
+        document.getElementById('filter-relatorio-etapa').value = '';
+        document.getElementById('filter-relatorio-status').value = '';
+        document.getElementById('filter-relatorio-triagem').value = '';
+        document.getElementById('filter-relatorio-medico').value = '';
+        applyReportFilters();
       });
     }
 
     function renderReportRow(patient, row = null) {
       row = row || getReportsData().find(item => item['ID Atendimento'] === patient.id);
-      const examSummary = row['Exames Realizados'] ? `${row['Qtde Concluídos']}/${row['Qtde Exames']} concluídos` : `${row['Qtde Concluídos']}/${row['Qtde Exames']} concluídos`;
+      const examSummary = `${row['Qtde Concluídos']}/${row['Qtde Exames']} concluído(s)`;
+      const pendingNames = getExamPendingNames(patient);
+      const triagemStatus = (patient.triagem?.status || 'Pendente') === 'Concluído' ? 'Concluído' : 'Pendente';
+      const medicoStatus = ['Apto', 'Apto com Restrições', 'Inapto'].includes(patient.medico?.resultado || '') ? 'Concluído' : 'Pendente';
+      const flowLabel = getAttendanceFlowLabel(patient);
+      const attendanceStatus = patient.statusAtendimento || getStageStatus(patient);
       return `
         <tr>
           <td>
             <div class="row-title">${patient.nome}</div>
             <div class="small mono">${patient.id} • ${maskText(patient.cpf)}</div>
+            <div class="small">${patient.preferencial === 'Sim' ? '⭐ Preferencial' : 'Fluxo padrão'}</div>
           </td>
           <td>
             <div>${maskText(patient.empresa)}</div>
             <div class="small">${maskText(patient.setor)} • ${maskText(patient.funcao)}</div>
+            <div class="small">Telefone: ${maskText(patient.telefone)}</div>
           </td>
           <td>
             <div>${maskText(patient.tipoAtendimento)}</div>
-            <div class="small">${patient.preferencial === 'Sim' ? '⭐ Preferencial' : 'Atendimento comum'}</div>
             <div class="small">${formatDate(patient.dataAtendimento)}</div>
+            <div class="small">ASO recepção: ${patient.asoCadastrado ? 'Sim' : 'Não'}</div>
           </td>
           <td>
-            <div>${badge(getStageStatus(patient))}</div>
-            <div class="small" style="margin-top:6px">${attendanceChip(patient)}</div>
-            <div class="small" style="margin-top:6px">ASO recepção: ${patient.asoCadastrado ? 'Sim' : 'Não'}</div>
+            <div><span class="status ${getReportStatusBadgeClass(flowLabel)}">${flowLabel}</span></div>
+            <div class="small" style="margin-top:6px"><span class="status ${getReportStatusBadgeClass(attendanceStatus)}">${attendanceStatus}</span></div>
           </td>
           <td>
-            <div class="small">${examSummary}</div>
+            <div class="small"><strong>Resumo:</strong> ${examSummary}</div>
             <div class="small" style="margin-top:6px"><strong>Realizados:</strong> ${row['Exames Realizados'] || '—'}</div>
             <div class="small" style="margin-top:6px"><strong>Pendentes:</strong> ${row['Exames Pendentes'] || '—'}</div>
           </td>
           <td>
-            <div>${badge(patient.triagem?.status || 'Pendente')}</div>
-            <div class="small" style="margin-top:6px">${patient.triagem?.observacoes || 'Sem observação'}</div>
+            <div><span class="status ${getReportStatusBadgeClass(triagemStatus)}">${triagemStatus}</span></div>
+            <div class="small" style="margin-top:6px">${patient.triagem?.observacoes || 'Sem observação registrada'}</div>
           </td>
           <td>
-            <div>${badge(getMedicalStatus(patient))}</div>
-            <div class="small" style="margin-top:6px">${patient.medico?.nome || '—'} ${patient.medico?.resultado ? '• ' + patient.medico.resultado : ''}</div>
-            <div class="small" style="margin-top:6px">${patient.medico?.pendencia || patient.medico?.observacoes || 'Sem observação'}</div>
+            <div><span class="status ${getReportStatusBadgeClass(medicoStatus)}">${medicoStatus}</span></div>
+            <div class="small" style="margin-top:6px">${patient.medico?.nome || 'Médico não informado'}${patient.medico?.resultado ? ` • ${patient.medico.resultado}` : ''}</div>
+            <div class="small" style="margin-top:6px">${patient.medico?.pendencia || patient.medico?.observacoes || 'Sem observação registrada'}</div>
+          </td>
+          <td>
+            <div class="row-title">${daysOpen(patient)} dia(s)</div>
+            <div class="small">Etapa atual: ${maskText(patient.etapa)}</div>
+          </td>
+          <td>
+            <div class="small">${pendingNames.length ? pendingNames.join(', ') : 'Sem exames pendentes'}</div>
+            <div class="small" style="margin-top:6px">${!patient.asoCadastrado ? 'ASO ainda não cadastrado na recepção.' : 'ASO regularizado na recepção.'}</div>
           </td>
         </tr>
       `;
@@ -3330,6 +5222,7 @@
                 <select id="medico-resultado">
                   <option value="">Selecione</option>
                   <option value="Apto" ${patient.medico.resultado === 'Apto' ? 'selected' : ''}>Apto</option>
+                  <option value="Apto com Restrições" ${patient.medico.resultado === 'Apto com Restrições' ? 'selected' : ''}>Apto com Restrições</option>
                   <option value="Inapto" ${patient.medico.resultado === 'Inapto' ? 'selected' : ''}>Inapto</option>
                   <option value="Pendente" ${patient.medico.resultado === 'Pendente' ? 'selected' : ''}>Pendente</option>
                 </select>
@@ -3620,6 +5513,10 @@
       });
       document.getElementById('pageTitle').textContent = PAGE_META[page][0];
       document.getElementById('pageSubtitle').textContent = `${PAGE_META[page][1]} Unidade ativa: ${(UNIT_OPTIONS[selectedUnit] || UNIT_OPTIONS.paulista).shortName}.`;
+      const novoAtendimentoButton = document.getElementById('btnNovoAtendimento');
+      if (novoAtendimentoButton) {
+        novoAtendimentoButton.classList.toggle('hidden', page !== 'recepcao');
+      }
       if (page === 'dashboard') renderDashboard();
       if (page === 'recepcao') renderRecepcao();
       if (page === 'exames') renderExames();
@@ -3652,8 +5549,7 @@
     document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => setPage(btn.dataset.page)));
     document.getElementById('btnNovoAtendimento').addEventListener('click', openNewModal);
     document.getElementById('openUnitSelector').addEventListener('click', openUnitModal);
-    document.getElementById('btnRestaurar').addEventListener('click', restoreBase);
-    document.getElementById('patientModal').addEventListener('click', (e) => {
+        document.getElementById('patientModal').addEventListener('click', (e) => {
       if (e.target.id === 'patientModal') closePatientModal();
     });
     document.getElementById('newModal').addEventListener('click', (e) => {
@@ -3686,6 +5582,7 @@
     window.openAttendanceScreen = openAttendanceScreen;
     window.closeAttendanceScreen = closeAttendanceScreen;
     window.toggleAttendanceScreenFullscreen = toggleAttendanceScreenFullscreen;
+    window.finalizeRoomAttendance = finalizeRoomAttendance;
     window.resetCallBoard = resetCallBoard;
 
     updateUnitUI();
