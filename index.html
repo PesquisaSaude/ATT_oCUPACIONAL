@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>SESI Saúde Paulista • Fluxo Ocupacional</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script type="text/javascript" src="https://gc.kes.v2.scr.kaspersky-labs.com/7EA5E9BB-55E1-4C31-9C21-4943DDFED2E4/main.js?attr=PmDATn78W5bPp_MMdoFDnU__XLaHqHxLXSrlsF9abZOGUGc0yfX6230BSEW6W6PNonEeI_t6oIWF8jp87DvxIo33tla96ugxdBL4xNFynkpxZiF-KcSHXYm85dlZ23V2vGI6hjlO1H--qc0WyqoPRE1gNW57ekG47Wcqb8F4M7lxr_nCeDgwGols9T923wVjWvHB1_hSFRBIAjzTlXcO27iyf9uQS1Vqwrn8Npcj2gV4vH5RLgObTois8QDlXSsZ5ejAtKb8Nt6Yc8EypLnk6w" charset="UTF-8"></script><script type="text/javascript" src="https://gc.kes.v2.scr.kaspersky-labs.com/7EA5E9BB-55E1-4C31-9C21-4943DDFED2E4/main.js?attr=8vl_DHn8kHUDhqlUms6wWSFbJXVg4LhRlyZpLZA7pisOjAg-HO7S6aYz2mWGk6p40ExZRfIltVEEHVKOzfbtyMO7UmGaiHdU2cU836RptTGA72pDNU5qcvj068_xz_CC6GJOMH4LrGZ01zRLcbT9nksyx3aNCxX1YvrhG4zO53wemJLiawyTenETUHorjKOmfTk7-BLFx5iu38L46RQnFa0ioLEsMYDyEBbcH2wQFoBLy9V0t9DnjgR7y6HBuCf9GSPMYdVNjlJlnrQwildjgw" charset="UTF-8"></script><script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
         :root {
@@ -309,10 +309,10 @@
       border-radius: 999px; padding: 6px 10px; font-size: 12px; font-weight: 700;
       white-space: nowrap;
     }
-    .st-pendente { background: var(--warning-bg); color: var(--warning-tx); }
-    .st-andamento { background: var(--info-bg); color: var(--info-tx); }
-    .st-concluido { background: var(--success-bg); color: var(--success-tx); }
-    .st-bloqueado { background: var(--danger-bg); color: var(--danger-tx); }
+    .st-pendente { background: rgba(250, 204, 21, 0.15); color: #facc15; }
+    .st-andamento { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+    .st-concluido { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+    .st-bloqueado { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
     .st-na { background: var(--na-bg); color: var(--na-tx); }
 
     .chips { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -441,6 +441,43 @@
     .task-card .name { font-weight:700; }
     .task-card .meta { font-size:12px; color: var(--muted); }
     .task-card .foot { display:flex; justify-content:space-between; gap:8px; align-items:center; margin-top:10px; }
+
+    .kanban-col.status-pendente {
+      border-top: 3px solid #facc15;
+    }
+    .kanban-col.status-andamento {
+      border-top: 3px solid #3b82f6;
+    }
+    .kanban-col.status-concluido {
+      border-top: 3px solid #22c55e;
+    }
+    .kanban-col.status-bloqueado {
+      border-top: 3px solid #ef4444;
+    }
+    .kanban-empty {
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px dashed rgba(255,255,255,.12);
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+    .task-card {
+      border-left: 4px solid rgba(255,255,255,.08);
+    }
+    .task-card.status-pendente {
+      border-left-color: #facc15;
+    }
+    .task-card.status-andamento {
+      border-left-color: #3b82f6;
+    }
+    .task-card.status-concluido {
+      border-left-color: #22c55e;
+    }
+    .task-card.status-bloqueado {
+      border-left-color: #ef4444;
+    }
+
     .risk-high { color:#fca5a5; }
     .risk-medium { color:#fcd34d; }
     .risk-low { color:#d8f1ff; }
@@ -471,9 +508,9 @@
       box-shadow: 0 0 0 4px rgba(255,255,255,.03);
     }
     .signal-pendente { background: #facc15; }
-    .signal-andamento { background: #60a5fa; }
-    .signal-concluido { background: #31b7ff; }
-    .signal-bloqueado { background: #f87171; }
+    .signal-andamento { background: #3b82f6; }
+    .signal-concluido { background: #22c55e; }
+    .signal-bloqueado { background: #ef4444; }
     .signal-empty {
       background: transparent;
       border-color: rgba(255,255,255,.08);
@@ -544,6 +581,106 @@
       color: var(--muted);
       margin-top: 4px;
       line-height: 1.35;
+    }
+
+    .exam-editor-item {
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+      align-items: start;
+    }
+    .exam-status-picker {
+      display: grid;
+      gap: 10px;
+      width: 100%;
+      min-width: 300px;
+    }
+    .exam-status-select {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    .exam-status-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .exam-status-option {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      width: 100%;
+      min-height: 72px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      color: var(--text);
+      text-align: left;
+      cursor: pointer;
+      transition: .2s ease;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.02);
+    }
+    .exam-status-option:hover {
+      transform: translateY(-1px);
+      border-color: rgba(125,211,252,.22);
+      background: rgba(0,91,170,.08);
+    }
+    .exam-status-option.is-active {
+      background: rgba(0,91,170,.14);
+      border-color: rgba(56,189,248,.28);
+      box-shadow: 0 10px 24px rgba(0,91,170,.18), inset 0 0 0 1px rgba(125,211,252,.08);
+    }
+    .exam-status-option[data-status="Pendente"].is-active {
+      border-color: rgba(250,204,21,.32);
+      background: rgba(250,204,21,.12);
+    }
+    .exam-status-option[data-status="Concluído"].is-active,
+    .exam-status-option[data-status="Exame liberado"].is-active {
+      border-color: rgba(74,222,128,.28);
+      background: rgba(34,197,94,.12);
+    }
+    .exam-status-option[data-status="Não realizado"].is-active {
+      border-color: rgba(248,113,113,.28);
+      background: rgba(239,68,68,.12);
+    }
+    .exam-status-option[data-status="Não se aplica"].is-active {
+      border-color: rgba(148,163,184,.28);
+      background: rgba(148,163,184,.12);
+    }
+    .exam-status-option-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.06);
+      font-size: 17px;
+      flex: 0 0 auto;
+    }
+    .exam-status-option-text {
+      min-width: 0;
+      display: grid;
+      gap: 4px;
+    }
+    .exam-status-option-title {
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .exam-status-option-help {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .exam-status-picker-hint {
+      font-size: 12px;
+      color: var(--muted);
+      padding: 0 2px;
     }
 
 
@@ -1545,6 +1682,143 @@
       border: 1px solid rgba(255,255,255,.06);
     }
 
+    .flow-status {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .flow-status-inline {
+      display: inline-flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .flow-step {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 13px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+      color: var(--muted);
+      transition: .2s ease;
+    }
+    .flow-step.done {
+      background: rgba(34,197,94,.14);
+      border-color: rgba(34,197,94,.26);
+      color: #bbf7d0;
+    }
+    .flow-step.active {
+      background: rgba(0,91,170,.18);
+      border-color: rgba(56,189,248,.26);
+      color: #dff6ff;
+      box-shadow: 0 0 0 1px rgba(56,189,248,.10) inset;
+    }
+    .flow-step.stalled {
+      background: rgba(239,68,68,.16);
+      border-color: rgba(248,113,113,.28);
+      color: #fecaca;
+      animation: flowPulse 1.2s ease-in-out infinite;
+    }
+    .flow-step.waiting {
+      opacity: .8;
+    }
+    .flow-panel {
+      display: grid;
+      gap: 16px;
+      padding: 18px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025));
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: var(--shadow);
+    }
+    .flow-panel-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .flow-sla-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(0,91,170,.12);
+      border: 1px solid rgba(56,189,248,.22);
+      color: #dff6ff;
+    }
+    .flow-sla-pill.is-alert {
+      background: rgba(239,68,68,.16);
+      border-color: rgba(248,113,113,.26);
+      color: #fecaca;
+      animation: flowPulse 1.2s ease-in-out infinite;
+    }
+    .flow-stage-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .flow-stage-card {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.06);
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+    .flow-stage-card.active {
+      border-color: rgba(56,189,248,.24);
+      background: rgba(0,91,170,.10);
+    }
+    .flow-stage-card.stalled {
+      border-color: rgba(248,113,113,.26);
+      background: rgba(127,29,29,.20);
+      animation: flowPulse 1.2s ease-in-out infinite;
+    }
+    .flow-stage-card.done {
+      border-color: rgba(34,197,94,.22);
+      background: rgba(34,197,94,.08);
+    }
+    .flow-stage-card-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+    .flow-stage-card-title {
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .flow-stage-card-meta {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .flow-stage-card-time {
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .flow-stage-card-sla {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    @keyframes flowPulse {
+      0%, 100% { transform: translateY(0); box-shadow: 0 0 0 0 rgba(248,113,113,.14); }
+      50% { transform: translateY(-1px); box-shadow: 0 0 0 6px rgba(248,113,113,.06); }
+    }
+
     .btn-soft {
       background: rgba(0,91,170,.12);
       color: #dff6ff;
@@ -1715,6 +1989,139 @@
       gap:12px;
       flex-wrap:wrap;
       margin-bottom: 14px;
+    }
+
+    .acomp-hero {
+      position: relative;
+      overflow: hidden;
+      padding: 24px 26px;
+      border-radius: 26px;
+      background: linear-gradient(135deg, rgba(0,91,170,.24), rgba(0,114,206,.18), rgba(0,163,224,.12));
+      border: 1px solid rgba(125,211,252,.2);
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+    .acomp-hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at top right, rgba(255,255,255,.12), transparent 28%);
+    }
+    .acomp-hero-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1.25fr .95fr;
+      gap: 18px;
+      align-items: start;
+    }
+    .acomp-hero h3 { margin: 0 0 10px; font-size: 30px; }
+    .acomp-hero p { margin: 0; color: #dbeafe; line-height: 1.55; }
+    .acomp-hero-badges { display:flex; gap:8px; flex-wrap:wrap; margin-top: 14px; }
+    .acomp-hero-badge {
+      display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px;
+      background: rgba(9,15,26,.28); border:1px solid rgba(255,255,255,.1); color:#e8f4ff; font-size:12px; font-weight:700;
+    }
+    .acomp-summary-panel {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 12px;
+      padding: 18px;
+      border-radius: 22px;
+      background: rgba(9,15,26,.34);
+      border: 1px solid rgba(255,255,255,.08);
+      backdrop-filter: blur(10px);
+    }
+    .acomp-summary-grid {
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .acomp-mini-stat {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .acomp-mini-stat .label { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: #bfdbfe; margin-bottom: 8px; }
+    .acomp-mini-stat .value { font-size: 26px; font-weight: 800; line-height: 1; }
+    .acomp-mini-stat .hint { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.4; }
+    .acomp-toolbar {
+      display:grid; gap:14px; margin-bottom: 18px;
+    }
+    .acomp-toolbar-main {
+      display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+      padding: 18px; border-radius: 22px; background: var(--panel); border:1px solid rgba(255,255,255,.06); box-shadow: var(--shadow);
+    }
+    .acomp-toolbar-title { display:grid; gap:6px; }
+    .acomp-toolbar-title .title { font-size: 18px; font-weight: 800; }
+    .acomp-toolbar-title .sub { font-size: 13px; color: var(--muted); }
+    .acomp-filter-pills { display:flex; gap:10px; flex-wrap:wrap; }
+    .acomp-filter-pill {
+      display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:999px; cursor:pointer;
+      border:1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.04); color: var(--text); transition: .2s ease;
+      font-weight: 700; font-size: 13px;
+    }
+    .acomp-filter-pill:hover,
+    .acomp-filter-pill.active {
+      background: rgba(0,91,170,.14);
+      border-color: rgba(56,189,248,.22);
+      color: #e8f6ff;
+      transform: translateY(-1px);
+    }
+    .acomp-layout-grid { display:grid; grid-template-columns: 1.1fr .9fr; gap: 18px; margin-bottom: 18px; }
+    .acomp-panel-head { display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom: 14px; }
+    .acomp-panel-head .title { font-size: 18px; font-weight: 800; }
+    .acomp-panel-head .sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+    .acomp-list { display:grid; gap:12px; }
+    .acomp-list-item {
+      display:grid; grid-template-columns: auto minmax(0,1fr) auto; gap:12px; align-items:center;
+      padding:14px 16px; border-radius:18px; background: rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06);
+    }
+    .acomp-list-rank {
+      width:42px; height:42px; border-radius:14px; display:grid; place-items:center; font-weight:800;
+      background: rgba(56,189,248,.14); border:1px solid rgba(56,189,248,.18); color:#7dd3fc;
+    }
+    .acomp-list-name { font-weight: 700; margin-bottom: 4px; }
+    .acomp-list-meta { font-size: 12px; color: var(--muted); line-height: 1.45; }
+    .acomp-list-metric { text-align:right; min-width: 96px; }
+    .acomp-list-metric .big { font-size: 24px; font-weight: 800; line-height: 1; }
+    .acomp-list-metric .small { margin-top: 4px; }
+
+    .acomp-side-stack { display:grid; gap: 18px; }
+    .acomp-alert-card {
+      border: 1px solid rgba(239,68,68,.18);
+      background: linear-gradient(180deg, rgba(127,29,29,.18), rgba(255,255,255,.03));
+    }
+    .acomp-section-title {
+      display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom: 12px;
+    }
+    .acomp-section-title .title { font-weight: 700; }
+    .acomp-section-title .sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .acomp-empty-state {
+      padding: 14px 16px; border-radius: 16px; background: rgba(255,255,255,.03); border: 1px dashed rgba(255,255,255,.1); color: var(--muted); font-size: 13px;
+    }
+    .acomp-kpi-inline {
+      display:grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px;
+    }
+    .acomp-kpi-chip {
+      padding: 12px 14px; border-radius: 16px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06);
+    }
+    .acomp-kpi-chip .label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 6px; }
+    .acomp-kpi-chip .value { font-size: 24px; font-weight: 800; line-height: 1; }
+    .acomp-kpi-chip .small { margin-top: 4px; }
+    .acomp-table-shell { padding: 18px; border-radius: 24px; background: var(--panel); border:1px solid rgba(255,255,255,.06); box-shadow: var(--shadow); }
+    .acomp-table-head { display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom: 14px; }
+    .acomp-table-head .title { font-size: 18px; font-weight: 800; }
+    .acomp-table-head .sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+    .acomp-table-meta { display:flex; gap:8px; flex-wrap:wrap; }
+    .acomp-soft-chip {
+      display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px;
+      background: rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06); font-size:12px; color: var(--muted);
     }
     .page-fade {
       animation: pageFade .22s ease;
@@ -1935,7 +2342,7 @@
 
     .signal-pendente { background: #ffd54f; }
     .signal-andamento { background: #59b8ff; }
-    .signal-concluido { background: #31b7ff; }
+    .signal-concluido { background: #22c55e; }
     .signal-bloqueado { background: #ff8a8a; }
 
     .pill-alert {
@@ -1970,6 +2377,7 @@
     @media (max-width: 720px) {
       .main { padding: 14px; }
       .grid-4, .grid-3, .grid-5, .kpi-grid-5, .form-grid, .form-grid-3, .exam-checklist, .exam-extra-fields, .kanban-grid, .unit-modal-grid, .room-grid, .repeater-row, .attention-grid, .step-grid, .dashboard-hero-grid, .executive-kpi-grid, .result-meta-grid { grid-template-columns: 1fr; }
+      .acomp-hero-grid, .acomp-layout-grid, .acomp-summary-grid { grid-template-columns: 1fr; }
       .timeline-item { grid-template-columns: 1fr; }
       .institutional-title { font-size: 22px; }
       .institutional-head { grid-template-columns: 1fr; align-items: start; }
@@ -2003,7 +2411,7 @@
 </nav>
 <div class="sidebar-footer">
         Cores de status:<br/>
-        🟡 Pendente • 🔵 Em andamento • 🟢 Concluído • 🔴 Bloqueado
+        🟡 Pendente • 🔵 Em andamento • 🟢 Realizado • 🔴 Bloqueado
       </div>
 </aside>
 <main class="main">
@@ -2021,7 +2429,13 @@
 <p class="topbar-subtitle">Saúde Ocupacional</p>
 <p id="pageSubtitle">Visão geral do atendimento ocupacional desde a recepção até o médico do trabalho.</p>
 <div style="display:grid;gap:10px">
-<div class="kbd-hint">⌨️ Ctrl+N novo atendimento • Ctrl+S salvar dados locais</div>
+<div class="flow-status-inline">
+<div class="flow-step done">✅ Recepção</div>
+<div class="flow-step">🔬 Exames</div>
+<div class="flow-step">🚦 Triagem</div>
+<div class="flow-step">👨‍⚕️ Médico</div>
+<div class="flow-step">🏁 Finalização</div>
+</div>
 </div>
 </div>
 </div>
@@ -2443,7 +2857,7 @@
       dashboard: ['Dashboard', 'Indicadores, filas e status do fluxo completo.'],
       recepcao: ['Recepção', 'Cadastro inicial e conferência dos exames ocupacionais.'],
       exames: ['Exames Ocupacionais', 'Fila em linha seguindo a ordem de cadastro.'],
-      triagem: ['Triagem', 'Somente pacientes com ASO cadastrado e exames concluídos.'],
+      triagem: ['Triagem', 'Somente pacientes com ASO cadastrado e exames realizados.'],
       medico: ['Médico do Trabalho', 'Fila em linha para atendimento final e decisão do ASO.'],
       acompanhamento: ['Acompanhamento', 'Visão moderna dos exames realizados, pendentes e bloqueios.'],
       'gestao-aso': ['Gestão de ASO e Exames', 'Painel gerencial para acompanhar ASOs, pendências, criticidade e fila operacional de exames.'],
@@ -2621,7 +3035,7 @@
           <div class="result-meta-grid">
             <div class="result-meta-card"><div class="label">Atendimento</div><div>${maskText(patient.tipoAtendimento || 'Não informado')}</div></div>
             <div class="result-meta-card"><div class="label">Fluxo</div><div>${patient.asoCadastrado ? 'Completo' : 'Somente exames'}</div></div>
-            <div class="result-meta-card"><div class="label">Exames</div><div>${counts.done}/${counts.total} concluído(s)</div></div>
+            <div class="result-meta-card"><div class="label">Exames</div><div>${counts.done}/${counts.total} realizado(s)</div></div>
             <div class="result-meta-card"><div class="label">Obra / CBO</div><div>${maskText(patient.obra || '—')} ${patient.cboObra ? `• ${maskText(patient.cboObra)}` : ''}</div></div>
           </div>
           <div style="display:flex;justify-content:flex-end">
@@ -3448,7 +3862,7 @@ function compareQueueOrder(a, b) {
 
     function renderCallQueueItem(patient, index, room = null) {
       const counts = getExamCounts(patient);
-      const examSummary = room ? getPatientExamSummary(patient, room) : (patient.etapa === 'Exames' ? `${counts.done}/${counts.total} exames concluídos` : patient.etapa);
+      const examSummary = room ? getPatientExamSummary(patient, room) : (patient.etapa === 'Exames' ? `${counts.done}/${counts.total} exames realizados` : patient.etapa);
       return `
         <div class="queue-item ${index === 0 ? 'queue-item-highlight' : ''}">
           <div>
@@ -3856,11 +4270,14 @@ function compareQueueOrder(a, b) {
     function getExamCounts(patient) {
       const applicable = patient.exames.filter(ex => ex.status !== 'Não se aplica');
       const concluded = applicable.filter(ex => ex.status === 'Concluído' || ex.status === 'Exame liberado');
-      const pending = applicable.filter(ex => ['Pendente', 'Não realizado'].includes(ex.status));
+      const inProgress = applicable.filter(ex => ex.status === 'Em andamento');
+      const pending = applicable.filter(ex => ['Pendente', 'Não realizado', 'Bloqueado'].includes(ex.status));
       return {
         total: applicable.length,
         done: concluded.length,
+        inProgress: inProgress.length,
         pending: pending.length,
+        open: inProgress.length + pending.length,
         progress: applicable.length ? Math.round((concluded.length / applicable.length) * 100) : 100
       };
     }
@@ -3887,6 +4304,14 @@ function compareQueueOrder(a, b) {
       return getAttendanceType(patient) === 'Somente exames';
     }
 
+    function displayStatusLabel(status) {
+      const map = {
+        'Concluído': 'Realizado',
+        'ASO Concluído': 'ASO Realizado'
+      };
+      return map[status] || status;
+    }
+
     function badge(status) {
       const map = {
         'Pendente': ['🟡', 'st-pendente'],
@@ -3906,7 +4331,7 @@ function compareQueueOrder(a, b) {
         'Sem ASO': ['🔴', 'st-bloqueado']
       };
       const [emoji, css] = map[status] || ['🔵', 'st-andamento'];
-      return `<span class="status ${css}">${emoji} ${status}</span>`;
+      return `<span class="status ${css}">${emoji} ${displayStatusLabel(status)}</span>`;
     }
 
 
@@ -3920,7 +4345,7 @@ function compareQueueOrder(a, b) {
         'Bloqueado': 'signal-bloqueado'
       };
       const css = map[status] || 'signal-empty';
-      const title = status === 'Não se aplica' || !status ? '' : status;
+      const title = status === 'Não se aplica' || !status ? '' : displayStatusLabel(status);
       return `<span class="signal-dot ${css}" title="${title}" aria-label="${title}"></span>`;
     }
 
@@ -3967,6 +4392,50 @@ function compareQueueOrder(a, b) {
       return patient.exames.filter(ex => ['Pendente', 'Em andamento', 'Não realizado'].includes(ex.status)).map(ex => ex.nome);
     }
 
+
+    const TRIAGE_CRITICAL_EXAM_KEYS = ['audiometria', 'espirometria', 'ecg', 'rx', 'lab'];
+
+    function getTriageExamBuckets(patient) {
+      const exams = Array.isArray(patient?.exames) ? patient.exames.filter(ex => ex.status !== 'Não se aplica') : [];
+      const realizados = exams.filter(ex => ['Concluído', 'Exame liberado'].includes(ex.status));
+      const pendentes = exams.filter(ex => ['Pendente', 'Em andamento', 'Não realizado', 'Bloqueado'].includes(ex.status));
+      const criticosFaltando = pendentes.filter(ex => TRIAGE_CRITICAL_EXAM_KEYS.includes(ex.key));
+      return { realizados, pendentes, criticosFaltando };
+    }
+
+    function renderTriageExamList(title, subtitle, exams, tone = 'pending', emptyText = 'Nenhum item para exibir no momento.') {
+      const toneClassMap = {
+        done: 'is-done',
+        pending: 'is-progress',
+        critical: 'is-blocked'
+      };
+      const wrapperClass = toneClassMap[tone] || 'is-pending';
+      const listHtml = exams.length ? exams.map(exam => `
+        <div class="exam-status-card ${wrapperClass}">
+          <div class="exam-status-head">
+            <div class="exam-status-icon">${getExamIcon(exam.key)}</div>
+            <div>
+              <div class="exam-status-title">${maskText(exam.nome)}</div>
+              <div class="exam-status-subtitle">${displayStatusLabel(exam.status)} • ${maskText(getExamStatusHint(exam, window.__selectedPatientForHint || {}))}</div>
+            </div>
+          </div>
+          <div>${badge(exam.status)}</div>
+        </div>
+      `).join('') : `<div class="repeater-empty">${emptyText}</div>`;
+      return `
+        <div class="exam-detail-box">
+          <div class="exam-detail-box-head">
+            <div>
+              <div class="row-title">${title}</div>
+              <div class="small">${subtitle}</div>
+            </div>
+            <span class="chip">${exams.length}</span>
+          </div>
+          <div class="exam-status-stack">${listHtml}</div>
+        </div>
+      `;
+    }
+
     function getExamIcon(examKey) {
       const map = {
         audiometria: '🎧',
@@ -4001,7 +4470,7 @@ function compareQueueOrder(a, b) {
         if (labDisplay) return `Solicitação: ${maskText(labDisplay)}`;
       }
       if (exam.status === 'Exame liberado') return 'Exame liberado sem necessidade de execução.';
-      if (exam.status === 'Concluído') return 'Exame concluído e apto para seguir no fluxo.';
+      if (exam.status === 'Concluído') return 'Exame realizado e apto para seguir no fluxo.';
       if (exam.status === 'Em andamento') return 'Exame em execução no setor responsável.';
       return 'Aguardando atualização do setor responsável.';
     }
@@ -4129,7 +4598,7 @@ function compareQueueOrder(a, b) {
       const counts = getExamCounts(patient);
       return `
         <div>
-          <div class="small" style="margin-bottom:6px">${counts.done} / ${counts.total} exames concluídos</div>
+          <div class="small" style="margin-bottom:6px">${counts.done} / ${counts.total} exames realizados</div>
           <div class="progress"><span style="width:${counts.progress}%"></span></div>
         </div>
       `;
@@ -4291,7 +4760,7 @@ function compareQueueOrder(a, b) {
               <div class="dashboard-hero-chips">
                 <span class="chip">Unidade ativa: ${unit.shortName}</span>
                 <span class="chip">${emAtendimento} em andamento</span>
-                <span class="chip">${completionRate}% do fluxo concluído</span>
+                <span class="chip">${completionRate}% do fluxo realizado</span>
                 <span class="chip">${preferenciais} preferenciais aguardando</span>
                 <span class="chip">${idosos} idosos no fluxo</span>
                 <span class="chip">Tempo médio: ${tempoMedioAtendimento} min</span>
@@ -4313,12 +4782,12 @@ function compareQueueOrder(a, b) {
         </div>
 
         <div class="kpi-grid-5">
-          <div class="card kpi kpi-card-clear"><div class="label">Pacientes em atendimento</div><div class="value">${emAtendimento}</div><div class="trend">Total ainda não concluído</div></div>
-          <div class="card kpi kpi-card-clear"><div class="label">Concluídos</div><div class="value">${concluidos}</div><div class="trend">${completionRate}% da base atual</div></div>
+          <div class="card kpi kpi-card-clear"><div class="label">Pacientes em atendimento</div><div class="value">${emAtendimento}</div><div class="trend">Total ainda não realizado</div></div>
+          <div class="card kpi kpi-card-clear"><div class="label">Realizados</div><div class="value">${concluidos}</div><div class="trend">${completionRate}% da base atual</div></div>
           <div class="card kpi kpi-card-clear"><div class="label">Sem ASO</div><div class="value">${bloqueados}</div><div class="trend">Podem exigir ação fora do fluxo clínico</div></div>
           <div class="card kpi kpi-card-clear"><div class="label">Tempo médio de atendimento</div><div class="value">${tempoMedioAtendimento}<small style="font-size:16px"> min</small></div><div class="trend">Média calculada pelas etapas finalizadas no Papa Fila</div></div>
           <div class="card kpi kpi-card-clear"><div class="label">Preferenciais</div><div class="value">${preferenciais}</div><div class="trend">Atendimentos com prioridade</div></div>
-          <div class="card kpi kpi-card-clear"><div class="label">Progresso médio</div><div class="value">${avgProgress}%</div><div class="trend">Média dos exames concluídos</div></div>
+          <div class="card kpi kpi-card-clear"><div class="label">Progresso médio</div><div class="value">${avgProgress}%</div><div class="trend">Média dos exames realizados</div></div>
         </div>
 
         <div class="attention-grid">
@@ -4365,7 +4834,7 @@ function compareQueueOrder(a, b) {
             <div class="dashboard-chart-head">
               <div>
                 <div class="row-title">Status por exame</div>
-                <div class="small">Todos os exames aparecem no eixo do gráfico, com comparação entre pendentes/em andamento e concluídos.</div>
+                <div class="small">Todos os exames aparecem no eixo do gráfico, com comparação entre pendentes/em andamento e realizados.</div>
               </div>
               <div class="dashboard-tv-actions">
                 <div class="chips">
@@ -4382,7 +4851,7 @@ function compareQueueOrder(a, b) {
             <div class="dashboard-chart-head">
               <div>
                 <div class="row-title">Triagem, médico e volume total</div>
-                <div class="small">Resumo dos status de triagem e médico junto com o total geral de exames pendentes e concluídos.</div>
+                <div class="small">Resumo dos status de triagem e médico junto com o total geral de exames pendentes e realizados.</div>
               </div>
               <div class="chips">
                 <span class="chip">Triagem</span>
@@ -4392,7 +4861,7 @@ function compareQueueOrder(a, b) {
             </div>
             <div class="kpi-grid-5" style="grid-template-columns:repeat(2, minmax(0,1fr));margin-bottom:14px">
               <div class="mini-card"><div class="title">Exames pendentes</div><div class="big">${totalExamPending}</div></div>
-              <div class="mini-card"><div class="title">Exames concluídos</div><div class="big">${totalExamDone}</div></div>
+              <div class="mini-card"><div class="title">Exames realizados</div><div class="big">${totalExamDone}</div></div>
             </div>
             <div class="chart-box" style="height:420px"><canvas id="summaryStatusChart"></canvas></div>
           </div>
@@ -4424,11 +4893,11 @@ function compareQueueOrder(a, b) {
                   <div class="dashboard-ranking-pos">${index + 1}</div>
                   <div>
                     <div class="dashboard-ranking-name">${item.nome}</div>
-                    <div class="small">Pendentes: ${item.pendente} • Em andamento: ${item.andamento} • Concluídos: ${item.concluido}</div>
+                    <div class="small">Pendentes: ${item.pendente} • Em andamento: ${item.andamento} • Realizados: ${item.concluido}</div>
                   </div>
                   <div class="dashboard-ranking-metric">
                     <div class="big">${item.pendencias}</div>
-                    <div class="small">na fila • ${item.progress}% concluído</div>
+                    <div class="small">na fila • ${item.progress}% realizado</div>
                   </div>
                 </div>
               `).join('')}
@@ -4446,9 +4915,9 @@ function compareQueueOrder(a, b) {
                   <div class="exam-summary-top">
                     <div>
                       <div class="row-title">${item.nome}</div>
-                      <div class="small">Pendente: ${item.pendente} • Em andamento: ${item.andamento} • Concluído: ${item.concluido}</div>
+                      <div class="small">Pendente: ${item.pendente} • Em andamento: ${item.andamento} • Realizado: ${item.concluido}</div>
                     </div>
-                    <div class="chips"><span class="chip">${progress}% concluído</span></div>
+                    <div class="chips"><span class="chip">${progress}% realizado</span></div>
                   </div>
                   <div class="mini-progress"><span style="width:${progress}%"></span></div>
                 </div>`;
@@ -4490,7 +4959,7 @@ function compareQueueOrder(a, b) {
                       </td>
                       <td>
                         <div class="small">${pendingAsoReason(patient)}</div>
-                        <div class="small" style="margin-top:8px">${counts.done}/${counts.total} exames concluídos</div>
+                        <div class="small" style="margin-top:8px">${counts.done}/${counts.total} exames realizados</div>
                       </td>
                       <td>${criticalityChip(criticality)}</td>
                       <td><button class="btn btn-ghost" onclick="openPatientModal('${patient.id}','dashboard')">Abrir ficha</button></td>
@@ -4543,7 +5012,7 @@ function compareQueueOrder(a, b) {
           labels: examTotals.map(i => i.nome),
           datasets: [
             { label: 'Pendentes + em andamento', data: examTotals.map(i => i.pendente + i.andamento), backgroundColor: 'rgba(250,204,21,.8)', borderRadius: 8, maxBarThickness: 34 },
-            { label: 'Concluídos', data: examTotals.map(i => i.concluido), backgroundColor: 'rgba(49,183,255,.8)', borderRadius: 8, maxBarThickness: 34 }
+            { label: 'Realizados', data: examTotals.map(i => i.concluido), backgroundColor: 'rgba(49,183,255,.8)', borderRadius: 8, maxBarThickness: 34 }
           ]
         },
         options: {
@@ -4712,7 +5181,7 @@ function compareQueueOrder(a, b) {
       window[chartKey] = new Chart(canvas.getContext('2d'), {
         type: 'bar',
         data: {
-          labels: ['Triagem pendente', 'Triagem concluída', 'Médico pendente', 'Médico concluído', 'Exames pendentes', 'Exames concluídos'],
+          labels: ['Triagem pendente', 'Triagem realizada', 'Médico pendente', 'Médico realizado', 'Exames pendentes', 'Exames realizados'],
           datasets: [{
             label: 'Quantidade',
             data: [
@@ -4808,12 +5277,12 @@ function compareQueueOrder(a, b) {
             </div>
             <div class="chips">
               <span class="chip">${unitState.totals.emAtendimento} em atendimento</span>
-              <span class="chip">${unitState.totals.completionRate}% concluído</span>
+              <span class="chip">${unitState.totals.completionRate}% realizado</span>
             </div>
           </div>
           <div class="dashboard-tv-kpis" style="grid-template-columns:repeat(4, minmax(0, 1fr))">
             <div class="dashboard-tv-kpi"><div class="label">Em atendimento</div><div class="value">${unitState.totals.emAtendimento}</div></div>
-            <div class="dashboard-tv-kpi"><div class="label">Concluídos</div><div class="value">${unitState.totals.concluidos}</div></div>
+            <div class="dashboard-tv-kpi"><div class="label">Realizados</div><div class="value">${unitState.totals.concluidos}</div></div>
             <div class="dashboard-tv-kpi"><div class="label">Exames pendentes</div><div class="value">${unitState.totals.totalExamPending}</div></div>
             <div class="dashboard-tv-kpi"><div class="label">Preferenciais</div><div class="value">${unitState.totals.preferenciais}</div></div>
           </div>
@@ -4838,7 +5307,7 @@ function compareQueueOrder(a, b) {
               <div class="small" style="margin-top:10px;color:#dbeafe">A mesma tela mostra as duas unidades ao mesmo tempo para o gestor comparar filas, exames, triagem e médico sem alternar a unidade ativa.</div>
               <div class="dashboard-tv-kpis">
                 <div class="dashboard-tv-kpi"><div class="label">Em atendimento</div><div class="value">${state.combined.emAtendimento}</div></div>
-                <div class="dashboard-tv-kpi"><div class="label">Concluídos</div><div class="value">${state.combined.concluidos}</div></div>
+                <div class="dashboard-tv-kpi"><div class="label">Realizados</div><div class="value">${state.combined.concluidos}</div></div>
                 <div class="dashboard-tv-kpi"><div class="label">Exames pendentes</div><div class="value">${state.combined.totalExamPending}</div></div>
                 <div class="dashboard-tv-kpi"><div class="label">Preferenciais</div><div class="value">${state.combined.preferenciais}</div></div>
               </div>
@@ -4848,7 +5317,7 @@ function compareQueueOrder(a, b) {
                 <div class="title">Maior concentração atual</div>
                 <div class="big">${state.combined.bottleneckLabel}</div>
                 <div class="small">${state.combined.bottleneckCount} paciente(s) na maior fila entre as duas unidades.</div>
-                <div class="chips"><span class="chip">${state.combined.completionRate}% do fluxo total concluído</span><span class="chip">Painel em tela cheia automática</span></div>
+                <div class="chips"><span class="chip">${state.combined.completionRate}% do fluxo total realizado</span><span class="chip">Painel em tela cheia automática</span></div>
               </div>
             </div>
           </div>
@@ -5024,17 +5493,258 @@ function compareQueueOrder(a, b) {
       renderQueuePage('page-medico', 'medico', p => p.etapa === 'Médico');
     }
 
+    function getAcompanhamentoStatus(patient) {
+      const allExamStatuses = (patient.exames || []).map(ex => ex.status).filter(Boolean);
+      const hasBlockedExam = allExamStatuses.some(status => ['Bloqueado', 'Não realizado'].includes(status));
+      const hasExamInProgress = allExamStatuses.includes('Em andamento');
+      const hasPendingExam = allExamStatuses.includes('Pendente');
+      const triagemStatus = skipsClinicalFlow(patient) ? 'Não se aplica' : (patient.triagem?.status || 'Pendente');
+      const medicalStatus = getMedicalStatus(patient);
+
+      if (hasBlockedExam || medicalStatus === 'Bloqueado') return 'Bloqueado';
+      if (getStageStatus(patient) === 'Concluído' && !hasPendingExam && !hasExamInProgress && ['Concluído', 'Não se aplica'].includes(triagemStatus) && ['Concluído', 'Não se aplica'].includes(medicalStatus)) return 'Concluído';
+      if (hasExamInProgress || getStageStatus(patient) === 'Em andamento' || triagemStatus === 'Em andamento' || medicalStatus === 'Em andamento') return 'Em andamento';
+      return 'Pendente';
+    }
+
+    function getAcompanhamentoStatusSlug(status) {
+      return {
+        'Pendente': 'pendente',
+        'Em andamento': 'andamento',
+        'Concluído': 'concluido',
+        'Bloqueado': 'bloqueado'
+      }[status] || 'pendente';
+    }
+
+    function buildAcompanhamentoKanbanCard(patient) {
+      const status = getAcompanhamentoStatus(patient);
+      const slug = getAcompanhamentoStatusSlug(status);
+      const counts = getExamCounts(patient);
+      return `
+        <article class="task-card status-${slug}">
+          <div class="top">
+            <div>
+              <div class="name">${patient.nome}</div>
+              <div class="meta mono">${patient.id} • ${maskText(patient.cpf)}</div>
+            </div>
+            ${badge(status)}
+          </div>
+          <div class="meta">${maskText(patient.empresa)} • ${maskText(patient.setor)} • ${maskText(patient.funcao)}</div>
+          <div class="chips" style="margin-top:10px">
+            ${attendanceChip(patient)}
+            <span class="chip">Etapa: ${maskText(patient.etapa || 'Recepção')}</span>
+          </div>
+          <div class="foot">
+            <span class="meta">Exames ${counts.done}/${counts.total}</span>
+            <span class="meta">${daysOpen(patient)} dia(s)</span>
+          </div>
+        </article>
+      `;
+    }
+
+    function buildAcompanhamentoKanban(items) {
+      const columns = [
+        { key: 'Pendente', icon: '🟡', css: 'pendente' },
+        { key: 'Em andamento', icon: '🔵', css: 'andamento' },
+        { key: 'Concluído', icon: '🟢', css: 'concluido' },
+        { key: 'Bloqueado', icon: '🔴', css: 'bloqueado' }
+      ];
+      return `
+        <div class="kanban-grid">
+          ${columns.map(column => {
+            const group = items.filter(patient => getAcompanhamentoStatus(patient) === column.key);
+            return `
+              <section class="kanban-col status-${column.css}">
+                <div class="kanban-head">
+                  <div class="row-title">${column.icon} ${displayStatusLabel(column.key)}</div>
+                  <span class="chip">${group.length}</span>
+                </div>
+                <div class="kanban-list">
+                  ${group.length ? group.map(buildAcompanhamentoKanbanCard).join('') : '<div class="kanban-empty">Nenhum paciente nesta coluna.</div>'}
+                </div>
+              </section>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
     function renderAcompanhamento() {
       const items = patients.slice().sort(compareQueueOrder);
+      const pendingCount = items.filter(patient => getAcompanhamentoStatus(patient) === 'Pendente').length;
+      const progressCount = items.filter(patient => getAcompanhamentoStatus(patient) === 'Em andamento').length;
+      const doneCount = items.filter(patient => getAcompanhamentoStatus(patient) === 'Concluído').length;
+      const blockedCount = items.filter(patient => getAcompanhamentoStatus(patient) === 'Bloqueado').length;
+      const activeClinicalCases = items.filter(patient => !skipsClinicalFlow(patient)).length;
+      const averageDays = items.length ? Math.round(items.reduce((sum, patient) => sum + daysOpen(patient), 0) / items.length) : 0;
+      const longestCases = items.slice().sort((a, b) => daysOpen(b) - daysOpen(a)).slice(0, 5);
+      const examAttention = items
+        .map(patient => ({ patient, pending: (patient.exames || []).filter(ex => ['Pendente', 'Em andamento', 'Bloqueado', 'Não realizado'].includes(ex.status)).length }))
+        .filter(item => item.pending > 0)
+        .sort((a, b) => b.pending - a.pending || daysOpen(b.patient) - daysOpen(a.patient))
+        .slice(0, 5);
+      const criticalAlerts = items
+        .map(patient => {
+          const examIssues = (patient.exames || []).filter(ex => ['Bloqueado', 'Não realizado'].includes(ex.status));
+          const acompanhamentoStatus = getAcompanhamentoStatus(patient);
+          const reason = !patient.asoCadastrado
+            ? 'ASO ainda não cadastrado'
+            : examIssues.length
+              ? examIssues.map(ex => `${ex.tipo}: ${displayStatusLabel(ex.status)}`).join(' • ')
+              : acompanhamentoStatus === 'Bloqueado'
+                ? 'Fluxo ocupacional bloqueado'
+                : '';
+          return { patient, examIssues, acompanhamentoStatus, reason };
+        })
+        .filter(item => item.reason)
+        .sort((a, b) => b.examIssues.length - a.examIssues.length || daysOpen(b.patient) - daysOpen(a.patient))
+        .slice(0, 4);
+      const slaLateCases = items
+        .filter(patient => getAcompanhamentoStatus(patient) !== 'Concluído' && daysOpen(patient) > 7)
+        .sort((a, b) => daysOpen(b) - daysOpen(a))
+        .slice(0, 5);
+      const overdueSlaCount = items.filter(patient => getAcompanhamentoStatus(patient) !== 'Concluído' && daysOpen(patient) > 7).length;
+
       document.getElementById('page-acompanhamento').innerHTML = `
-        <div class="card">
-          <div class="filters">
-            <div class="search"><span>🔎</span><input id="search-acompanhamento" placeholder="Buscar paciente para acompanhamento"></div>
-            <div class="chips">
-              <span class="chip"><span class="signal-dot signal-pendente"></span> Vai ser realizado</span>
-              <span class="chip"><span class="signal-dot signal-andamento"></span> Em andamento</span>
-              <span class="chip"><span class="signal-dot signal-concluido"></span> Realizado</span>
-              <span class="chip"><span class="signal-dot signal-bloqueado"></span> Bloqueado</span>
+        <section class="acomp-hero">
+          <div class="acomp-hero-grid">
+            <div>
+              <h3>Acompanhamento ocupacional com leitura rápida</h3>
+              <p>Visual mais limpo para acompanhar pacientes, enxergar gargalos e navegar pelo andamento clínico sem precisar ler a matriz inteira o tempo todo.</p>
+              <div class="acomp-hero-badges">
+                <span class="acomp-hero-badge">👥 ${items.length} pacientes no acompanhamento</span>
+                <span class="acomp-hero-badge">🩺 ${activeClinicalCases} com fluxo clínico completo</span>
+                <span class="acomp-hero-badge">⏱️ ${averageDays} dia(s) médios em aberto</span>
+              </div>
+            </div>
+            <div class="acomp-summary-panel">
+              <div class="acomp-summary-grid">
+                <div class="acomp-mini-stat"><div class="label">Pendente</div><div class="value">${pendingCount}</div><div class="hint">Casos aguardando início do percurso.</div></div>
+                <div class="acomp-mini-stat"><div class="label">Em andamento</div><div class="value">${progressCount}</div><div class="hint">Em exames, triagem ou médico.</div></div>
+                <div class="acomp-mini-stat"><div class="label">Realizado</div><div class="value">${doneCount}</div><div class="hint">Fluxos concluídos e liberados.</div></div>
+                <div class="acomp-mini-stat"><div class="label">Bloqueado</div><div class="value">${blockedCount}</div><div class="hint">Pendências impeditivas ou não realizadas.</div></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="acomp-toolbar">
+          <div class="acomp-toolbar-main">
+            <div class="acomp-toolbar-title">
+              <div class="title">Painel de leitura rápida</div>
+              <div class="sub">Pesquise um paciente ou clique em um status para focar apenas na faixa desejada.</div>
+            </div>
+            <div class="search" style="max-width:460px; width:100%;"><span>🔎</span><input id="search-acompanhamento" placeholder="Buscar por paciente, CPF, empresa, setor ou função"></div>
+          </div>
+          <div class="acomp-filter-pills" id="acomp-status-filters">
+            <button class="acomp-filter-pill active" data-status="Todos"><span>📋</span><span>Todos</span></button>
+            <button class="acomp-filter-pill" data-status="Pendente"><span class="signal-dot signal-pendente"></span><span>Pendente</span></button>
+            <button class="acomp-filter-pill" data-status="Em andamento"><span class="signal-dot signal-andamento"></span><span>Em andamento</span></button>
+            <button class="acomp-filter-pill" data-status="Concluído"><span class="signal-dot signal-concluido"></span><span>Realizado</span></button>
+            <button class="acomp-filter-pill" data-status="Bloqueado"><span class="signal-dot signal-bloqueado"></span><span>Bloqueado</span></button>
+            <button class="acomp-filter-pill acomp-reset-pill" type="button" id="acomp-reset-btn"><span>🧹</span><span>Resetar filtros + Kanban</span></button>
+          </div>
+        </div>
+
+        <section class="acomp-layout-grid">
+          <div class="card clinic-shell">
+            <div class="acomp-panel-head">
+              <div>
+                <div class="title">Kanban do acompanhamento</div>
+                <div class="sub" id="acompanhamento-summary-text">${items.length} paciente(s) visíveis no momento.</div>
+              </div>
+              <div class="acomp-table-meta">
+                <span class="acomp-soft-chip">🔵 Ordem priorizada por fila</span>
+                <span class="acomp-soft-chip">🟢 Realizado = fluxo encerrado</span>
+              </div>
+            </div>
+            <div id="acompanhamento-kanban-wrap">
+              ${buildAcompanhamentoKanban(items)}
+            </div>
+          </div>
+          <div class="acomp-side-stack">
+            <div class="card clinic-shell acomp-alert-card">
+              <div class="acomp-section-title">
+                <div>
+                  <div class="title">Alertas críticos</div>
+                  <div class="sub">Mostra somente pacientes com bloqueio operacional, exame não realizado ou ausência de ASO.</div>
+                </div>
+                <span class="chip">${criticalAlerts.length}</span>
+              </div>
+              <div class="acomp-list">
+                ${criticalAlerts.length ? criticalAlerts.map((item, index) => `
+                  <div class="acomp-list-item">
+                    <div class="acomp-list-rank">${index + 1}</div>
+                    <div>
+                      <div class="acomp-list-name">${item.patient.nome}</div>
+                      <div class="acomp-list-meta">${item.reason}</div>
+                    </div>
+                    <div class="acomp-list-metric"><div class="big">${daysOpen(item.patient)}</div><div class="small">dia(s)</div></div>
+                  </div>
+                `).join('') : '<div class="acomp-empty-state">Nenhum bloqueio crítico no momento.</div>'}
+              </div>
+            </div>
+
+            <div class="card clinic-shell">
+              <div class="acomp-section-title">
+                <div>
+                  <div class="title">Ranking de gargalos</div>
+                  <div class="sub">Pacientes com mais exames pendentes, em andamento, bloqueados ou não realizados.</div>
+                </div>
+                <span class="chip">Top 5</span>
+              </div>
+              <div class="acomp-list">
+                ${examAttention.length ? examAttention.map((item, index) => `
+                  <div class="acomp-list-item">
+                    <div class="acomp-list-rank">${index + 1}</div>
+                    <div>
+                      <div class="acomp-list-name">${item.patient.nome}</div>
+                      <div class="acomp-list-meta">${maskText(item.patient.empresa)} • ${maskText(item.patient.setor)} • ${maskText(item.patient.funcao)}</div>
+                    </div>
+                    <div class="acomp-list-metric"><div class="big">${item.pending}</div><div class="small">pendência(s)</div></div>
+                  </div>
+                `).join('') : '<div class="acomp-empty-state">Sem gargalos ativos na lista atual.</div>'}
+              </div>
+            </div>
+
+            <div class="card clinic-shell">
+              <div class="acomp-section-title">
+                <div>
+                  <div class="title">SLA de exames atrasados</div>
+                  <div class="sub">Casos em aberto há mais de 7 dias para priorização rápida.</div>
+                </div>
+                <span class="chip">${overdueSlaCount}</span>
+              </div>
+              <div class="acomp-kpi-inline">
+                <div class="acomp-kpi-chip"><div class="label">SLA alvo</div><div class="value">7</div><div class="small">dias</div></div>
+                <div class="acomp-kpi-chip"><div class="label">Atrasados</div><div class="value">${overdueSlaCount}</div><div class="small">pacientes</div></div>
+                <div class="acomp-kpi-chip"><div class="label">Maior atraso</div><div class="value">${slaLateCases.length ? daysOpen(slaLateCases[0]) : 0}</div><div class="small">dias</div></div>
+              </div>
+              <div class="acomp-list">
+                ${slaLateCases.length ? slaLateCases.map((patient, index) => `
+                  <div class="acomp-list-item">
+                    <div class="acomp-list-rank">${index + 1}</div>
+                    <div>
+                      <div class="acomp-list-name">${patient.nome}</div>
+                      <div class="acomp-list-meta">${displayStatusLabel(getAcompanhamentoStatus(patient))} • ${maskText(patient.empresa)} • ${maskText(patient.funcao)}</div>
+                    </div>
+                    <div class="acomp-list-metric"><div class="big">${daysOpen(patient)}</div><div class="small">dia(s)</div></div>
+                  </div>
+                `).join('') : '<div class="acomp-empty-state">Nenhum caso acima do SLA definido.</div>'}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="acomp-table-shell">
+          <div class="acomp-table-head">
+            <div>
+              <div class="title">Matriz detalhada por paciente</div>
+              <div class="sub">Visão consolidada dos exames, triagem e decisão médica.</div>
+            </div>
+            <div class="acomp-table-meta">
+              <span class="acomp-soft-chip">📌 ${longestCases.length ? `Maior permanência: ${longestCases[0].nome} (${daysOpen(longestCases[0])} dia(s))` : 'Sem casos em aberto'}</span>
+              <span class="acomp-soft-chip">🧭 Use o filtro de status para reduzir ruído visual</span>
             </div>
           </div>
           <div class="table-wrap matrix-table">
@@ -5064,11 +5774,66 @@ function compareQueueOrder(a, b) {
           </div>
         </div>
       `;
-      document.getElementById('search-acompanhamento').addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        const filtered = items.filter(p => [p.nome, p.id, p.cpf, p.empresa, p.setor, p.funcao].some(v => (v || '').toLowerCase().includes(term)));
-        document.getElementById('tbody-acompanhamento').innerHTML = filtered.length ? filtered.map(renderFollowRow).join('') : `<tr><td colspan="15"><div class="small">Nenhum resultado encontrado.</div></td></tr>`;
+
+      const searchInput = document.getElementById('search-acompanhamento');
+      const filterButtons = Array.from(document.querySelectorAll('#acomp-status-filters .acomp-filter-pill[data-status]'));
+      const resetButton = document.getElementById('acomp-reset-btn');
+      const kanbanWrap = document.getElementById('acompanhamento-kanban-wrap');
+      const tableBody = document.getElementById('tbody-acompanhamento');
+      const summaryText = document.getElementById('acompanhamento-summary-text');
+      let activeStatus = 'Todos';
+
+      function animateKanbanSwap(html) {
+        kanbanWrap.classList.remove('kanban-fade-in');
+        kanbanWrap.classList.add('kanban-fade-out');
+        window.setTimeout(() => {
+          kanbanWrap.innerHTML = html;
+          kanbanWrap.classList.remove('kanban-fade-out');
+          kanbanWrap.classList.add('kanban-fade-in');
+          window.setTimeout(() => kanbanWrap.classList.remove('kanban-fade-in'), 340);
+        }, 180);
+      }
+
+      function applyAcompanhamentoFilters(options = {}) {
+        const { clearKanban = false } = options;
+        const term = (searchInput.value || '').toLowerCase();
+        const filtered = items.filter(patient => {
+          const matchesTerm = [patient.nome, patient.id, patient.cpf, patient.empresa, patient.setor, patient.funcao].some(v => (v || '').toLowerCase().includes(term));
+          const matchesStatus = activeStatus === 'Todos' || getAcompanhamentoStatus(patient) === activeStatus;
+          return matchesTerm && matchesStatus;
+        });
+
+        tableBody.innerHTML = filtered.length
+          ? filtered.map(renderFollowRow).join('')
+          : `<tr><td colspan="15"><div class="small">Nenhum resultado encontrado para os filtros aplicados.</div></td></tr>`;
+
+        if (clearKanban) {
+          animateKanbanSwap(buildAcompanhamentoKanban([]));
+          summaryText.textContent = 'Quadro limpo visualmente. Os dados continuam salvos e os filtros foram resetados.';
+          return;
+        }
+
+        animateKanbanSwap(buildAcompanhamentoKanban(filtered));
+        summaryText.textContent = `${filtered.length} paciente(s) visíveis${activeStatus !== 'Todos' ? ` • status ${displayStatusLabel(activeStatus)}` : ''}.`;
+      }
+
+      searchInput.addEventListener('input', () => applyAcompanhamentoFilters());
+      filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          activeStatus = button.dataset.status || 'Todos';
+          filterButtons.forEach(item => item.classList.toggle('active', item === button));
+          applyAcompanhamentoFilters();
+        });
       });
+
+      if (resetButton) {
+        resetButton.addEventListener('click', () => {
+          searchInput.value = '';
+          activeStatus = 'Todos';
+          filterButtons.forEach(item => item.classList.toggle('active', item.dataset.status === 'Todos'));
+          applyAcompanhamentoFilters({ clearKanban: true });
+        });
+      }
     }
 
     function renderFollowRow(patient) {
@@ -5203,7 +5968,7 @@ function compareQueueOrder(a, b) {
             </div>
             <div class="locator-field">
               <div class="label">Resumo de exames</div>
-              <div class="value">${counts.done}/${counts.total} concluído(s)</div>
+              <div class="value">${counts.done}/${counts.total} realizado(s)</div>
             </div>
           </div>
 
@@ -5332,7 +6097,7 @@ function compareQueueOrder(a, b) {
           'Exames Realizados': examesRealizados,
           'Exames Pendentes': examesPendentes,
           'Qtde Exames': counts.total,
-          'Qtde Concluídos': counts.done,
+          'Qtde Realizados': counts.done,
           'Qtde Pendentes': counts.pending,
           'Triagem Status': patient.triagem?.status || '',
           'Triagem Data': patient.triagem?.data || '',
@@ -5355,24 +6120,32 @@ function compareQueueOrder(a, b) {
     function getExamFilterStatus(patient) {
       const counts = getExamCounts(patient);
       if (!counts.total) return 'Sem exame aplicável';
-      if (counts.pending > 0) return 'Com pendência';
-      if (counts.done === counts.total) return 'Todos concluídos';
-      return 'Parcial';
+      if (counts.done === counts.total) return 'Todos realizados';
+      if (counts.done > 0 && counts.open > 0) return 'Parcial';
+      if (counts.open > 0) return 'Com pendência';
+      return 'Com pendência';
+    }
+
+    function normalizeFilterValue(value) {
+      return sanitizeText(value).toLowerCase();
     }
 
     function filterGestaoAsoItems(items) {
-      const trabalhador = (gestaoAsoFilters.trabalhador || '').trim().toLowerCase();
-      const cpf = (gestaoAsoFilters.cpf || '').replace(/\D/g, '');
+      const trabalhador = normalizeFilterValue(gestaoAsoFilters.trabalhador);
+      const cpf = sanitizeText(gestaoAsoFilters.cpf).replace(/\D/g, '');
+      const empresaFiltro = sanitizeText(gestaoAsoFilters.empresa);
+      const statusExameFiltro = sanitizeText(gestaoAsoFilters.statusExame);
+      const statusAtendimentoFiltro = sanitizeText(gestaoAsoFilters.statusAtendimento);
       return items.filter(patient => {
         const empresa = ((patient.empresa || 'Não informado').trim() || 'Não informado');
-        const patientCpf = (patient.cpf || '').replace(/\D/g, '');
+        const patientCpf = sanitizeText(patient.cpf).replace(/\D/g, '');
         const examStatus = getExamFilterStatus(patient);
-        const atendimentoStatus = patient.statusAtendimento || 'Não informado';
-        const matchEmpresa = !gestaoAsoFilters.empresa || empresa === gestaoAsoFilters.empresa;
-        const matchTrabalhador = !trabalhador || (patient.nome || '').toLowerCase().includes(trabalhador);
+        const atendimentoStatus = sanitizeText(patient.statusAtendimento || getStageStatus(patient) || 'Não informado');
+        const matchEmpresa = !empresaFiltro || empresa === empresaFiltro;
+        const matchTrabalhador = !trabalhador || normalizeFilterValue(patient.nome).includes(trabalhador);
         const matchCpf = !cpf || patientCpf.includes(cpf);
-        const matchExam = !gestaoAsoFilters.statusExame || examStatus === gestaoAsoFilters.statusExame;
-        const matchAtendimento = !gestaoAsoFilters.statusAtendimento || atendimentoStatus === gestaoAsoFilters.statusAtendimento;
+        const matchExam = !statusExameFiltro || examStatus === statusExameFiltro;
+        const matchAtendimento = !statusAtendimentoFiltro || atendimentoStatus === statusAtendimentoFiltro;
         return matchEmpresa && matchTrabalhador && matchCpf && matchExam && matchAtendimento;
       });
     }
@@ -5399,8 +6172,8 @@ function compareQueueOrder(a, b) {
       syncAllFlows();
       const baseItems = patients.slice().sort(compareQueueOrder);
       const empresasDisponiveis = [...new Set(baseItems.map(p => (p.empresa || 'Não informado').trim() || 'Não informado'))].sort((a,b) => a.localeCompare(b, 'pt-BR'));
-      const statusAtendimentoDisponiveis = [...new Set(baseItems.map(p => p.statusAtendimento || 'Não informado'))].sort((a,b) => a.localeCompare(b, 'pt-BR'));
-      const statusExameDisponiveis = ['Com pendência', 'Todos concluídos', 'Sem exame aplicável'];
+      const statusAtendimentoDisponiveis = [...new Set(baseItems.map(p => sanitizeText(p.statusAtendimento || getStageStatus(p) || 'Não informado')))].sort((a,b) => a.localeCompare(b, 'pt-BR'));
+      const statusExameDisponiveis = ['Com pendência', 'Parcial', 'Todos realizados', 'Sem exame aplicável'];
 
       function renderContent() {
         const items = filterGestaoAsoItems(baseItems);
@@ -5473,7 +6246,7 @@ function compareQueueOrder(a, b) {
             <div class="card kpi"><div class="label">Sem ASO cadastrado</div><div class="value">${semAso}</div><div class="hint">Bloqueiam sequência do fluxo</div></div>
             <div class="card kpi"><div class="label">Exames pendentes</div><div class="value">${examesPendentes}</div><div class="hint">Demandam atuação operacional</div></div>
             <div class="card kpi"><div class="label">ASO pendente</div><div class="value">${asoPendente}</div><div class="hint">Em espera de decisão médica</div></div>
-            <div class="card kpi"><div class="label">ASO concluído</div><div class="value">${asoConcluido}</div><div class="hint">Aptos, aptos com restrições ou inaptos finalizados</div></div>
+            <div class="card kpi"><div class="label">ASO realizado</div><div class="value">${asoConcluido}</div><div class="hint">Aptos, aptos com restrições ou inaptos finalizados</div></div>
           </div>
 
           <div class="grid-2">
@@ -5545,7 +6318,7 @@ function compareQueueOrder(a, b) {
                 <div class="kanban-list">${proximasAcoes.medico.slice(0,8).map(renderGestaoCard).join('') || '<div class="small">Nenhum paciente nesta coluna.</div>'}</div>
               </div>
               <div class="kanban-col">
-                <div class="kanban-head"><div class="row-title">Concluídos</div><span class="chip">${proximasAcoes.concluidos.length}</span></div>
+                <div class="kanban-head"><div class="row-title">Realizados</div><span class="chip">${proximasAcoes.concluidos.length}</span></div>
                 <div class="kanban-list">${proximasAcoes.concluidos.slice(0,8).map(renderGestaoCard).join('') || '<div class="small">Nenhum paciente nesta coluna.</div>'}</div>
               </div>
             </div>
@@ -5562,7 +6335,7 @@ function compareQueueOrder(a, b) {
                       <th>Total</th>
                       <th>Sem ASO</th>
                       <th>Exames pendentes</th>
-                      <th>ASO concluído</th>
+                      <th>ASO realizado</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -5664,6 +6437,155 @@ function compareQueueOrder(a, b) {
       return maskText(patient.etapa);
     }
 
+
+    const FLOW_STAGE_SLA_MINUTES = {
+      'Recepção': 15,
+      'Exames': 60,
+      'Triagem': 20,
+      'Médico': 25,
+      'Finalização': 10
+    };
+
+    function getFlowStageOrder(patient) {
+      const order = ['Recepção'];
+      if (getExamCounts(patient).total > 0) order.push('Exames');
+      if (patient.asoCadastrado) {
+        order.push('Triagem', 'Médico');
+      }
+      order.push('Finalização');
+      return order;
+    }
+
+    function getFlowCurrentStage(patient) {
+      if (patient.etapa === 'Concluído') return 'Finalização';
+      if (patient.etapa === 'Médico') return 'Médico';
+      if (patient.etapa === 'Triagem') return 'Triagem';
+      if (patient.etapa === 'Exames') return 'Exames';
+      return 'Recepção';
+    }
+
+    function getStageIcon(stage) {
+      if (stage === 'Recepção') return '✅';
+      if (stage === 'Exames') return '🔬';
+      if (stage === 'Triagem') return '🚦';
+      if (stage === 'Médico') return '👨‍⚕️';
+      if (stage === 'Finalização') return '🏁';
+      return '•';
+    }
+
+    function getStageQueueValues(stage, patient) {
+      if (stage === 'Recepção') return ['Recepção'];
+      if (stage === 'Triagem') return ['Triagem'];
+      if (stage === 'Médico') return ['Atendimento médico'];
+      if (stage === 'Exames') {
+        return (patient.exames || []).map(exam => exam.nome);
+      }
+      return ['Finalização'];
+    }
+
+    function getStageSpentMinutes(patient, stage) {
+      if (stage === 'Recepção') return 0;
+      if (stage === 'Finalização') return patient.etapa === 'Concluído' ? 0 : null;
+      const metrics = ensureAttendanceMetrics(patient);
+      const queueValues = getStageQueueValues(stage, patient);
+      const durations = (metrics.completedDurations || []).filter(item => queueValues.includes(item.queueType));
+      if (!durations.length) return stage === getFlowCurrentStage(patient) ? null : 0;
+      return durations.reduce((acc, item) => acc + Number(item?.minutes || 0), 0);
+    }
+
+    function getCurrentStageStartIso(patient) {
+      const metrics = ensureAttendanceMetrics(patient);
+      if (metrics.currentStageStart) return metrics.currentStageStart;
+      const papaFila = ensurePapaFila(patient);
+      const currentStage = getFlowCurrentStage(patient);
+      const roomConfig = papaFila.roomKey ? getRoomConfig(papaFila.roomKey) : null;
+      if (papaFila.calledAt && roomConfig && getQueueStage(roomConfig.queueType, roomConfig.stage) === currentStage) {
+        return papaFila.calledAt;
+      }
+      return '';
+    }
+
+    function getCurrentStageElapsedMinutes(patient) {
+      const startedAt = getCurrentStageStartIso(patient);
+      if (!startedAt) return null;
+      const startedDate = new Date(startedAt);
+      if (Number.isNaN(startedDate.getTime())) return null;
+      return Math.max(1, Math.round((Date.now() - startedDate.getTime()) / 60000));
+    }
+
+    function formatMinutesHuman(minutes) {
+      if (minutes === null || minutes === undefined || !Number.isFinite(Number(minutes))) return '—';
+      const value = Math.max(0, Math.round(Number(minutes)));
+      const hours = Math.floor(value / 60);
+      const mins = value % 60;
+      if (hours && mins) return `${hours}h ${String(mins).padStart(2, '0')}min`;
+      if (hours) return `${hours}h`;
+      return `${mins}min`;
+    }
+
+    function buildPatientFlowStages(patient) {
+      const order = getFlowStageOrder(patient);
+      const currentStage = getFlowCurrentStage(patient);
+      const currentIndex = order.indexOf(currentStage);
+      const currentElapsed = getCurrentStageElapsedMinutes(patient);
+      return order.map((stage, index) => {
+        const slaMinutes = FLOW_STAGE_SLA_MINUTES[stage] || 0;
+        const spentMinutes = stage === currentStage ? currentElapsed : getStageSpentMinutes(patient, stage);
+        const isDone = currentStage === 'Finalização' ? index < currentIndex : index < currentIndex;
+        const isActive = index === currentIndex;
+        const isWaiting = index > currentIndex;
+        const overSla = Boolean(isActive && slaMinutes && Number.isFinite(currentElapsed) && currentElapsed > slaMinutes);
+        return {
+          stage,
+          icon: getStageIcon(stage),
+          slaMinutes,
+          spentMinutes,
+          isDone,
+          isActive,
+          isWaiting,
+          overSla,
+          deltaMinutes: Number.isFinite(spentMinutes) ? Math.max(0, spentMinutes - slaMinutes) : 0
+        };
+      });
+    }
+
+    function renderPatientFlowPanel(patient) {
+      const stages = buildPatientFlowStages(patient);
+      const activeStage = stages.find(stage => stage.isActive) || stages[stages.length - 1];
+      const activeSummary = activeStage
+        ? `${activeStage.icon} ${activeStage.stage} • ${activeStage.spentMinutes === null ? 'sem cronômetro ativo' : formatMinutesHuman(activeStage.spentMinutes)}`
+        : 'Fluxo sem etapa ativa';
+      return `
+        <div class="flow-panel">
+          <div class="flow-panel-head">
+            <div>
+              <div class="row-title" style="margin-bottom:6px">Etapa atual do fluxo</div>
+              <div class="small">Acompanhe em tempo real a etapa ativa, o tempo acumulado por etapa e o SLA previsto para o paciente.</div>
+            </div>
+            <div class="flow-sla-pill ${activeStage?.overSla ? 'is-alert' : ''}">${activeStage?.overSla ? '🚨 SLA estourado' : '⏱️ SLA monitorado'} • ${activeSummary}</div>
+          </div>
+          <div class="flow-status">
+            ${stages.map(stage => `
+              <span class="flow-step ${stage.isDone ? 'done' : ''} ${stage.isActive ? 'active' : ''} ${stage.overSla ? 'stalled' : ''} ${stage.isWaiting ? 'waiting' : ''}">${stage.icon} ${stage.stage}</span>
+            `).join('')}
+          </div>
+          <div class="flow-stage-grid">
+            ${stages.map(stage => `
+              <div class="flow-stage-card ${stage.isDone ? 'done' : ''} ${stage.isActive ? 'active' : ''} ${stage.overSla ? 'stalled' : ''}">
+                <div class="flow-stage-card-header">
+                  <div class="flow-stage-card-title">${stage.icon} ${stage.stage}</div>
+                  <span class="status ${stage.overSla ? 'st-bloqueado' : stage.isDone ? 'st-concluido' : stage.isActive ? 'st-andamento' : 'st-na'}">${stage.overSla ? 'Atrasado' : stage.isDone ? 'Realizado' : stage.isActive ? 'Em curso' : 'Aguardando'}</span>
+                </div>
+                <div class="flow-stage-card-time">${stage.isWaiting ? '—' : stage.spentMinutes === null ? 'Aguardando início' : formatMinutesHuman(stage.spentMinutes)}</div>
+                <div class="flow-stage-card-meta">${stage.isWaiting ? 'Etapa ainda não iniciada.' : stage.isDone ? 'Tempo registrado na etapa.' : stage.spentMinutes === null ? 'Cronômetro será iniciado ao chamar o paciente nesta etapa.' : 'Cronômetro ativo para a etapa atual.'}</div>
+                <div class="flow-stage-card-sla">🚨 SLA ${formatMinutesHuman(stage.slaMinutes)}${stage.overSla ? ` • +${formatMinutesHuman(stage.deltaMinutes)}` : ''}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
     function getExamPendingNames(patient) {
       return (patient.exames || [])
         .filter(exam => !['Concluído', 'Não se aplica', 'Exame liberado'].includes(exam.status))
@@ -5732,7 +6654,7 @@ function compareQueueOrder(a, b) {
               <p>Consolidação dos atendimentos com visão para produtividade, pendências clínicas, tempo em aberto e rastreabilidade do fluxo por paciente.</p>
               <div class="report-badge-row">
                 <span class="chip">${total} atendimentos consolidados</span>
-                <span class="chip">${completionRate}% concluídos</span>
+                <span class="chip">${completionRate}% realizados</span>
                 <span class="chip">${examsPendingTotal} exames pendentes</span>
                 <span class="chip">${triagemPendente} triagens pendentes</span>
                 <span class="chip">${medicoPendente} decisões médicas pendentes</span>
@@ -5748,11 +6670,11 @@ function compareQueueOrder(a, b) {
 
         <div class="report-kpi-grid">
           <div class="card kpi"><div class="label">Atendimentos</div><div class="value">${total}</div><div class="hint">Todos os registros consolidados</div></div>
-          <div class="card kpi"><div class="label">Concluídos</div><div class="value">${concluidos}</div><div class="hint">Alta com ASO finalizado</div></div>
+          <div class="card kpi"><div class="label">Realizados</div><div class="value">${concluidos}</div><div class="hint">Alta com ASO finalizado</div></div>
           <div class="card kpi"><div class="label">Em andamento</div><div class="value">${emAndamento}</div><div class="hint">Fluxos ativos na operação</div></div>
           <div class="card kpi"><div class="label">Bloqueados</div><div class="value">${bloqueados}</div><div class="hint">Dependem de regularização</div></div>
           <div class="card kpi"><div class="label">Exames pendentes</div><div class="value">${examsPendingTotal}</div><div class="hint">Soma das pendências clínicas</div></div>
-          <div class="card kpi"><div class="label">Exames concluídos</div><div class="value">${examsDoneTotal}</div><div class="hint">Executados na base atual</div></div>
+          <div class="card kpi"><div class="label">Exames realizados</div><div class="value">${examsDoneTotal}</div><div class="hint">Executados na base atual</div></div>
         </div>
 
         <div class="report-highlight-grid">
@@ -5806,7 +6728,7 @@ function compareQueueOrder(a, b) {
                   <div class="report-list-item">
                     <div>
                       <div class="row-title">${item.empresa}</div>
-                      <div class="small">${item.total} atendimento(s) • ${item.concluidos} concluído(s)</div>
+                      <div class="small">${item.total} atendimento(s) • ${item.concluidos} realizado(s)</div>
                     </div>
                     <div class="metric">
                       <div class="big">${item.pendentes}</div>
@@ -5845,7 +6767,7 @@ function compareQueueOrder(a, b) {
                 <option value="Exames">Exames</option>
                 <option value="Triagem">Triagem</option>
                 <option value="Médico">Médico</option>
-                <option value="Concluído">Concluído</option>
+                <option value="Concluído">Realizado</option>
               </select>
             </div>
             <div class="field" style="margin:0">
@@ -5853,7 +6775,7 @@ function compareQueueOrder(a, b) {
               <select id="filter-relatorio-status">
                 <option value="">Todos</option>
                 <option value="Em andamento">Em andamento</option>
-                <option value="Concluído">Concluído</option>
+                <option value="Concluído">Realizado</option>
                 <option value="Bloqueado">Bloqueado</option>
               </select>
             </div>
@@ -5861,7 +6783,7 @@ function compareQueueOrder(a, b) {
               <label>Triagem</label>
               <select id="filter-relatorio-triagem">
                 <option value="">Todas</option>
-                <option value="Concluído">Concluída</option>
+                <option value="Concluído">Realizada</option>
                 <option value="Pendente">Pendente</option>
               </select>
             </div>
@@ -5869,7 +6791,7 @@ function compareQueueOrder(a, b) {
               <label>Médico</label>
               <select id="filter-relatorio-medico">
                 <option value="">Todos</option>
-                <option value="Concluído">Concluído</option>
+                <option value="Concluído">Realizado</option>
                 <option value="Pendente">Pendente</option>
               </select>
             </div>
@@ -5947,7 +6869,7 @@ function compareQueueOrder(a, b) {
 
     function renderReportRow(patient, row = null) {
       row = row || getReportsData().find(item => item['ID Atendimento'] === patient.id);
-      const examSummary = `${row['Qtde Concluídos']}/${row['Qtde Exames']} concluído(s)`;
+      const examSummary = `${row['Qtde Realizados'] || row['Qtde Concluídos']}/${row['Qtde Exames']} realizado(s)`;
       const pendingNames = getExamPendingNames(patient);
       const triagemStatus = (patient.triagem?.status || 'Pendente') === 'Concluído' ? 'Concluído' : 'Pendente';
       const medicoStatus = ['Apto', 'Apto com Restrições', 'Inapto'].includes(patient.medico?.resultado || '') ? 'Concluído' : 'Pendente';
@@ -6014,6 +6936,7 @@ function compareQueueOrder(a, b) {
       const counts = getExamCounts(patient);
 
       let content = `
+        ${renderPatientFlowPanel(patient)}
         <div class="split">
           <div class="card" style="padding:16px">
             <div class="row-title" style="margin-bottom:10px">Dados do atendimento</div>
@@ -6032,7 +6955,7 @@ function compareQueueOrder(a, b) {
             <div class="row-title" style="margin-bottom:10px">Resumo de exames</div>
             <div class="summary-list">
               <div class="summary-item"><div>Total aplicável</div><div>${counts.total}</div></div>
-              <div class="summary-item"><div>Concluídos</div><div>${counts.done}</div></div>
+              <div class="summary-item"><div>Realizados</div><div>${counts.done}</div></div>
               <div class="summary-item"><div>Pendentes</div><div>${counts.pending}</div></div>
               <div class="summary-item"><div>Progresso</div><div>${counts.progress}%</div></div>
             </div>
@@ -6135,16 +7058,24 @@ function compareQueueOrder(a, b) {
         `;
       }
 
-      if (context === 'exames' || context === 'acompanhamento' || context === 'gestao-aso') {
+      if (context === 'exames' || context === 'acompanhamento') {
+        const activeExamFilterKey = context === 'exames' ? (examsFilters?.exam || '') : '';
+        const visiblePatientExams = activeExamFilterKey
+          ? (patient.exames || []).filter(ex => ex.key === activeExamFilterKey)
+          : (patient.exames || []);
+        const activeExamFilterMeta = activeExamFilterKey
+          ? EXAM_ORDER.find(ex => ex.key === activeExamFilterKey)
+          : null;
         content += `
           <div class="card" style="padding:16px">
             <div class="row-title" style="margin-bottom:12px">Exames ocupacionais em linha</div>
+            ${activeExamFilterMeta ? `<div class="obs-box" style="margin-bottom:14px">Exibindo apenas o status do exame filtrado: <strong>${activeExamFilterMeta.nome}</strong>.</div>` : ''}
             <div class="field" style="margin-bottom:14px">
               <label>Observações do cadastro / recepção</label>
               <div class="obs-box">${patient.obsCadastro ? maskText(patient.obsCadastro) : 'Nenhuma observação registrada no cadastro.'}</div>
             </div>
             <div class="summary-list">
-              ${patient.exames.map(ex => {
+              ${visiblePatientExams.length ? visiblePatientExams.map(ex => {
                 const detailText = ex.key === 'rx'
                   ? formatExamTypeDisplay(patient, 'rx')
                   : (ex.key === 'lab' ? formatExamTypeDisplay(patient, 'lab') : '');
@@ -6159,17 +7090,55 @@ function compareQueueOrder(a, b) {
                       <textarea id="reason-${patient.id}-${ex.key}" placeholder="Descreva o motivo do exame não ter sido realizado.">${ex.motivoNaoRealizado || ''}</textarea>
                     </div>
                   </div>
-                  <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
-                    <select id="exam-${patient.id}-${ex.key}" onchange="toggleExamReasonField('${patient.id}','${ex.key}')">
+                  <div class="exam-status-picker">
+                    <select class="exam-status-select" id="exam-${patient.id}-${ex.key}" onchange="toggleExamReasonField('${patient.id}','${ex.key}')" aria-label="Status do exame ${ex.nome}">
                       <option value="Pendente" ${ex.status === 'Pendente' ? 'selected' : ''}>Pendente</option>
-                      <option value="Concluído" ${ex.status === 'Concluído' ? 'selected' : ''}>Concluído</option>
+                      <option value="Concluído" ${ex.status === 'Concluído' ? 'selected' : ''}>Realizado</option>
                       <option value="Não realizado" ${ex.status === 'Não realizado' ? 'selected' : ''}>Não realizado</option>
                       <option value="Exame liberado" ${ex.status === 'Exame liberado' ? 'selected' : ''}>Exame liberado</option>
                       <option value="Não se aplica" ${ex.status === 'Não se aplica' ? 'selected' : ''}>Não se aplica</option>
                     </select>
+                    <div class="exam-status-grid" role="group" aria-label="Escolha do status do exame ${ex.nome}">
+                      <button type="button" class="exam-status-option ${ex.status === 'Pendente' ? 'is-active' : ''}" data-status="Pendente" onclick="setExamStatusChoice('${patient.id}','${ex.key}','Pendente')">
+                        <span class="exam-status-option-icon">⏳</span>
+                        <span class="exam-status-option-text">
+                          <span class="exam-status-option-title">Pendente</span>
+                          <span class="exam-status-option-help">Aguardando execução do exame.</span>
+                        </span>
+                      </button>
+                      <button type="button" class="exam-status-option ${ex.status === 'Concluído' ? 'is-active' : ''}" data-status="Concluído" onclick="setExamStatusChoice('${patient.id}','${ex.key}','Concluído')">
+                        <span class="exam-status-option-icon">✅</span>
+                        <span class="exam-status-option-text">
+                          <span class="exam-status-option-title">Realizado</span>
+                          <span class="exam-status-option-help">Exame realizado com sucesso.</span>
+                        </span>
+                      </button>
+                      <button type="button" class="exam-status-option ${ex.status === 'Não realizado' ? 'is-active' : ''}" data-status="Não realizado" onclick="setExamStatusChoice('${patient.id}','${ex.key}','Não realizado')">
+                        <span class="exam-status-option-icon">⚠️</span>
+                        <span class="exam-status-option-text">
+                          <span class="exam-status-option-title">Não realizado</span>
+                          <span class="exam-status-option-help">Exige o preenchimento do motivo.</span>
+                        </span>
+                      </button>
+                      <button type="button" class="exam-status-option ${ex.status === 'Exame liberado' ? 'is-active' : ''}" data-status="Exame liberado" onclick="setExamStatusChoice('${patient.id}','${ex.key}','Exame liberado')">
+                        <span class="exam-status-option-icon">🟢</span>
+                        <span class="exam-status-option-text">
+                          <span class="exam-status-option-title">Exame liberado</span>
+                          <span class="exam-status-option-help">Pronto para seguir no fluxo.</span>
+                        </span>
+                      </button>
+                      <button type="button" class="exam-status-option ${ex.status === 'Não se aplica' ? 'is-active' : ''}" data-status="Não se aplica" onclick="setExamStatusChoice('${patient.id}','${ex.key}','Não se aplica')">
+                        <span class="exam-status-option-icon">➖</span>
+                        <span class="exam-status-option-text">
+                          <span class="exam-status-option-title">Não se aplica</span>
+                          <span class="exam-status-option-help">Remover este exame do fluxo atual.</span>
+                        </span>
+                      </button>
+                    </div>
+                    <div class="exam-status-picker-hint">Clique em uma opção para atualizar rapidamente o status.</div>
                   </div>
                 </div>`;
-              }).join('')}
+              }).join('') : `<div class="obs-box">Nenhum exame corresponde ao filtro selecionado para este atendimento.</div>`}
             </div>
             <div class="modal-foot" style="padding:0;margin-top:16px;border-top:0">
               <button type="button" class="btn btn-success" onclick="saveExams('${patient.id}')">Salvar exames</button>
@@ -6178,14 +7147,70 @@ function compareQueueOrder(a, b) {
         `;
       }
 
+      if (context === 'gestao-aso') {
+        const exams = (patient.exames || []).filter(ex => ex.status !== 'Não se aplica');
+        const realizados = exams.filter(ex => ['Concluído', 'Exame liberado'].includes(ex.status));
+        const pendentes = exams.filter(ex => ['Pendente', 'Em andamento', 'Não realizado', 'Bloqueado'].includes(ex.status));
+        content += `
+          <div class="card" style="padding:16px">
+            <div class="row-title" style="margin-bottom:12px">Resumo dos exames</div>
+            <div class="field" style="margin-bottom:14px">
+              <label>Observações do cadastro / recepção</label>
+              <div class="obs-box">${patient.obsCadastro ? maskText(patient.obsCadastro) : 'Nenhuma observação registrada no cadastro.'}</div>
+            </div>
+            <div class="grid-2" style="grid-template-columns:repeat(2,minmax(0,1fr));gap:16px">
+              ${renderTriageExamList(
+                'Exames realizados',
+                'Itens concluídos e liberados para análise do ASO.',
+                realizados,
+                'done',
+                'Nenhum exame realizado até o momento.'
+              )}
+              ${renderTriageExamList(
+                'Exames pendentes',
+                'Itens que ainda dependem de execução ou tratativa.',
+                pendentes,
+                'pending',
+                'Nenhum exame pendente no momento.'
+              )}
+            </div>
+          </div>
+        `;
+      }
+
       if (context === 'triagem' || context === 'acompanhamento' || context === 'gestao-aso') {
         const triageBlocked = !patient.asoCadastrado || counts.done !== counts.total;
+        const triageExamBuckets = getTriageExamBuckets(patient);
+        window.__selectedPatientForHint = patient;
         content += `
           <div class="card" style="padding:16px">
             <div class="row-title" style="margin-bottom:12px">Triagem</div>
             <div class="field" style="margin-bottom:14px">
               <label>Observações do cadastro / recepção</label>
               <div class="obs-box">${patient.obsCadastro ? maskText(patient.obsCadastro) : 'Nenhuma observação registrada no cadastro.'}</div>
+            </div>
+            <div class="grid-3" style="margin-bottom:16px">
+              ${renderTriageExamList(
+                'Exames realizados',
+                'Tudo o que já foi concluído antes da triagem.',
+                triageExamBuckets.realizados,
+                'done',
+                'Nenhum exame realizado até o momento.'
+              )}
+              ${renderTriageExamList(
+                'Exames pendentes',
+                'Itens ainda em aberto para concluir o atendimento.',
+                triageExamBuckets.pendentes,
+                'pending',
+                'Nenhum exame pendente no momento.'
+              )}
+              ${renderTriageExamList(
+                'Críticos faltando',
+                'Exames essenciais ainda não concluídos para decisão clínica.',
+                triageExamBuckets.criticosFaltando,
+                'critical',
+                'Nenhum exame crítico faltando.'
+              )}
             </div>
             ${triageBlocked ? `
               <div class="summary-item">
@@ -6208,9 +7233,12 @@ function compareQueueOrder(a, b) {
             `}
           </div>
         `;
+        window.__selectedPatientForHint = null;
       }
 
       if (context === 'medico' || context === 'acompanhamento' || context === 'gestao-aso') {
+        const medicoExamBuckets = getTriageExamBuckets(patient);
+        window.__selectedPatientForHint = patient;
         content += `
           <div class="card" style="padding:16px">
             <div class="row-title" style="margin-bottom:12px">Médico do trabalho</div>
@@ -6222,6 +7250,15 @@ function compareQueueOrder(a, b) {
             <div class="field" style="margin-bottom:14px">
               <label>Observação registrada na triagem</label>
               <div class="obs-box">${patient.triagem.observacoes ? maskText(patient.triagem.observacoes) : 'Nenhuma observação registrada na triagem.'}</div>
+            </div>
+            <div style="margin-bottom:16px">
+              ${renderTriageExamList(
+                'Exames realizados pelo paciente',
+                'Exames já concluídos e disponíveis para apoiar a decisão médica.',
+                medicoExamBuckets.realizados,
+                'done',
+                'Nenhum exame realizado até o momento.'
+              )}
             </div>
             <div class="form-grid">
               <div class="field">
@@ -6260,6 +7297,7 @@ function compareQueueOrder(a, b) {
             </div>
           </div>
         `;
+        window.__selectedPatientForHint = null;
       }
 
       if (context === 'gestao-aso') {
@@ -6419,6 +7457,23 @@ function compareQueueOrder(a, b) {
       openPatientModal(id, 'recepcao');
     }
 
+    function refreshExamStatusChoice(id, examKey) {
+      const select = document.getElementById(`exam-${id}-${examKey}`);
+      const item = document.querySelector(`[data-exam-item="${id}-${examKey}"]`);
+      if (!select || !item) return;
+      item.querySelectorAll('.exam-status-option').forEach(btn => {
+        btn.classList.toggle('is-active', btn.dataset.status === select.value);
+      });
+    }
+
+    function setExamStatusChoice(id, examKey, status) {
+      const select = document.getElementById(`exam-${id}-${examKey}`);
+      if (!select) return;
+      select.value = status;
+      toggleExamReasonField(id, examKey);
+      refreshExamStatusChoice(id, examKey);
+    }
+
     function toggleExamReasonField(id, examKey) {
       const select = document.getElementById(`exam-${id}-${examKey}`);
       const wrapper = document.getElementById(`reason-wrap-${id}-${examKey}`);
@@ -6427,6 +7482,7 @@ function compareQueueOrder(a, b) {
       const shouldShow = select.value === 'Não realizado';
       wrapper.classList.toggle('hidden', !shouldShow);
       if (!shouldShow && textarea) textarea.value = '';
+      refreshExamStatusChoice(id, examKey);
     }
 
     function saveExams(id) {
@@ -6466,7 +7522,7 @@ function compareQueueOrder(a, b) {
         return;
       }
       if (counts.done !== counts.total) {
-        alert('A triagem só pode manter pendente pacientes com todos os exames ocupacionais concluídos.');
+        alert('A triagem só pode manter pendente pacientes com todos os exames ocupacionais realizados.');
         return;
       }
       patient.triagem.status = 'Pendente';
@@ -6486,7 +7542,7 @@ function compareQueueOrder(a, b) {
         return;
       }
       if (counts.done !== counts.total) {
-        alert('A triagem só pode liberar pacientes com todos os exames ocupacionais concluídos.');
+        alert('A triagem só pode liberar pacientes com todos os exames ocupacionais realizados.');
         return;
       }
       patient.triagem.status = 'Concluído';
