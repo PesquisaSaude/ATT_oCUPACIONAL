@@ -3029,7 +3029,7 @@
             <div class="chips">
               <span class="chip">Etapa: ${badge(getStageStatus(patient))}</span>
               ${patient.obra ? `<span class="chip">🏗️ ${maskText(patient.obra)}</span>` : ''}
-              ${patient.preferencial === 'Sim' ? '<span class="chip">👴♿ Preferencial</span>' : ''}
+              ${patient.preferencial === 'Sim' ? '<span class="chip">🧓♿🤰 Preferencial</span>' : ''}
             </div>
           </div>
           <div class="result-meta-grid">
@@ -4658,7 +4658,7 @@ function compareQueueOrder(a, b) {
             <div class="small">${maskText(patient.setor)} • ${maskText(patient.funcao)}</div>
             <div class="chips" style="margin-top:8px">
               ${attendanceChip(patient)}
-              ${patient.preferencial === 'Sim' ? '<span class="chip">👴♿ Preferencial</span>' : ''}
+              ${patient.preferencial === 'Sim' ? '<span class="chip">🧓♿🤰 Preferencial</span>' : ''}
             </div>
           </td>
           <td>
@@ -4951,7 +4951,7 @@ function compareQueueOrder(a, b) {
                       <td>
                         <div class="row-title">${patient.nome}</div>
                         <div class="small mono">${patient.id}</div>
-                        <div class="chips">${attendanceChip(patient)} ${patient.preferencial === 'Sim' ? '<span class="chip">⭐ Preferencial</span>' : ''}</div>
+                        <div class="chips">${attendanceChip(patient)} ${patient.preferencial === 'Sim' ? '<span class="chip">🧓♿🤰 Preferencial</span>' : ''}</div>
                       </td>
                       <td>
                         <div>${badge(getStageStatus(patient))}</div>
@@ -6880,7 +6880,7 @@ function compareQueueOrder(a, b) {
           <td>
             <div class="row-title">${patient.nome}</div>
             <div class="small mono">${patient.id} • ${maskText(patient.cpf)}</div>
-            <div class="small">${patient.preferencial === 'Sim' ? '👴♿ Preferencial' : 'Fluxo padrão'}</div>
+            <div class="small">${patient.preferencial === 'Sim' ? '🧓♿🤰 Preferencial' : 'Fluxo padrão'}</div>
           </td>
           <td>
             <div>${maskText(patient.empresa)}</div>
