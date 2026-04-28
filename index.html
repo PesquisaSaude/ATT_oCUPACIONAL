@@ -2503,8 +2503,8 @@
 </div>
 <div class="field"><label>Data de atendimento</label><input name="dataAtendimento" type="date"/></div>
 <div class="field"><label>Telefone</label><input name="telefone"/></div>
-<div class="field"><label>Atendimento ?</label>
-<select name="">
+<div class="field"><label>Atendimento preferencial?</label>
+<select name="preferencial">
 <option value="Não">Não</option>
 <option value="Sim">Sim</option>
 </select>
@@ -2985,7 +2985,7 @@
 
     function getQuickFilterFlags(patient) {
       return {
-        preferenciais: patient. === 'Sim' || isElderlyPriority(patient),
+        preferenciais: patient.preferencial === 'Sim' || isElderlyPriority(patient),
         semAso: !patient.asoCadastrado,
         obra: Boolean(sanitizeText(patient.obra)),
         pendentes: pendingExamNames(patient).length > 0 || ['Recepção','Exames','Triagem','Médico'].includes(patient.etapa)
@@ -4951,7 +4951,7 @@ function compareQueueOrder(a, b) {
                       <td>
                         <div class="row-title">${patient.nome}</div>
                         <div class="small mono">${patient.id}</div>
-                        <div class="chips">${attendanceChip(patient)} ${patient.preferencial === 'Sim' ? '<span class="chip">👴 Preferencial</span>' : ''}</div>
+                        <div class="chips">${attendanceChip(patient)} ${patient.preferencial === 'Sim' ? '<span class="chip">⭐ Preferencial</span>' : ''}</div>
                       </td>
                       <td>
                         <div>${badge(getStageStatus(patient))}</div>
