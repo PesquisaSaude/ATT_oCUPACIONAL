@@ -321,6 +321,45 @@
       border-radius: 999px; padding: 6px 10px; font-size: 11px;
       background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.06);
     }
+
+    .chip-priority {
+      background: rgba(250, 204, 21, .20) !important;
+      border-color: rgba(250, 204, 21, .40) !important;
+      color: #fff3bf !important;
+      font-weight: 900;
+      box-shadow: 0 0 0 2px rgba(250, 204, 21, .10), 0 10px 24px rgba(250, 204, 21, .10);
+      text-transform: uppercase;
+      letter-spacing: .03em;
+    }
+    .priority-row-highlight td {
+      background: rgba(250, 204, 21, .055) !important;
+      box-shadow: inset 4px 0 0 rgba(250, 204, 21, .92);
+    }
+    .priority-alert-box {
+      display: none;
+      grid-column: 1 / -1;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(250, 204, 21, .18), rgba(217, 164, 0, .10));
+      border: 1px solid rgba(250, 204, 21, .30);
+      color: #fff7cc;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
+    }
+    .priority-alert-box.active { display: block; }
+    .priority-alert-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      margin-bottom: 6px;
+    }
+    .priority-alert-text {
+      color: #fde68a;
+      font-size: 13px;
+      line-height: 1.45;
+    }
     .chip-flow-aso {
       background: rgba(49, 183, 255, .14);
       border-color: rgba(49, 183, 255, .22);
@@ -2442,7 +2481,7 @@
 <div class="topbar-actions">
 <div class="topbar-search">
 <span>🔎</span>
-<input id="globalSearchInput" type="search" placeholder="Busca global por paciente, CPF, empresa, função ou obra">
+<input id="globalSearchInput" type="search" placeholder="Busca global por paciente, CPF, empresa, contrato, função ou obra">
 <button class="btn btn-ghost topbar-search-btn" id="btnOpenGlobalSearch" type="button">Abrir</button>
 </div>
 <button class="btn btn-primary" id="btnNovoAtendimento">+ Novo Atendimento</button>
@@ -2492,6 +2531,22 @@
 <div class="field"><label>CPF</label><input name="cpf"/></div>
 <div class="field"><label>Data de nascimento</label><input name="dataNascimento" type="date"/></div>
 <div class="field"><label>Empresa</label><input name="empresa"/></div>
+<div class="field"><label>Contrato</label>
+<select id="contratoNumeroSelect" name="contratoNumero"></select>
+</div>
+<div class="field"><label>Status do contrato</label>
+<input id="contratoStatusSelect" name="contratoStatus" readonly placeholder="Selecione um contrato"/>
+</div>
+<div class="field"><label>Status financeiro do contrato</label>
+<input id="contratoFinanceiroSelect" name="contratoStatusFinanceiro" readonly placeholder="Selecione um contrato"/>
+</div>
+<div class="field"><label>Tipo de contrato</label>
+<input id="contratoTipoSelect" name="contratoTipo" readonly placeholder="Selecione um contrato"/>
+</div>
+<div class="field">
+<label>Resumo do contrato</label>
+<div class="obs-box" id="contratoResumoBox">Selecione um contrato para carregar os status.</div>
+</div>
 <div class="field"><label>Tipo de atendimento</label>
 <select name="tipoAtendimento">
 <option>Admissional</option>
@@ -2504,10 +2559,14 @@
 <div class="field"><label>Data de atendimento</label><input name="dataAtendimento" type="date"/></div>
 <div class="field"><label>Telefone</label><input name="telefone"/></div>
 <div class="field"><label>Atendimento preferencial?</label>
-<select name="preferencial">
+<select name="preferencial" id="preferencialSelect">
 <option value="Não">Não</option>
 <option value="Sim">Sim</option>
 </select>
+</div>
+<div class="priority-alert-box" id="priorityPreviewBox" aria-live="polite">
+  <div class="priority-alert-title">⚠️ Atendimento preferencial identificado</div>
+  <div class="priority-alert-text">Boa prática: quando marcado como preferencial, o paciente aparecerá com selo amarelo de alta visibilidade e destaque lateral nas filas, buscas, relatórios e tela de chamada para facilitar a identificação rápida pelos usuários.</div>
 </div>
 <div class="field"><label>Setor</label><input name="setor"/></div>
 <div class="field"><label>Função</label><input name="funcao"/></div>
@@ -2610,7 +2669,7 @@
 </div>
 <div class="modal-body">
 <div class="global-search-toolbar">
-<div class="search global-search-input"><span>🔎</span><input id="globalSearchModalInput" type="search" placeholder="Busque por paciente, CPF, ID, empresa, função, setor, obra ou CBO da obra"></div>
+<div class="search global-search-input"><span>🔎</span><input id="globalSearchModalInput" type="search" placeholder="Busque por paciente, CPF, ID, empresa, contrato, função, setor, obra ou CBO da obra"></div>
 <div class="chips smart-filter-group">
 <button class="smart-filter active" type="button" data-global-filter="todos">Todos</button>
 <button class="smart-filter" type="button" data-global-filter="pendentes">Pendentes</button>
@@ -2864,6 +2923,32 @@
       'localizar-atendimento': ['Localizar Atendimento', 'Consulta do atendimento por nome ou CPF com visualização completa das informações e status.'],      relatorios: ['Relatórios', 'Consolidação dos atendimentos com exportação para Excel.']
     };
 
+
+
+    // Base simulada de contratos. Em produção, substitua este array por uma chamada ao backend/API.
+    const CONTRACT_DATABASE = [
+      { numero: 'CTR-2024-001', empresa: 'Indústria Paulista LTDA', statusContrato: 'Vigente', statusFinanceiro: 'Adimplente', tipoContrato: 'ASO + Exames Ocupacionais' },
+      { numero: 'CTR-2024-014', empresa: 'Construtora Atlântico', statusContrato: 'Em Renovação', statusFinanceiro: 'Em Negociação', tipoContrato: 'ASO + Exames Ocupacionais' },
+      { numero: 'CTR-2023-087', empresa: 'Serviços Integrados Recife', statusContrato: 'Expirado', statusFinanceiro: 'Inadimplente', tipoContrato: 'Exames Ocupacionais' },
+      { numero: 'CTR-2025-006', empresa: 'Logística Nordeste SA', statusContrato: 'Vigente', statusFinanceiro: 'Adimplente', tipoContrato: 'ASO' },
+      { numero: 'CTR-2025-019', empresa: 'Metalúrgica Santo Amaro', statusContrato: 'Em Renovação', statusFinanceiro: 'Adimplente', tipoContrato: 'ASO + Exames Ocupacionais' }
+    ];
+    const CONTRACT_STATUS_OPTIONS = ['Vigente', 'Em Renovação', 'Expirado'];
+    const CONTRACT_FINANCIAL_STATUS_OPTIONS = ['Adimplente', 'Inadimplente', 'Em Negociação'];
+    const CONTRACT_TYPE_OPTIONS = ['ASO + Exames Ocupacionais', 'ASO', 'Exames Ocupacionais'];
+    function getContractByNumber(numero) { return CONTRACT_DATABASE.find(contract => contract.numero === numero) || null; }
+    function contractOptionsHtml(selected = '') {
+      return ['<option value="">Selecione o contrato</option>']
+        .concat(CONTRACT_DATABASE.map(contract => `<option value="${contract.numero}" ${contract.numero === selected ? 'selected' : ''}>${contract.numero} • ${contract.empresa}</option>`)).join('');
+    }
+    function statusOptionsHtml(options, selected = '') {
+      return options.map(option => `<option value="${option}" ${option === selected ? 'selected' : ''}>${option}</option>`).join('');
+    }
+    function contractSummaryHtml(patient) {
+      const numero = patient?.contratoNumero || '';
+      if (!numero) return '<div class="small">Contrato não vinculado.</div>';
+      return `<div class="small mono">${maskText(numero)}</div><div class="chips" style="margin-top:8px">${badge(patient.contratoStatus || 'Vigente')}${badge(patient.contratoStatusFinanceiro || 'Adimplente')}${badge(patient.contratoTipo || 'ASO + Exames Ocupacionais')}</div>`;
+    }
     function buildSantoAmaroBase(base) {
       const source = Array.isArray(base) ? clone(base) : [];
       if (!source.length) return [];
@@ -2967,6 +3052,9 @@
         patient.id,
         patient.cpf,
         patient.empresa,
+        patient.contratoNumero,
+        patient.contratoStatus,
+        patient.contratoStatusFinanceiro,
         patient.setor,
         patient.funcao,
         patient.obra,
@@ -3029,7 +3117,7 @@
             <div class="chips">
               <span class="chip">Etapa: ${badge(getStageStatus(patient))}</span>
               ${patient.obra ? `<span class="chip">🏗️ ${maskText(patient.obra)}</span>` : ''}
-              ${patient.preferencial === 'Sim' ? '<span class="chip">🧓♿🤰 Preferencial</span>' : ''}
+              ${priorityChip(patient, true)}
             </div>
           </div>
           <div class="result-meta-grid">
@@ -3081,7 +3169,7 @@
 
     function sanitizePatientRecord(patient) {
       if (!patient || typeof patient !== 'object') return patient;
-      const textFields = ['cnpj','empresa','obra','cboObra','cei','nome','nomeSocial','setor','funcao','cpf','telefone','email','endereco','cep','tipoAtendimento','grupoServico','servico','rxTipo','labTipo','obsCadastro','retorno','dataRetorno','sexo','dataNascimento','dataAtendimento','statusAtendimento','etapa'];
+      const textFields = ['cnpj','empresa','obra','cboObra','cei','nome','nomeSocial','setor','funcao','cpf','telefone','email','endereco','cep','tipoAtendimento','grupoServico','servico','rxTipo','labTipo','obsCadastro','retorno','dataRetorno','sexo','dataNascimento','dataAtendimento','statusAtendimento','etapa','contratoNumero','contratoStatus','contratoStatusFinanceiro','contratoTipo'];
       textFields.forEach(field => {
         if (field in patient) patient[field] = sanitizeText(patient[field]);
       });
@@ -4300,6 +4388,16 @@ function compareQueueOrder(a, b) {
       return `<span class="chip ${withAso ? 'chip-flow-aso' : 'chip-flow-exames'}">${withAso ? '🩺 Com ASO' : '🧪 Somente exames'}</span>`;
     }
 
+
+    function priorityChip(patient, compact = false) {
+      if (patient?.preferencial !== 'Sim') return '';
+      return `<span class="chip chip-priority" title="Atendimento preferencial: priorizar identificação e chamada">⚠️ ${compact ? 'Preferencial' : 'Atendimento Preferencial'}</span>`;
+    }
+
+    function priorityRowClass(patient) {
+      return patient?.preferencial === 'Sim' ? ' class="priority-row-highlight"' : '';
+    }
+
     function skipsClinicalFlow(patient) {
       return getAttendanceType(patient) === 'Somente exames';
     }
@@ -4328,7 +4426,13 @@ function compareQueueOrder(a, b) {
         'ASO Inapto': ['🔴', 'st-bloqueado'],
         'ASO Pendente': ['🟡', 'st-pendente'],
         'ASO Cadastrado': ['🔵', 'st-andamento'],
-        'Sem ASO': ['🔴', 'st-bloqueado']
+        'Sem ASO': ['🔴', 'st-bloqueado'],
+        'Vigente': ['🟢', 'st-concluido'],
+        'Em Renovação': ['🟡', 'st-pendente'],
+        'Expirado': ['🔴', 'st-bloqueado'],
+        'Adimplente': ['🟢', 'st-concluido'],
+        'Inadimplente': ['🔴', 'st-bloqueado'],
+        'Em Negociação': ['🟡', 'st-pendente']
       };
       const [emoji, css] = map[status] || ['🔵', 'st-andamento'];
       return `<span class="status ${css}">${emoji} ${displayStatusLabel(status)}</span>`;
@@ -4651,20 +4755,21 @@ function compareQueueOrder(a, b) {
         });
       }
       return `
-        <tr>
+        <tr${priorityRowClass(patient)}>
           <td>
             <div class="row-title">${patient.nome}</div>
             <div class="small mono">${patient.id} • ${maskText(patient.cpf)}</div>
             <div class="small">${maskText(patient.setor)} • ${maskText(patient.funcao)}</div>
             <div class="chips" style="margin-top:8px">
               ${attendanceChip(patient)}
-              ${patient.preferencial === 'Sim' ? '<span class="chip">🧓♿🤰 Preferencial</span>' : ''}
+              ${priorityChip(patient, true)}
             </div>
           </td>
           <td>
             <div>${maskText(patient.empresa)}</div>
             <div class="small">${maskText(patient.tipoAtendimento)}</div>
             <div class="small">${maskText(patient.setor)} • ${maskText(patient.funcao)}</div>
+            <div style="margin-top:8px">${contractSummaryHtml(patient)}</div>
           </td>
           <td>${page === 'exames' ? renderExamStatusPanel(patient, selectedExamKey) : badge(getStageStatus(patient))}</td>
           <td>
@@ -4951,7 +5056,7 @@ function compareQueueOrder(a, b) {
                       <td>
                         <div class="row-title">${patient.nome}</div>
                         <div class="small mono">${patient.id}</div>
-                        <div class="chips">${attendanceChip(patient)} ${patient.preferencial === 'Sim' ? '<span class="chip">🧓♿🤰 Preferencial</span>' : ''}</div>
+                        <div class="chips">${attendanceChip(patient)} ${priorityChip(patient, true)}</div>
                       </td>
                       <td>
                         <div>${badge(getStageStatus(patient))}</div>
@@ -5849,7 +5954,7 @@ function compareQueueOrder(a, b) {
             : (patient.etapa === 'Médico' ? 'Em andamento' : 'Pendente'));
       const triagemStatus = isOnlyExamsFlow ? 'Não se aplica' : (patient.triagem?.status || 'Pendente');
       return `
-        <tr>
+        <tr${priorityRowClass(patient)}>
           <td>
             <div class="row-title">${patient.nome}</div>
             <div class="small mono">${patient.id} • ${maskText(patient.cpf)}</div>
@@ -6880,7 +6985,7 @@ function compareQueueOrder(a, b) {
           <td>
             <div class="row-title">${patient.nome}</div>
             <div class="small mono">${patient.id} • ${maskText(patient.cpf)}</div>
-            <div class="small">${patient.preferencial === 'Sim' ? '🧓♿🤰 Preferencial' : 'Fluxo padrão'}</div>
+            <div class="small">${patient.preferencial === 'Sim' ? priorityChip(patient, true) : 'Fluxo padrão'}</div>
           </td>
           <td>
             <div>${maskText(patient.empresa)}</div>
@@ -6971,6 +7076,18 @@ function compareQueueOrder(a, b) {
               <div class="field"><label>Nome do paciente</label><input id="edit-nome" value="${patient.nome || ''}"></div>
               <div class="field"><label>CPF</label><input id="edit-cpf" value="${patient.cpf || ''}"></div>
               <div class="field"><label>Empresa</label><input id="edit-empresa" value="${patient.empresa || ''}"></div>
+              <div class="field"><label>Contrato</label>
+                <select id="edit-contrato-numero" onchange="syncContractFields('edit')">${contractOptionsHtml(patient.contratoNumero || '')}</select>
+              </div>
+              <div class="field"><label>Status do contrato</label>
+                <input id="edit-contrato-status" readonly value="${maskText(patient.contratoStatus || 'Vigente')}"/>
+              </div>
+              <div class="field"><label>Status financeiro do contrato</label>
+                <input id="edit-contrato-financeiro" readonly value="${maskText(patient.contratoStatusFinanceiro || 'Adimplente')}"/>
+              </div>
+              <div class="field"><label>Tipo de contrato</label>
+                <input id="edit-contrato-tipo" readonly value="${maskText(patient.contratoTipo || 'ASO + Exames Ocupacionais')}"/>
+              </div>
               <div class="field"><label>Tipo de atendimento</label>
                 <select id="edit-tipo-atendimento">
                   <option value="Admissional" ${patient.tipoAtendimento === 'Admissional' ? 'selected' : ''}>Admissional</option>
@@ -7406,6 +7523,10 @@ function compareQueueOrder(a, b) {
       patient.nome = sanitizeText(document.getElementById('edit-nome').value);
       patient.cpf = sanitizeText(document.getElementById('edit-cpf').value);
       patient.empresa = sanitizeText(document.getElementById('edit-empresa').value);
+      patient.contratoNumero = sanitizeText(document.getElementById('edit-contrato-numero')?.value || '');
+      patient.contratoStatus = sanitizeText(document.getElementById('edit-contrato-status')?.value || 'Vigente');
+      patient.contratoStatusFinanceiro = sanitizeText(document.getElementById('edit-contrato-financeiro')?.value || 'Adimplente');
+      patient.contratoTipo = sanitizeText(document.getElementById('edit-contrato-tipo')?.value || 'ASO + Exames Ocupacionais');
       patient.tipoAtendimento = sanitizeText(document.getElementById('edit-tipo-atendimento').value) || 'Admissional';
       patient.dataAtendimento = sanitizeText(document.getElementById('edit-data-atendimento').value) || patient.dataAtendimento;
       patient.telefone = sanitizeText(document.getElementById('edit-telefone').value);
@@ -7576,6 +7697,34 @@ function compareQueueOrder(a, b) {
       closePatientModal();
     }
 
+    function syncContractFields(prefix = '') {
+      const contractSelect = document.getElementById(prefix ? `${prefix}-contrato-numero` : 'contratoNumeroSelect');
+      const statusSelect = document.getElementById(prefix ? `${prefix}-contrato-status` : 'contratoStatusSelect');
+      const financialSelect = document.getElementById(prefix ? `${prefix}-contrato-financeiro` : 'contratoFinanceiroSelect');
+      const typeSelect = document.getElementById(prefix ? `${prefix}-contrato-tipo` : 'contratoTipoSelect');
+      const summaryBox = document.getElementById('contratoResumoBox');
+      if (!contractSelect || !statusSelect || !financialSelect || !typeSelect) return;
+      const contract = getContractByNumber(contractSelect.value);
+      if (contract) {
+        statusSelect.value = contract.statusContrato;
+        financialSelect.value = contract.statusFinanceiro;
+        typeSelect.value = contract.tipoContrato;
+        if (!prefix && summaryBox) summaryBox.innerHTML = `<strong>${contract.numero}</strong> • ${contract.empresa}<br>Status: ${contract.statusContrato} • Financeiro: ${contract.statusFinanceiro} • Tipo: ${contract.tipoContrato}`;
+      } else {
+        statusSelect.value = '';
+        financialSelect.value = '';
+        typeSelect.value = '';
+        if (!prefix && summaryBox) summaryBox.textContent = 'Selecione um contrato para carregar os status e o tipo.';
+      }
+    }
+
+    function syncPriorityPreview() {
+      const preferencialSelect = document.querySelector('#newAttendanceForm [name="preferencial"]');
+      const preview = document.getElementById('priorityPreviewBox');
+      if (!preferencialSelect || !preview) return;
+      preview.classList.toggle('active', preferencialSelect.value === 'Sim');
+    }
+
     function openNewModal() {
       document.getElementById('newModal').classList.add('open');
     }
@@ -7588,10 +7737,20 @@ function compareQueueOrder(a, b) {
       document.getElementById('labTipoField').classList.add('hidden');
       resetExamDetailRows('rx');
       resetExamDetailRows('lab');
+      const contratoSelect = document.getElementById('contratoNumeroSelect');
+      if (contratoSelect) contratoSelect.value = '';
+      const contratoStatusSelect = document.getElementById('contratoStatusSelect');
+      if (contratoStatusSelect) contratoStatusSelect.value = '';
+      const contratoFinanceiroSelect = document.getElementById('contratoFinanceiroSelect');
+      if (contratoFinanceiroSelect) contratoFinanceiroSelect.value = '';
+      const contratoTipoSelect = document.getElementById('contratoTipoSelect');
+      if (contratoTipoSelect) contratoTipoSelect.value = '';
+      syncContractFields();
       const asoSelect = document.getElementById('asoCadastradoSelect');
       if (asoSelect) asoSelect.value = 'true';
       const preferencialSelect = document.querySelector('#newAttendanceForm [name="preferencial"]');
       if (preferencialSelect) preferencialSelect.value = 'Não';
+      syncPriorityPreview();
       const obraFlag = document.getElementById('obraFlag');
       if (obraFlag) obraFlag.checked = false;
       syncObraFields(true);
@@ -7621,10 +7780,20 @@ function compareQueueOrder(a, b) {
       resetExamDetailRows('lab');
 
       const formEl = document.getElementById('newAttendanceForm');
+      const contratoSelect = document.getElementById('contratoNumeroSelect');
+      if (contratoSelect) {
+        contratoSelect.innerHTML = contractOptionsHtml();
+        contratoSelect.addEventListener('change', () => syncContractFields());
+        syncContractFields();
+      }
       const asoSelect = document.getElementById('asoCadastradoSelect');
       if (asoSelect) asoSelect.value = 'true';
       const preferencialSelect = document.querySelector('#newAttendanceForm [name="preferencial"]');
-      if (preferencialSelect) preferencialSelect.value = 'Não';
+      if (preferencialSelect) {
+        preferencialSelect.value = 'Não';
+        preferencialSelect.addEventListener('change', syncPriorityPreview);
+        syncPriorityPreview();
+      }
       document.querySelectorAll('#examChecklist input[type="checkbox"]').forEach(input => {
         input.addEventListener('change', syncNewAttendanceExamFields);
       });
@@ -7652,8 +7821,10 @@ function compareQueueOrder(a, b) {
         const labTipo = serializeExamTypeList(labTipos);
         const asoSelecionado = form.get('asoCadastrado') === 'true';
         const observacoesIniciais = sanitizeText(form.get('obsCadastro'));
+        const contratoSelecionado = getContractByNumber(sanitizeText(form.get('contratoNumero')));
         const detalhesCadastro = [
           observacoesIniciais,
+          form.get('preferencial') === 'Sim' ? 'ATENDIMENTO PREFERENCIAL: identificar com prioridade na fila e na chamada' : '',
           form.get('obraFlag') && sanitizeText(form.get('obra')) ? `Obra: ${sanitizeText(form.get('obra'))}` : '',
           form.get('obraFlag') && sanitizeText(form.get('cboObra')) ? `CBO da obra: ${sanitizeText(form.get('cboObra'))}` : '',
           selected.has('rx') && rxTipo ? `RX: ${rxTipo}` : '',
@@ -7667,6 +7838,10 @@ function compareQueueOrder(a, b) {
           dataRetorno: '',
           cnpj: '',
           empresa: sanitizeText(form.get('empresa')),
+          contratoNumero: sanitizeText(form.get('contratoNumero')),
+          contratoStatus: contratoSelecionado?.statusContrato || sanitizeText(form.get('contratoStatus')) || 'Vigente',
+          contratoStatusFinanceiro: contratoSelecionado?.statusFinanceiro || sanitizeText(form.get('contratoStatusFinanceiro')) || 'Adimplente',
+          contratoTipo: contratoSelecionado?.tipoContrato || sanitizeText(form.get('contratoTipo')) || 'ASO + Exames Ocupacionais',
           obra: form.get('obraFlag') ? sanitizeText(form.get('obra')) : '',
           cboObra: form.get('obraFlag') ? sanitizeText(form.get('cboObra')) : '',
           cei: '',
