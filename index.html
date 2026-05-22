@@ -4062,6 +4062,46 @@ button[data-totem-key] {
 }
 </style>
 
+
+<style id="toten-action-button-color-correction">
+/* Correção final: cores específicas dos botões de ação do TOTEM.
+   Usa seletores por atributo + !important para vencer estilos anteriores. */
+.toten-keypad [data-toten-action="clear"],
+#toten-fullscreen-keypad [data-fullscreen-action="clear"] {
+  background: linear-gradient(135deg, #facc15, #d9a400) !important;
+  border-color: rgba(250, 204, 21, .55) !important;
+  color: #1f2937 !important;
+  text-shadow: none !important;
+  box-shadow: 0 12px 28px rgba(250, 204, 21, .22), inset 0 1px 0 rgba(255,255,255,.24) !important;
+}
+
+.toten-keypad [data-toten-action="clear"]:hover,
+.toten-keypad [data-toten-action="clear"]:focus,
+#toten-fullscreen-keypad [data-fullscreen-action="clear"]:hover,
+#toten-fullscreen-keypad [data-fullscreen-action="clear"]:focus {
+  background: linear-gradient(135deg, #fde047, #facc15) !important;
+  border-color: rgba(253, 224, 71, .72) !important;
+  color: #111827 !important;
+}
+
+.toten-keypad [data-toten-action="backspace"],
+#toten-fullscreen-keypad [data-fullscreen-action="backspace"] {
+  background: linear-gradient(135deg, #ef4444, #b91c1c) !important;
+  border-color: rgba(248, 113, 113, .56) !important;
+  color: #ffffff !important;
+  box-shadow: 0 12px 28px rgba(239, 68, 68, .24), inset 0 1px 0 rgba(255,255,255,.14) !important;
+}
+
+.toten-keypad [data-toten-action="backspace"]:hover,
+.toten-keypad [data-toten-action="backspace"]:focus,
+#toten-fullscreen-keypad [data-fullscreen-action="backspace"]:hover,
+#toten-fullscreen-keypad [data-fullscreen-action="backspace"]:focus {
+  background: linear-gradient(135deg, #f87171, #dc2626) !important;
+  border-color: rgba(252, 165, 165, .72) !important;
+  color: #ffffff !important;
+}
+</style>
+
 </head>
 <body>
 <div class="app">
