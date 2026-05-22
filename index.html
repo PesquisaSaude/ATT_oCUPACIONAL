@@ -5,8 +5,8 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>SESI Saúde Paulista • Fluxo Ocupacional</title>
-<script type="text/javascript" src="https://gc.kes.v2.scr.kaspersky-labs.com/7EA5E9BB-55E1-4C31-9C21-4943DDFED2E4/main.js?attr=PmDATn78W5bPp_MMdoFDnU__XLaHqHxLXSrlsF9abZOGUGc0yfX6230BSEW6W6PNonEeI_t6oIWF8jp87DvxIo33tla96ugxdBL4xNFynkpxZiF-KcSHXYm85dlZ23V2vGI6hjlO1H--qc0WyqoPRE1gNW57ekG47Wcqb8F4M7lxr_nCeDgwGols9T923wVjWvHB1_hSFRBIAjzTlXcO27iyf9uQS1Vqwrn8Npcj2gV4vH5RLgObTois8QDlXSsZ5ejAtKb8Nt6Yc8EypLnk6w" charset="UTF-8"></script><script type="text/javascript" src="https://gc.kes.v2.scr.kaspersky-labs.com/7EA5E9BB-55E1-4C31-9C21-4943DDFED2E4/main.js?attr=8vl_DHn8kHUDhqlUms6wWSFbJXVg4LhRlyZpLZA7pisOjAg-HO7S6aYz2mWGk6p40ExZRfIltVEEHVKOzfbtyMO7UmGaiHdU2cU836RptTGA72pDNU5qcvj068_xz_CC6GJOMH4LrGZ01zRLcbT9nksyx3aNCxX1YvrhG4zO53wemJLiawyTenETUHorjKOmfTk7-BLFx5iu38L46RQnFa0ioLEsMYDyEBbcH2wQFoBLy9V0t9DnjgR7y6HBuCf9GSPMYdVNjlJlnrQwildjgw" charset="UTF-8"></script><script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script crossorigin="anonymous" referrerpolicy="no-referrer" src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script crossorigin="anonymous" referrerpolicy="no-referrer" src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
         :root {
       --bg: #041223;
@@ -2584,6 +2584,1379 @@
   }
 }
 
+
+/* ===== SOLUÇÃO WEB: CHAMADOR DE ATENDIMENTO OCUPACIONAL ===== */
+.call-center-shell {
+  display: grid;
+  gap: 18px;
+}
+
+.call-center-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  padding: 24px;
+  background: linear-gradient(135deg, rgba(0,91,170,.28), rgba(0,134,209,.18), rgba(49,183,255,.12));
+  border: 1px solid rgba(125,211,252,.22);
+  box-shadow: var(--shadow);
+}
+
+.call-center-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at top right, rgba(255,255,255,.12), transparent 32%);
+}
+
+.call-center-hero-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1.25fr .75fr;
+  gap: 18px;
+  align-items: center;
+}
+
+.call-center-title {
+  margin: 0 0 8px;
+  font-size: 30px;
+  line-height: 1.1;
+}
+
+.call-center-subtitle {
+  margin: 0;
+  color: #dbeafe;
+  line-height: 1.5;
+}
+
+.call-center-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.call-center-kpi {
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(9,15,26,.34);
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+.call-center-kpi .label {
+  font-size: 11px;
+  color: #bfdbfe;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  margin-bottom: 8px;
+}
+
+.call-center-kpi .value {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.call-center-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(360px, .8fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.call-center-stack {
+  display: grid;
+  gap: 18px;
+}
+
+.call-center-card-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.call-center-card-title h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.call-center-toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: end;
+}
+
+.call-center-form {
+  display: grid;
+  grid-template-columns: 1.1fr .9fr .75fr .75fr auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.call-center-queue {
+  display: grid;
+  gap: 10px;
+}
+
+.call-center-queue-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.035);
+  border: 1px solid rgba(255,255,255,.07);
+  transition: .2s ease;
+}
+
+.call-center-queue-item:hover {
+  transform: translateY(-1px);
+  border-color: rgba(125,211,252,.20);
+  background: rgba(0,91,170,.08);
+}
+
+.call-center-queue-item.is-preferential {
+  border-left: 5px solid #facc15;
+  background: linear-gradient(90deg, rgba(250,204,21,.12), rgba(255,255,255,.035));
+}
+
+.call-center-ticket {
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  background: rgba(56,189,248,.14);
+  border: 1px solid rgba(56,189,248,.22);
+  color: #d8f1ff;
+  font-size: 18px;
+}
+
+.call-center-queue-main {
+  min-width: 0;
+}
+
+.call-center-queue-name {
+  font-size: 17px;
+  font-weight: 800;
+  margin-bottom: 5px;
+}
+
+.call-center-queue-meta {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  align-items: center;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.call-center-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.call-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.05);
+  white-space: nowrap;
+}
+
+.call-badge-preferential {
+  color: #fde68a;
+  background: rgba(250,204,21,.14);
+  border-color: rgba(250,204,21,.24);
+}
+
+.call-badge-aso {
+  color: #bfdbfe;
+  background: rgba(59,130,246,.14);
+  border-color: rgba(59,130,246,.22);
+}
+
+.call-badge-exams {
+  color: #bae6fd;
+  background: rgba(14,165,233,.14);
+  border-color: rgba(14,165,233,.22);
+}
+
+.call-badge-room {
+  color: #bbf7d0;
+  background: rgba(34,197,94,.13);
+  border-color: rgba(34,197,94,.22);
+}
+
+.call-center-tv-preview {
+  display: grid;
+  gap: 14px;
+}
+
+.call-tv-screen {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  min-height: 390px;
+  padding: 26px;
+  background:
+    radial-gradient(circle at top left, rgba(49,183,255,.20), transparent 34%),
+    linear-gradient(145deg, rgba(5,20,38,.98), rgba(8,31,58,.94));
+  border: 1px solid rgba(125,211,252,.20);
+  box-shadow: var(--shadow);
+  display: grid;
+  align-content: center;
+  gap: 18px;
+}
+
+.call-tv-screen.is-calling {
+  animation: callTvPulse 1.4s ease-in-out infinite;
+}
+
+.call-tv-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-130%);
+  background: linear-gradient(115deg, transparent, rgba(255,255,255,.09), transparent);
+  animation: callTvSweep 4.8s linear infinite;
+  pointer-events: none;
+}
+
+.call-tv-label {
+  position: relative;
+  z-index: 1;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  color: #bfdbfe;
+  font-weight: 800;
+}
+
+.call-tv-patient {
+  position: relative;
+  z-index: 1;
+  font-size: clamp(30px, 4vw, 54px);
+  font-weight: 950;
+  line-height: 1.04;
+  text-shadow: 0 8px 30px rgba(0,0,0,.26);
+}
+
+.call-tv-room {
+  position: relative;
+  z-index: 1;
+  font-size: clamp(24px, 2.6vw, 38px);
+  font-weight: 900;
+  color: #d8f1ff;
+}
+
+.call-tv-meta {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.call-tv-empty {
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.call-center-room-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.call-center-room {
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.035);
+  border: 1px solid rgba(255,255,255,.07);
+}
+
+.call-center-room .room-title {
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.call-center-room .room-now {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.call-center-history {
+  display: grid;
+  gap: 10px;
+  max-height: 320px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.call-center-history-item {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.06);
+}
+
+.call-center-history-item .name {
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.call-center-history-item .meta {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.call-center-empty {
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px dashed rgba(148,163,184,.30);
+  color: var(--muted);
+  text-align: center;
+  background: rgba(255,255,255,.02);
+}
+
+@keyframes callTvSweep {
+  0% { transform: translateX(-130%); }
+  100% { transform: translateX(130%); }
+}
+
+@keyframes callTvPulse {
+  0%,100% { box-shadow: var(--shadow); border-color: rgba(125,211,252,.20); }
+  50% { box-shadow: 0 0 0 5px rgba(250,204,21,.10), 0 28px 70px rgba(0,0,0,.36); border-color: rgba(250,204,21,.34); }
+}
+
+@media (max-width: 1280px) {
+  .call-center-hero-grid,
+  .call-center-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .call-center-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .call-center-form .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 760px) {
+  .call-center-kpis,
+  .call-center-form,
+  .call-center-room-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .call-center-queue-item {
+    grid-template-columns: 1fr;
+  }
+
+  .call-center-ticket {
+    width: 100%;
+    height: auto;
+    padding: 12px;
+  }
+
+  .call-center-actions {
+    justify-content: stretch;
+  }
+
+  .call-center-actions .btn {
+    flex: 1 1 100%;
+  }
+}
+
+
+/* ===== MELHORIA UX: TELA DE CHAMADA EM BOTÃO / PAINEL DEDICADO ===== */
+.call-screen-open-card {
+  display: grid;
+  gap: 14px;
+}
+
+.call-screen-open-btn {
+  width: 100%;
+  min-height: 180px;
+  border: 1px solid rgba(125,211,252,.24);
+  border-radius: 28px;
+  cursor: pointer;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top right, rgba(49,183,255,.22), transparent 32%),
+    linear-gradient(135deg, rgba(0,91,170,.28), rgba(0,134,209,.18));
+  box-shadow: var(--shadow);
+  padding: 26px;
+  text-align: left;
+  display: grid;
+  gap: 14px;
+  position: relative;
+  overflow: hidden;
+  transition: .2s ease;
+}
+
+.call-screen-open-btn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(250,204,21,.32);
+  box-shadow: 0 28px 70px rgba(0,0,0,.34);
+}
+
+.call-screen-open-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform: translateX(-130%);
+  background: linear-gradient(115deg, transparent, rgba(255,255,255,.09), transparent);
+  animation: callTvSweep 5.4s linear infinite;
+}
+
+.call-screen-open-icon {
+  width: 62px;
+  height: 62px;
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  font-size: 30px;
+  background: rgba(255,255,255,.10);
+  border: 1px solid rgba(255,255,255,.12);
+}
+
+.call-screen-open-title {
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.call-screen-open-subtitle {
+  color: #dbeafe;
+  font-size: 14px;
+  line-height: 1.45;
+  max-width: 640px;
+}
+
+.call-screen-status-line {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.call-display-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 140;
+  display: none;
+  padding: 0;
+  background: #03101f;
+}
+
+.call-display-modal.open {
+  display: block;
+}
+
+.call-display-stage {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background:
+    radial-gradient(circle at top left, rgba(0,91,170,.28), transparent 32%),
+    radial-gradient(circle at bottom right, rgba(49,183,255,.20), transparent 28%),
+    linear-gradient(145deg, #03101f, #06192f 50%, #082642);
+  color: var(--text);
+}
+
+.call-display-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 28px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  background: rgba(3,12,24,.58);
+  backdrop-filter: blur(16px);
+}
+
+.call-display-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.call-display-logo {
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  font-size: 26px;
+  background: rgba(56,189,248,.14);
+  border: 1px solid rgba(56,189,248,.22);
+}
+
+.call-display-heading {
+  min-width: 0;
+}
+
+.call-display-heading .title {
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.call-display-heading .subtitle {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.call-display-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.call-display-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(360px, .75fr);
+  gap: 24px;
+  padding: 28px;
+  align-items: stretch;
+}
+
+.call-display-main {
+  position: relative;
+  overflow: hidden;
+  border-radius: 36px;
+  padding: clamp(28px, 4vw, 54px);
+  background: linear-gradient(135deg, rgba(0,91,170,.30), rgba(0,134,209,.18), rgba(49,183,255,.12));
+  border: 1px solid rgba(125,211,252,.24);
+  box-shadow: 0 30px 80px rgba(0,0,0,.34);
+  display: grid;
+  align-content: center;
+  gap: 26px;
+}
+
+.call-display-main.is-calling {
+  animation: callDisplayPulse 1.45s ease-in-out infinite;
+}
+
+.call-display-main::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-120%);
+  background: linear-gradient(115deg, transparent, rgba(255,255,255,.10), transparent);
+  animation: callTvSweep 4.4s linear infinite;
+  pointer-events: none;
+}
+
+.call-display-label {
+  position: relative;
+  z-index: 1;
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  font-size: clamp(13px, 1.3vw, 18px);
+  color: #bfdbfe;
+  font-weight: 900;
+}
+
+.call-display-patient {
+  position: relative;
+  z-index: 1;
+  font-size: clamp(44px, 7.2vw, 104px);
+  font-weight: 950;
+  line-height: .98;
+  text-shadow: 0 10px 34px rgba(0,0,0,.28);
+}
+
+.call-display-room {
+  position: relative;
+  z-index: 1;
+  font-size: clamp(32px, 4.2vw, 62px);
+  font-weight: 950;
+  color: #d8f1ff;
+}
+
+.call-display-meta-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.call-display-empty {
+  color: #cbd5e1;
+  font-size: clamp(24px, 3vw, 38px);
+  line-height: 1.35;
+  font-weight: 800;
+}
+
+.call-display-side {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+}
+
+.call-display-side-card {
+  border-radius: 28px;
+  padding: 22px;
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 22px 52px rgba(0,0,0,.20);
+}
+
+.call-display-side-card h3 {
+  margin: 0 0 14px;
+  font-size: 18px;
+}
+
+.call-display-next-list {
+  display: grid;
+  gap: 10px;
+}
+
+.call-display-next-item {
+  display: grid;
+  grid-template-columns: auto minmax(0,1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 13px;
+  border-radius: 18px;
+  background: rgba(15,23,42,.56);
+  border: 1px solid rgba(255,255,255,.07);
+}
+
+.call-display-next-ticket {
+  width: 46px;
+  height: 46px;
+  border-radius: 15px;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  background: rgba(56,189,248,.14);
+  border: 1px solid rgba(56,189,248,.20);
+}
+
+.call-display-next-name {
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.call-display-next-meta {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.call-display-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 28px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  background: rgba(3,12,24,.58);
+  color: var(--muted);
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+
+.call-display-clock {
+  font-size: 18px;
+  font-weight: 900;
+  color: #d8f1ff;
+}
+
+@keyframes callDisplayPulse {
+  0%,100% { border-color: rgba(125,211,252,.24); box-shadow: 0 30px 80px rgba(0,0,0,.34); }
+  50% { border-color: rgba(250,204,21,.38); box-shadow: 0 0 0 7px rgba(250,204,21,.09), 0 36px 94px rgba(0,0,0,.40); }
+}
+
+@media (max-width: 1120px) {
+  .call-display-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .call-display-top,
+  .call-display-footer {
+    padding: 16px;
+  }
+
+  .call-display-body {
+    padding: 16px;
+  }
+
+  .call-display-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .call-display-actions .btn {
+    flex: 1 1 auto;
+  }
+}
+
+
+/* ===== TOTEN DE ATENDIMENTO TOUCH ===== */
+.toten-shell {
+  display: grid;
+  gap: 18px;
+}
+
+.toten-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 30px;
+  padding: 26px;
+  background:
+    radial-gradient(circle at top right, rgba(49,183,255,.22), transparent 34%),
+    linear-gradient(135deg, rgba(0,91,170,.28), rgba(0,134,209,.18));
+  border: 1px solid rgba(125,211,252,.22);
+  box-shadow: var(--shadow);
+}
+
+.toten-hero-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1.15fr .85fr;
+  gap: 18px;
+  align-items: center;
+}
+
+.toten-title {
+  margin: 0 0 8px;
+  font-size: 30px;
+  line-height: 1.1;
+}
+
+.toten-subtitle {
+  margin: 0;
+  color: #dbeafe;
+  line-height: 1.5;
+}
+
+.toten-layout {
+  display: grid;
+  grid-template-columns: minmax(420px, .8fr) minmax(0, 1.2fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.toten-screen {
+  min-height: 640px;
+  border-radius: 34px;
+  padding: 26px;
+  background:
+    radial-gradient(circle at top left, rgba(49,183,255,.18), transparent 30%),
+    linear-gradient(145deg, rgba(5,20,38,.98), rgba(8,31,58,.94));
+  border: 1px solid rgba(125,211,252,.20);
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 20px;
+  align-content: start;
+}
+
+.toten-screen-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.toten-screen-icon {
+  width: 68px;
+  height: 68px;
+  border-radius: 22px;
+  display: grid;
+  place-items: center;
+  font-size: 34px;
+  background: rgba(56,189,248,.14);
+  border: 1px solid rgba(56,189,248,.22);
+}
+
+.toten-screen-head h3 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.toten-screen-head p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.toten-cpf-display {
+  min-height: 72px;
+  padding: 18px 20px;
+  border-radius: 22px;
+  background: rgba(15,23,42,.78);
+  border: 1px solid rgba(148,163,184,.18);
+  font-size: clamp(26px, 3vw, 42px);
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-align: center;
+  display: grid;
+  place-items: center;
+}
+
+.toten-cpf-display.invalid {
+  border-color: rgba(239,68,68,.34);
+  background: rgba(239,68,68,.10);
+  color: #fecaca;
+}
+
+.toten-cpf-display.valid {
+  border-color: rgba(34,197,94,.30);
+  background: rgba(34,197,94,.10);
+  color: #bbf7d0;
+}
+
+.toten-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.toten-key {
+  min-height: 78px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 22px;
+  background: rgba(255,255,255,.055);
+  color: var(--text);
+  font-size: 30px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: .18s ease;
+}
+
+.toten-key:hover,
+.toten-key:focus {
+  transform: translateY(-1px);
+  background: rgba(0,91,170,.16);
+  border-color: rgba(125,211,252,.22);
+  outline: none;
+}
+
+.toten-key.action {
+  font-size: 17px;
+  background: rgba(255,255,255,.035);
+  color: #dbeafe;
+}
+
+.toten-key.confirm {
+  grid-column: span 3;
+  background: linear-gradient(135deg, #005baa, #0086d1);
+  box-shadow: 0 12px 28px rgba(0,91,170,.24);
+}
+
+.toten-key.confirm:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.toten-result {
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  display: grid;
+  gap: 10px;
+}
+
+.toten-result .label {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  font-weight: 800;
+}
+
+.toten-result .value {
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.toten-result.success {
+  border-color: rgba(34,197,94,.24);
+  background: rgba(34,197,94,.08);
+}
+
+.toten-result.warning {
+  border-color: rgba(250,204,21,.24);
+  background: rgba(250,204,21,.08);
+}
+
+.toten-practice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 14px;
+}
+
+.toten-practice-card {
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(255,255,255,.035);
+  border: 1px solid rgba(255,255,255,.07);
+}
+
+.toten-practice-card .title {
+  font-weight: 900;
+  margin-bottom: 6px;
+}
+
+.toten-practice-card .desc {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.toten-checkin-list {
+  display: grid;
+  gap: 10px;
+}
+
+.toten-checkin-item {
+  display: grid;
+  grid-template-columns: auto minmax(0,1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 13px 14px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.035);
+  border: 1px solid rgba(255,255,255,.07);
+}
+
+.toten-checkin-badge {
+  width: 46px;
+  height: 46px;
+  border-radius: 15px;
+  display: grid;
+  place-items: center;
+  background: rgba(56,189,248,.14);
+  border: 1px solid rgba(56,189,248,.22);
+  font-weight: 900;
+}
+
+.toten-checkin-name {
+  font-weight: 900;
+  margin-bottom: 4px;
+}
+
+.toten-checkin-meta {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+@media (max-width: 1180px) {
+  .toten-hero-grid,
+  .toten-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .toten-practice-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .toten-screen {
+    min-height: auto;
+    padding: 18px;
+  }
+
+  .toten-key {
+    min-height: 66px;
+  }
+}
+
+
+/* ===== MELHORIA UX TOTEN FULLSCREEN ===== */
+.toten-open-btn {
+  width: 100%;
+  min-height: 190px;
+  border-radius: 30px;
+  border: 1px solid rgba(125,211,252,.24);
+  cursor: pointer;
+  padding: 28px;
+  background:
+    radial-gradient(circle at top right, rgba(49,183,255,.20), transparent 32%),
+    linear-gradient(135deg, rgba(0,91,170,.28), rgba(0,134,209,.18));
+  color: var(--text);
+  display: grid;
+  gap: 14px;
+  text-align: left;
+  box-shadow: var(--shadow);
+  transition: .2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.toten-open-btn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(250,204,21,.34);
+}
+
+.toten-open-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-120%);
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,.08), transparent);
+  animation: callTvSweep 5s linear infinite;
+}
+
+.toten-open-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 24px;
+  display: grid;
+  place-items: center;
+  font-size: 36px;
+  background: rgba(255,255,255,.10);
+  border: 1px solid rgba(255,255,255,.14);
+}
+
+.toten-fullscreen-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 160;
+  display: none;
+  background:
+    radial-gradient(circle at top left, rgba(0,91,170,.26), transparent 30%),
+    linear-gradient(145deg, #03101f, #06192f 50%, #082642);
+}
+
+.toten-fullscreen-modal.open {
+  display: block;
+}
+
+.toten-fullscreen-stage {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+.toten-fullscreen-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 22px 28px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  background: rgba(3,12,24,.58);
+  backdrop-filter: blur(16px);
+}
+
+.toten-fullscreen-body {
+  display: grid;
+  place-items: center;
+  padding: 26px;
+}
+
+.toten-fullscreen-panel {
+  width: min(860px, 100%);
+  border-radius: 36px;
+  padding: clamp(24px, 4vw, 42px);
+  background: rgba(10,18,32,.86);
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 30px 80px rgba(0,0,0,.34);
+  display: grid;
+  gap: 24px;
+}
+
+.toten-question-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 16px;
+}
+
+.toten-question-btn {
+  min-height: 130px;
+  border-radius: 26px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.05);
+  color: var(--text);
+  cursor: pointer;
+  padding: 24px;
+  text-align: left;
+  display: grid;
+  gap: 10px;
+  transition: .2s ease;
+}
+
+.toten-question-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(0,91,170,.12);
+  border-color: rgba(125,211,252,.24);
+}
+
+.toten-question-btn.preferential:hover {
+  border-color: rgba(250,204,21,.34);
+  background: rgba(250,204,21,.10);
+}
+
+.toten-question-title {
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.toten-question-desc {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+@media (max-width: 760px) {
+  .toten-question-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ===== CORREÇÃO UX TOTEM FINAL ===== */
+.toten-fullscreen-modal.open{display:block!important}
+.toten-fullscreen-modal{overflow:hidden!important;background:radial-gradient(circle at top right,rgba(0,91,170,.20),transparent 30%),linear-gradient(135deg,#020b17,#04162b 52%,#06223f)!important}
+.toten-fullscreen-stage{height:100vh!important;min-height:100vh!important;display:grid!important;grid-template-rows:auto 1fr auto!important;overflow:hidden!important}
+.toten-fullscreen-top{min-height:70px!important;padding:14px 24px!important}
+.toten-fullscreen-body{display:block!important;padding:20px 24px!important;overflow:auto!important}
+.toten-fullscreen-panel{width:min(1180px,100%)!important;max-width:min(1180px,calc(100vw - 48px))!important;margin:0 auto!important;padding:24px!important;border-radius:30px!important;background:rgba(5,17,34,.92)!important;border:1px solid rgba(96,165,250,.18)!important;box-shadow:0 28px 72px rgba(0,0,0,.36)!important;display:grid!important;grid-template-columns:minmax(0,1.05fr) minmax(320px,.72fr)!important;grid-template-areas:"cpf cpf" "head help" "keypad help" "continue status"!important;gap:18px 24px!important;align-items:start!important;overflow:visible!important}
+#toten-fullscreen-cpf{grid-area:cpf!important;width:100%!important;max-width:100%!important;min-height:150px!important;margin:0!important;padding:22px 28px 48px!important;border-radius:24px!important;background:linear-gradient(180deg,#fff,#eef6ff)!important;color:#020817!important;border:2px solid rgba(96,165,250,.55)!important;box-shadow:0 0 0 5px rgba(37,99,235,.12),0 18px 44px rgba(0,0,0,.28),inset 0 -1px 0 rgba(15,23,42,.10)!important;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace!important;font-size:clamp(46px,6.8vw,86px)!important;line-height:1!important;letter-spacing:-.04em!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;font-weight:950!important;text-shadow:none!important;position:relative!important}
+#toten-fullscreen-cpf::after{content:"Digite os números do seu CPF";position:absolute;left:16px;right:16px;bottom:18px;font-family:Inter,system-ui,sans-serif;font-size:clamp(16px,1.5vw,24px);font-weight:850;letter-spacing:0;color:#0758c9;text-align:center}
+#toten-fullscreen-cpf.valid{border-color:rgba(34,197,94,.75)!important;box-shadow:0 0 0 5px rgba(34,197,94,.14),0 18px 44px rgba(0,0,0,.28)!important}
+#toten-fullscreen-cpf.invalid{border-color:rgba(239,68,68,.75)!important;box-shadow:0 0 0 5px rgba(239,68,68,.14),0 18px 44px rgba(0,0,0,.28)!important}
+.toten-screen-head{grid-area:head!important;min-height:auto!important;margin:0!important;padding:14px 0 0!important;display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;gap:16px!important;align-items:center!important;text-align:left!important;justify-content:start!important}
+.toten-screen-head .toten-screen-icon{width:70px!important;height:70px!important;border-radius:22px!important}
+.toten-screen-head h3{margin:0 0 6px!important;font-size:clamp(28px,3vw,42px)!important;line-height:1.05!important}
+.toten-screen-head p{margin:0!important;font-size:clamp(15px,1.35vw,19px)!important;color:#dbeafe!important}
+.toten-fullscreen-panel>.small{display:none!important}
+#toten-fullscreen-keypad{grid-area:keypad!important;width:100%!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important;margin:0!important}
+#toten-fullscreen-keypad .toten-key{min-width:0!important;min-height:clamp(72px,8vh,104px)!important;border-radius:22px!important;border:1px solid rgba(96,165,250,.18)!important;background:linear-gradient(180deg,rgba(20,39,66,.96),rgba(10,28,52,.96))!important;color:#fff!important;font-size:clamp(34px,4.2vw,58px)!important;font-weight:950!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 12px 26px rgba(0,0,0,.18)!important}
+#toten-fullscreen-keypad .toten-key.action{font-size:clamp(15px,1.45vw,21px)!important;font-weight:900!important}
+#toten-fullscreen-keypad [data-fullscreen-action="clear"]{background:linear-gradient(135deg,#dc2626,#b91c1c)!important;border-color:rgba(248,113,113,.35)!important}
+#toten-fullscreen-keypad [data-fullscreen-action="backspace"]{background:linear-gradient(135deg,#0068d8,#004eb5)!important;border-color:rgba(96,165,250,.35)!important}
+#toten-next-step-btn{grid-area:continue!important;width:100%!important;min-height:90px!important;margin:0!important;border-radius:22px!important;background:linear-gradient(135deg,#0b74ff,#0056d6)!important;border:1px solid rgba(96,165,250,.35)!important;box-shadow:0 18px 38px rgba(0,91,170,.30)!important;color:white!important;font-size:clamp(25px,3vw,38px)!important;font-weight:950!important}
+#toten-next-step-btn::after{content:" ›"}
+#toten-fullscreen-result{grid-area:status!important;align-self:stretch!important;min-height:90px!important;margin:0!important;padding:18px 22px!important;border-radius:22px!important;background:linear-gradient(145deg,rgba(12,36,66,.86),rgba(5,22,44,.78))!important;border:1px solid rgba(96,165,250,.18)!important;display:grid!important;align-content:center!important}
+#toten-fullscreen-result .label{color:#bfdbfe!important;font-size:12px!important;letter-spacing:.12em!important}
+#toten-fullscreen-result .value{color:#fff!important;font-size:clamp(22px,2vw,30px)!important;font-weight:950!important}
+#toten-fullscreen-result .small{color:#cfe5ff!important;font-size:14px!important}
+.toten-fullscreen-panel::after{grid-area:help;content:"Como funciona?\A\A1  Digite seu CPF no teclado ao lado.\A\A2  Confira os números informados.\A\A3  Pressione “Continuar” para confirmar.\A\A🔒 Seus dados estão seguros.\AUtilizamos seus dados apenas para identificar seu atendimento.";white-space:pre-line;align-self:stretch;padding:24px 28px;border-radius:24px;background:linear-gradient(145deg,rgba(12,36,66,.78),rgba(5,22,44,.74));border:1px solid rgba(96,165,250,.18);color:#f8fbff;font-size:clamp(16px,1.45vw,21px);line-height:1.5;font-weight:650}
+#toten-preferential-step{display:none;position:fixed!important;inset:0!important;z-index:500!important;width:auto!important;height:auto!important;margin:0!important;padding:22px!important;background:rgba(2,8,18,.72)!important;backdrop-filter:blur(12px)!important;border:0!important;box-shadow:none!important;align-items:center!important;justify-content:center!important}
+#toten-preferential-step.open{display:flex!important}
+#toten-preferential-step>.toten-screen-head{position:absolute;top:calc(50% - 250px);left:50%;transform:translateX(-50%);width:min(980px,calc(100vw - 44px));min-height:auto!important;padding:28px 28px 8px!important;background:rgba(4,18,35,.98);border-radius:28px 28px 0 0;border:1px solid rgba(96,165,250,.20);border-bottom:0;justify-content:center!important;text-align:center!important}
+#toten-preferential-step>.toten-question-grid{width:min(980px,calc(100vw - 44px))!important;padding:170px 28px 28px!important;border-radius:28px!important;background:rgba(4,18,35,.98);border:1px solid rgba(96,165,250,.20);box-shadow:0 32px 90px rgba(0,0,0,.46);display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:18px!important}
+.toten-question-btn{min-height:190px!important;border-radius:26px!important;padding:28px!important}
+.toten-question-title{font-size:clamp(30px,3vw,44px)!important}
+.toten-question-desc{font-size:clamp(16px,1.35vw,21px)!important}
+@media(max-width:980px),(max-height:760px){.toten-fullscreen-stage{overflow:auto!important}.toten-fullscreen-body{overflow:visible!important}.toten-fullscreen-panel{max-height:none!important;grid-template-columns:1fr!important;grid-template-areas:"cpf" "head" "keypad" "continue" "status"!important}.toten-fullscreen-panel::after{display:none!important}#toten-fullscreen-cpf{min-height:128px!important;font-size:clamp(38px,9vw,62px)!important;padding-left:14px!important;padding-right:14px!important}#toten-fullscreen-keypad .toten-key{min-height:70px!important}#toten-preferential-step>.toten-screen-head{top:calc(50% - 300px)}#toten-preferential-step>.toten-question-grid{grid-template-columns:1fr!important}}
+
+</style>
+<style id="toten-final-fix-style">
+.toten-fullscreen-modal{position:fixed;inset:0;z-index:9999;display:none;background:linear-gradient(135deg,#020b17,#04162b 55%,#06223f);color:#f8fbff}
+.toten-fullscreen-modal.open{display:block!important}
+.toten-fullscreen-stage{height:100vh;display:grid;grid-template-rows:auto 1fr auto;overflow:hidden}
+.toten-fullscreen-top{padding:14px 24px;display:flex;justify-content:space-between;align-items:center;background:rgba(2,13,27,.82);border-bottom:1px solid rgba(96,165,250,.18)}
+.toten-fullscreen-body{padding:20px 24px;overflow:auto}
+.toten-fullscreen-panel{width:min(1180px,100%);margin:0 auto;padding:24px;border-radius:30px;background:rgba(5,17,34,.92);border:1px solid rgba(96,165,250,.18);box-shadow:0 28px 72px rgba(0,0,0,.36);display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.72fr);grid-template-areas:"cpf cpf" "head help" "keypad help" "continue status";gap:18px 24px;position:relative}
+#toten-fullscreen-cpf{grid-area:cpf;width:100%;min-height:150px;padding:22px 28px 48px;border-radius:24px;background:linear-gradient(180deg,#fff,#eef6ff);color:#020817;border:2px solid rgba(96,165,250,.55);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:clamp(46px,6.8vw,86px);letter-spacing:-.04em;white-space:nowrap;display:flex;align-items:center;justify-content:center;font-weight:950;position:relative;box-shadow:0 0 0 5px rgba(37,99,235,.12),0 18px 44px rgba(0,0,0,.28)}
+#toten-fullscreen-cpf::after{content:"Digite os números do seu CPF";position:absolute;left:16px;right:16px;bottom:18px;font-family:Inter,system-ui,sans-serif;font-size:clamp(16px,1.5vw,24px);font-weight:850;color:#0758c9;text-align:center;letter-spacing:0}
+#toten-fullscreen-cpf.valid{border-color:rgba(34,197,94,.75)}
+#toten-fullscreen-cpf.invalid{border-color:rgba(239,68,68,.75)}
+.toten-screen-head{grid-area:head;display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center;text-align:left}
+.toten-screen-icon{width:70px;height:70px;border-radius:22px;display:grid;place-items:center;background:linear-gradient(135deg,#0069d9,#0052b8);font-size:32px}
+.toten-screen-head h3{margin:0 0 6px;font-size:clamp(28px,3vw,42px);line-height:1.05}
+.toten-screen-head p{margin:0;font-size:clamp(15px,1.35vw,19px);color:#dbeafe}
+#toten-fullscreen-keypad{grid-area:keypad;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+#toten-fullscreen-keypad .toten-key{min-height:clamp(72px,8vh,104px);border-radius:22px;border:1px solid rgba(96,165,250,.18);background:linear-gradient(180deg,rgba(20,39,66,.96),rgba(10,28,52,.96));color:#fff;font-size:clamp(34px,4.2vw,58px);font-weight:950;cursor:pointer}
+#toten-fullscreen-keypad .toten-key.action{font-size:clamp(15px,1.45vw,21px)}
+#toten-fullscreen-keypad [data-fullscreen-action="clear"]{background:linear-gradient(135deg,#dc2626,#b91c1c)}
+#toten-fullscreen-keypad [data-fullscreen-action="backspace"]{background:linear-gradient(135deg,#0068d8,#004eb5)}
+#toten-next-step-btn{grid-area:continue;min-height:90px;border-radius:22px;background:linear-gradient(135deg,#0b74ff,#0056d6);color:white;font-size:clamp(25px,3vw,38px);font-weight:950;border:1px solid rgba(96,165,250,.35);cursor:pointer}
+#toten-next-step-btn:disabled{opacity:.55;cursor:not-allowed}
+#toten-next-step-btn::after{content:" ›"}
+#toten-fullscreen-result{grid-area:status;min-height:90px;padding:18px 22px;border-radius:22px;background:linear-gradient(145deg,rgba(12,36,66,.86),rgba(5,22,44,.78));border:1px solid rgba(96,165,250,.18);display:grid;align-content:center}
+#toten-fullscreen-result .label{color:#bfdbfe;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+#toten-fullscreen-result .value{font-size:clamp(22px,2vw,30px);font-weight:950}
+#toten-fullscreen-result .small{color:#cfe5ff;font-size:14px}
+.toten-fullscreen-panel::after{grid-area:help;content:"Como funciona?\A\A1  Digite seu CPF no teclado ao lado.\A\A2  Confira os números informados.\A\A3  Pressione “Continuar” para confirmar.\A\A🔒 Seus dados estão seguros.\AUtilizamos seus dados apenas para identificar seu atendimento.";white-space:pre-line;padding:24px 28px;border-radius:24px;background:linear-gradient(145deg,rgba(12,36,66,.78),rgba(5,22,44,.74));border:1px solid rgba(96,165,250,.18);font-size:clamp(16px,1.45vw,21px);line-height:1.5}
+.toten-preferential-popup{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;background:rgba(2,8,18,.74);backdrop-filter:blur(12px);padding:22px}
+.toten-preferential-popup.open{display:flex!important}
+.toten-preferential-card{width:min(980px,calc(100vw - 44px));padding:28px;border-radius:28px;background:rgba(4,18,35,.98);border:1px solid rgba(96,165,250,.22);box-shadow:0 32px 90px rgba(0,0,0,.46)}
+.toten-preferential-card .toten-screen-head{margin-bottom:22px;justify-content:center;text-align:center}
+.toten-question-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.toten-question-btn{min-height:190px;border-radius:26px;padding:28px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#fff;text-align:left;cursor:pointer}
+.toten-question-btn.preferential{background:rgba(250,204,21,.10)}
+.toten-question-title{font-size:clamp(30px,3vw,44px);font-weight:950}
+.toten-question-desc{font-size:clamp(16px,1.35vw,21px);color:#cbd5e1;margin-top:10px}
+.call-display-footer{padding:10px 20px;text-align:center;background:rgba(2,13,27,.82);color:#cbd5e1}
+@media(max-width:980px){.toten-fullscreen-panel{grid-template-columns:1fr;grid-template-areas:"cpf" "head" "keypad" "continue" "status"}.toten-fullscreen-panel::after{display:none}.toten-question-grid{grid-template-columns:1fr}#toten-fullscreen-cpf{font-size:clamp(38px,9vw,62px);padding-left:14px;padding-right:14px}}
+</style>
+<style id="toten-caller-priority-rules-style">
+.call-center-queue-item.is-preferential,.queue-item.is-preferential,.toten-priority-row{border-left:6px solid #facc15!important;background:linear-gradient(90deg,rgba(250,204,21,.16),rgba(255,255,255,.035))!important;box-shadow:inset 0 0 0 1px rgba(250,204,21,.10),0 12px 28px rgba(0,0,0,.14)!important}
+.call-badge-preferential,.toten-badge-priority{color:#fff7cc!important;background:rgba(250,204,21,.18)!important;border-color:rgba(250,204,21,.36)!important;font-weight:950!important;text-transform:uppercase}
+.call-badge-toten{color:#dbeafe!important;background:rgba(59,130,246,.16)!important;border-color:rgba(96,165,250,.28)!important;font-weight:800!important}
+</style>
+<style id="exames-nao-realizado-filter-style">
+/* Botão/filtro Não Realizado - Exames Ocupacionais */
+.exam-filter-btn[data-exam-filter="nao-realizado"],
+[data-exam-filter="nao-realizado"],
+button[data-filter-exames="nao-realizado"],
+button[data-filter="nao-realizado"] {
+  border-color: rgba(239,68,68,.26) !important;
+}
+.exam-filter-btn[data-exam-filter="nao-realizado"].active,
+[data-exam-filter="nao-realizado"].active,
+button[data-filter-exames="nao-realizado"].active,
+button[data-filter="nao-realizado"].active {
+  background: rgba(239,68,68,.16) !important;
+  border-color: rgba(239,68,68,.34) !important;
+  color: #fecaca !important;
+}
+</style>
+<style id="exam-filter-order-style">
+.exam-filter-group,
+.filters-row,
+.exam-filters {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+</style>
+<style id="totem-cpf-keypad-size-fix">
+/* Correção específica da aba Totem de Atendimento:
+   impede que os números do CPF/teclado encolham ao serem selecionados. */
+#totem-cpf,
+#totem-cpf-input,
+input[name="totem-cpf"],
+input[name="cpf-totem"],
+.cpf-totem-input {
+  min-height: 56px !important;
+  font-size: 22px !important;
+  line-height: 1.2 !important;
+  letter-spacing: .08em !important;
+  font-variant-numeric: tabular-nums !important;
+  flex-shrink: 0 !important;
+}
+
+#totem-cpf:focus,
+#totem-cpf-input:focus,
+input[name="totem-cpf"]:focus,
+input[name="cpf-totem"]:focus,
+.cpf-totem-input:focus {
+  transform: none !important;
+  min-height: 56px !important;
+  font-size: 22px !important;
+}
+
+.totem-keypad button,
+.totem-cpf-keypad button,
+.cpf-keypad button,
+button[data-cpf-key],
+button[data-totem-key] {
+  min-width: 64px !important;
+  min-height: 58px !important;
+  flex: 0 0 64px !important;
+  font-size: 22px !important;
+  line-height: 1 !important;
+  transform-origin: center !important;
+  white-space: nowrap !important;
+}
+
+.totem-keypad button:active,
+.totem-keypad button:focus,
+.totem-cpf-keypad button:active,
+.totem-cpf-keypad button:focus,
+.cpf-keypad button:active,
+.cpf-keypad button:focus,
+button[data-cpf-key]:active,
+button[data-cpf-key]:focus,
+button[data-totem-key]:active,
+button[data-totem-key]:focus {
+  transform: none !important;
+  min-width: 64px !important;
+  min-height: 58px !important;
+  flex-basis: 64px !important;
+  font-size: 22px !important;
+}
+</style>
+<style id="totem-cpf-layout-fix">
+/* Layout específico da aba Totem de Atendimento:
+   visor do CPF em cima e teclado numérico abaixo.
+   Não altera a tela/modal "Abrir Tela do Totem". */
+#totem-cpf-panel,
+#totem-atendimento-panel,
+.totem-attendance-panel,
+.totem-cpf-panel,
+.card:has(#totem-cpf),
+.card:has(#totem-cpf-input),
+.card:has(.cpf-totem-input) {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+}
+
+#totem-cpf,
+#totem-cpf-input,
+input[name="totem-cpf"],
+input[name="cpf-totem"],
+.cpf-totem-input {
+  order: 1 !important;
+  width: 100% !important;
+  margin-bottom: 16px !important;
+  flex: 0 0 auto !important;
+}
+
+.totem-keypad,
+.totem-cpf-keypad,
+.cpf-keypad,
+[data-totem-keypad],
+[data-cpf-keypad] {
+  order: 2 !important;
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(64px, 1fr)) !important;
+  gap: 10px !important;
+  align-items: stretch !important;
+}
+
+.totem-keypad button,
+.totem-cpf-keypad button,
+.cpf-keypad button,
+button[data-cpf-key],
+button[data-totem-key] {
+  width: 100% !important;
+}
 </style>
 </head>
 <body>
@@ -2600,15 +3973,17 @@
 </div>
 </div>
 <nav class="nav">
-<button class="nav-btn active" data-page="dashboard"><span class="left"><span>📊</span><span>Dashboard</span></span><span>›</span></button>
-<button class="nav-btn" data-page="recepcao"><span class="left"><span>🧾</span><span>Recepção</span></span><span>›</span></button>
-<button class="nav-btn" data-page="exames"><span class="left"><span>🔬</span><span>Exames Ocupacionais</span></span><span>›</span></button>
-<button class="nav-btn" data-page="triagem"><span class="left"><span>🚦</span><span>Triagem</span></span><span>›</span></button>
-<button class="nav-btn" data-page="medico"><span class="left"><span>👨‍⚕️</span><span>Médico do Trabalho</span></span><span>›</span></button>
-<button class="nav-btn" data-page="acompanhamento"><span class="left"><span>🗂️</span><span>Acompanhamento</span></span><span>›</span></button>
-<button class="nav-btn" data-page="gestao-aso"><span class="left"><span>📋</span><span>Gestão de ASO e Exames</span></span><span>›</span></button>
-<button class="nav-btn" data-page="localizar-atendimento"><span class="left"><span>🔎</span><span>Localizar Atendimento</span></span><span>›</span></button>
-<button class="nav-btn" data-page="relatorios"><span class="left"><span>📑</span><span>Relatórios</span></span><span>›</span></button>
+<button class="nav-btn active" data-page="dashboard" type="button"><span class="left"><span>📊</span><span>Dashboard</span></span><span>›</span></button>
+<button class="nav-btn" data-page="recepcao" type="button"><span class="left"><span>🧾</span><span>Recepção</span></span><span>›</span></button>
+<button data-page="chamador" type="button"><span class="left">📣 <span>Chamador</span></span><span>›</span></button>
+<button data-page="toten" type="button"><span class="left">🖥️ <span>TOTEN de Atendimento</span></span><span>›</span></button>
+<button class="nav-btn" data-page="exames" type="button"><span class="left"><span>🔬</span><span>Exames Ocupacionais</span></span><span>›</span></button>
+<button class="nav-btn" data-page="triagem" type="button"><span class="left"><span>🚦</span><span>Triagem</span></span><span>›</span></button>
+<button class="nav-btn" data-page="medico" type="button"><span class="left"><span>👨‍⚕️</span><span>Médico do Trabalho</span></span><span>›</span></button>
+<button class="nav-btn" data-page="acompanhamento" type="button"><span class="left"><span>🗂️</span><span>Acompanhamento</span></span><span>›</span></button>
+<button class="nav-btn" data-page="gestao-aso" type="button"><span class="left"><span>📋</span><span>Gestão de ASO e Exames</span></span><span>›</span></button>
+<button class="nav-btn" data-page="localizar-atendimento" type="button"><span class="left"><span>🔎</span><span>Localizar Atendimento</span></span><span>›</span></button>
+<button class="nav-btn" data-page="relatorios" type="button"><span class="left"><span>📑</span><span>Relatórios</span></span><span>›</span></button>
 </nav>
 <div class="sidebar-footer">
         Cores de status:<br/>
@@ -2643,13 +4018,13 @@
 <div class="topbar-actions">
 <div class="topbar-search">
 <span>🔎</span>
-<input id="globalSearchInput" type="search" placeholder="Busca global por paciente, CPF, empresa, contrato, função ou obra">
+<input id="globalSearchInput" placeholder="Busca global por paciente, CPF, empresa, contrato, função ou obra" type="search"/>
 <button class="btn btn-ghost topbar-search-btn" id="btnOpenGlobalSearch" type="button">Abrir</button>
 </div>
-<button class="btn btn-primary" id="btnNovoAtendimento">+ Novo Atendimento</button>
-<button class="btn btn-soft hidden" id="btnExportBackup">Exportar Backup</button>
-<button class="btn btn-soft hidden" id="btnImportBackup">Importar Backup</button>
-<button class="btn btn-ghost hidden" id="btnRestoreBaseTop">Restaurar Base</button>
+<button class="btn btn-primary" id="btnNovoAtendimento" type="button">+ Novo Atendimento</button>
+<button class="btn btn-soft hidden" id="btnExportBackup" type="button">Exportar Backup</button>
+<button class="btn btn-soft hidden" id="btnImportBackup" type="button">Importar Backup</button>
+<button class="btn btn-ghost hidden" id="btnRestoreBaseTop" type="button">Restaurar Base</button>
 </div>
 </header>
 <section class="content" id="page-dashboard"></section>
@@ -2663,6 +4038,287 @@
 <section class="content hidden" id="page-relatorios"></section>
 </main>
 </div>
+<section class="content hidden page-fade" id="page-toten">
+<div class="toten-shell">
+<div class="toten-hero">
+<div class="toten-hero-grid">
+<div>
+<h3 class="toten-title">TOTEN de Atendimento</h3>
+<p class="toten-subtitle">
+            Tela touch para check-in por CPF na recepção. O sistema valida o CPF, identifica pacientes cadastrados e envia automaticamente para a fila do Chamador.
+          </p>
+<div class="dashboard-hero-chips">
+<span class="chip">🔐 Validador de CPF</span>
+<span class="chip">🖥️ Tela touch</span>
+<span class="chip">📣 Integração com Chamador</span>
+<span class="chip">⭐ Preferencial quando cadastrado</span>
+</div>
+</div>
+<div class="sticky-note">
+          Melhor prática: exibir nome apenas quando houver cadastro confirmado. Para não cadastrados, exibir CPF mascarado e registrar entrada mínima na fila.
+        </div>
+</div>
+</div>
+<div class="card" style="margin-bottom:18px;">
+<button class="toten-open-btn" id="open-toten-fullscreen-btn" type="button">
+<div class="toten-open-icon">🖥️</div>
+<div>
+<div class="call-screen-open-title">Abrir Tela do TOTEN</div>
+<div class="call-screen-open-subtitle">
+        Abre uma tela touch dedicada para autoatendimento do paciente na recepção com CPF, validação automática e integração ao Chamador.
+      </div>
+</div>
+<div class="call-screen-status-line">
+<span class="call-badge">Tela touch</span>
+<span class="call-badge">Check-in automático</span>
+<span class="call-badge call-badge-preferential">Preferencial</span>
+</div>
+</button>
+</div>
+<div class="toten-layout">
+<div class="toten-screen">
+<div class="toten-screen-head">
+<div class="toten-screen-icon">🖥️</div>
+<div>
+<h3>Informe seu CPF</h3>
+<p>Digite somente números. Seus dados serão usados para localizar seu atendimento.</p>
+</div>
+</div>
+<div class="toten-cpf-display" id="toten-cpf-display">___.___.___-__</div>
+<div aria-label="Teclado numérico do totem" class="toten-keypad">
+<button class="toten-key" data-toten-key="1" type="button">1</button>
+<button class="toten-key" data-toten-key="2" type="button">2</button>
+<button class="toten-key" data-toten-key="3" type="button">3</button>
+<button class="toten-key" data-toten-key="4" type="button">4</button>
+<button class="toten-key" data-toten-key="5" type="button">5</button>
+<button class="toten-key" data-toten-key="6" type="button">6</button>
+<button class="toten-key" data-toten-key="7" type="button">7</button>
+<button class="toten-key" data-toten-key="8" type="button">8</button>
+<button class="toten-key" data-toten-key="9" type="button">9</button>
+<button class="toten-key action" data-toten-action="clear" type="button">Limpar</button>
+<button class="toten-key" data-toten-key="0" type="button">0</button>
+<button class="toten-key action" data-toten-action="backspace" type="button">Apagar</button>
+<button class="toten-key confirm" disabled="" id="toten-confirm-btn" type="button">Confirmar Check-in</button>
+</div>
+<div class="toten-result" id="toten-result">
+<div class="label">Status</div>
+<div class="value">Aguardando CPF.</div>
+<div class="small">Após confirmar, o paciente será enviado para a fila do Chamador.</div>
+</div>
+</div>
+<div class="call-center-stack">
+<div class="card">
+<div class="call-center-card-title">
+<div>
+<h3>Boas práticas aplicadas</h3>
+<div class="small">Segurança, operação e experiência do usuário na recepção.</div>
+</div>
+</div>
+<div class="toten-practice-grid">
+<div class="toten-practice-card">
+<div class="title">CPF validado</div>
+<div class="desc">O sistema bloqueia CPFs com dígitos inválidos, sequências repetidas e erros de máscara.</div>
+</div>
+<div class="toten-practice-card">
+<div class="title">Identificação segura</div>
+<div class="desc">Paciente cadastrado exibe o nome. Caso contrário, exibe apenas CPF mascarado.</div>
+</div>
+<div class="toten-practice-card">
+<div class="title">Fila automática</div>
+<div class="desc">O check-in envia o paciente para a fila do Chamador, priorizando a recepção selecionada pela operação.</div>
+</div>
+<div class="toten-practice-card">
+<div class="title">Experiência touch</div>
+<div class="desc">Botões grandes, alto contraste e mensagens claras para uso em tela de recepção.</div>
+</div>
+</div>
+</div>
+<div class="card">
+<div class="call-center-card-title">
+<div>
+<h3>Cadastros simulados</h3>
+<div class="small">Base local de exemplo. Futuramente pode ser ligada ao banco de dados real.</div>
+</div>
+</div>
+<div class="table-wrap">
+<table style="min-width:720px">
+<thead>
+<tr>
+<th>CPF</th>
+<th>Paciente</th>
+<th>Empresa</th>
+<th>Tipo</th>
+<th>Preferencial</th>
+</tr>
+</thead>
+<tbody id="toten-patient-table"></tbody>
+</table>
+</div>
+</div>
+<div class="card">
+<div class="call-center-card-title">
+<div>
+<h3>Últimos check-ins do TOTEN</h3>
+<div class="small">Entradas realizadas por CPF e enviadas ao Chamador.</div>
+</div>
+<button class="btn btn-ghost" id="toten-clear-checkins" type="button">Limpar</button>
+</div>
+<div class="toten-checkin-list" id="toten-checkin-list"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="content hidden page-fade" id="page-chamador">
+<div class="call-center-shell">
+<div class="call-center-hero">
+<div class="call-center-hero-grid">
+<div>
+<h3 class="call-center-title">Chamador de Atendimento Ocupacional</h3>
+<p class="call-center-subtitle">
+            Gestão integrada da fila, chamada por voz, painel TV, salas, atendimento preferencial e histórico operacional.
+          </p>
+<div class="dashboard-hero-chips">
+<span class="chip chip-flow-aso">📋 ASO</span>
+<span class="chip chip-flow-exames">🧪 Exames Ocupacionais</span>
+<span class="chip">⭐ Atendimento Preferencial</span>
+<span class="chip">🔊 Chamada por voz</span>
+</div>
+</div>
+<div class="call-center-kpis">
+<div class="call-center-kpi">
+<div class="label">Aguardando</div>
+<div class="value" id="caller-kpi-waiting">0</div>
+</div>
+<div class="call-center-kpi">
+<div class="label">Preferenciais</div>
+<div class="value" id="caller-kpi-preferential">0</div>
+</div>
+<div class="call-center-kpi">
+<div class="label">Chamados hoje</div>
+<div class="value" id="caller-kpi-called">0</div>
+</div>
+</div>
+</div>
+</div>
+<div class="call-center-grid">
+<div class="call-center-stack">
+<div class="card">
+<div class="call-center-card-title">
+<div>
+<h3>Nova entrada na fila</h3>
+<div class="small">Inclua pacientes na fila do chamador ou use os dados simulados do atendimento ocupacional.</div>
+</div>
+<button class="btn btn-ghost" id="caller-seed-btn" type="button">Carregar fila exemplo</button>
+</div>
+<div class="call-center-form">
+<div class="field">
+<label>Paciente</label>
+<input id="caller-patient-name" placeholder="Nome do paciente" type="text">
+</input></div>
+<div class="field">
+<label>Empresa</label>
+<input id="caller-company" placeholder="Empresa / contrato" type="text"/>
+</div>
+<div class="field">
+<label>Tipo de atendimento</label>
+<select id="caller-service-type">
+<option value="ASO + Exames Ocupacionais">ASO + Exames Ocupacionais</option>
+<option value="ASO">ASO</option>
+<option value="Exames Ocupacionais">Exames Ocupacionais</option>
+</select>
+</div>
+<div class="field">
+<label>Preferencial</label>
+<select id="caller-preferential">
+<option value="Não">Não</option>
+<option value="Sim">Sim</option>
+</select>
+</div>
+<button class="btn btn-primary" id="caller-add-btn" type="button">Adicionar</button>
+</div>
+</div>
+<div class="card">
+<div class="call-center-card-title">
+<div>
+<h3>Fila de atendimento</h3>
+<div class="small">Preferenciais aparecem com destaque e prioridade operacional.</div>
+</div>
+<div class="call-center-toolbar">
+<div class="field" style="min-width:220px">
+<label>Sala padrão para chamada</label>
+<select id="caller-default-room">
+<option>Recepção Térreo 1</option>
+<option>Recepção Térreo 2</option>
+<option>Recepção Térreo 3</option>
+<option>Recepção Ocupacional 1</option>
+<option>Recepção Ocupacional 2</option>
+<option>Sala Triagem</option>
+<option>Sala Médico</option>
+<option>Sala Exames</option>
+<option>Sala Coleta</option>
+<option>Sala Audiometria</option>
+</select>
+</div>
+<button class="btn btn-success" id="caller-next-btn" type="button">Chamar próximo</button>
+</div>
+</div>
+<div class="call-center-queue" id="caller-queue-list"></div>
+</div>
+<div class="card">
+<div class="call-center-card-title">
+<div>
+<h3>Salas de atendimento</h3>
+<div class="small">Controle rápido da ocupação por sala.</div>
+</div>
+</div>
+<div class="call-center-room-grid" id="caller-rooms"></div>
+</div>
+</div>
+<div class="call-center-stack">
+<div class="card call-screen-open-card">
+<div class="call-center-card-title">
+<div>
+<h3>Tela de chamada</h3>
+<div class="small">Abra uma tela dedicada para exibir a chamada em monitor, TV ou recepção.</div>
+</div>
+<button class="btn btn-ghost" id="caller-repeat-btn" type="button">Rechamar</button>
+<button class="btn btn-warning" id="btn-voltar-fila" type="button">Voltar a Fila</button>
+</div>
+<button class="call-screen-open-btn" id="caller-open-display-btn" type="button">
+<div class="call-screen-open-icon">📺</div>
+<div>
+<div class="call-screen-open-title">Abrir tela de chamada</div>
+<div class="call-screen-open-subtitle">
+        Exibe paciente chamado, sala de atendimento, tipo de atendimento, identificação preferencial e próximos da fila em uma tela limpa para operação.
+      </div>
+</div>
+<div class="call-screen-status-line" id="caller-screen-status">
+<span class="call-badge call-badge-room">Painel pronto</span>
+<span class="call-badge">Clique para abrir</span>
+</div>
+</button>
+<div class="call-tv-screen" id="caller-tv-screen" style="min-height: 210px;">
+<div class="call-tv-label">Resumo da última chamada</div>
+<div class="call-tv-patient call-tv-empty" id="caller-tv-patient">Nenhum paciente chamado ainda.</div>
+<div class="call-tv-room" id="caller-tv-room"></div>
+<div class="call-tv-meta" id="caller-tv-meta"></div>
+</div>
+</div>
+<div class="card">
+<div class="call-center-card-title">
+<div>
+<h3>Histórico de chamadas</h3>
+<div class="small">Registro local das chamadas realizadas no navegador.</div>
+</div>
+<button class="btn btn-ghost" id="caller-clear-history-btn" type="button">Limpar histórico</button>
+</div>
+<div class="call-center-history" id="caller-history"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
 <div class="modal" id="patientModal">
 <div class="modal-card">
 <div class="modal-head">
@@ -2670,7 +4326,7 @@
 <div class="small mono" id="modalPatientId"></div>
 <div id="modalPatientName" style="font-size:22px;font-weight:700"></div>
 </div>
-<button class="btn btn-ghost" onclick="closePatientModal()">Fechar</button>
+<button class="btn btn-ghost" onclick="closePatientModal()" type="button">Fechar</button>
 </div>
 <div class="modal-body" id="modalPatientBody"></div>
 </div>
@@ -2685,7 +4341,7 @@
 <div class="logo-sesi-img modal-logo">
 <img alt="Logo SESI Saúde" src="data:image/png;base64,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"/>
 </div>
-<button class="btn btn-ghost" onclick="closeNewModal()">Fechar</button>
+<button class="btn btn-ghost" onclick="closeNewModal()" type="button">Fechar</button>
 </div>
 <form class="modal-body" id="newAttendanceForm">
 <div class="form-grid">
@@ -2697,13 +4353,13 @@
 <select id="contratoNumeroSelect" name="contratoNumero"></select>
 </div>
 <div class="field"><label>Status do contrato</label>
-<input id="contratoStatusSelect" name="contratoStatus" readonly placeholder="Selecione um contrato"/>
+<input id="contratoStatusSelect" name="contratoStatus" placeholder="Selecione um contrato" readonly=""/>
 </div>
 <div class="field"><label>Status financeiro do contrato</label>
-<input id="contratoFinanceiroSelect" name="contratoStatusFinanceiro" readonly placeholder="Selecione um contrato"/>
+<input id="contratoFinanceiroSelect" name="contratoStatusFinanceiro" placeholder="Selecione um contrato" readonly=""/>
 </div>
 <div class="field"><label>Tipo de contrato</label>
-<input id="contratoTipoSelect" name="contratoTipo" readonly placeholder="Selecione um contrato"/>
+<input id="contratoTipoSelect" name="contratoTipo" placeholder="Selecione um contrato" readonly=""/>
 </div>
 <div class="field">
 <label>Resumo do contrato</label>
@@ -2721,21 +4377,21 @@
 <div class="field"><label>Data de atendimento</label><input name="dataAtendimento" type="date"/></div>
 <div class="field"><label>Telefone</label><input name="telefone"/></div>
 <div class="field"><label>Atendimento preferencial?</label>
-<select name="preferencial" id="preferencialSelect">
+<select id="preferencialSelect" name="preferencial">
 <option value="Não">Não</option>
 <option value="Sim">Sim</option>
 </select>
 </div>
-<div class="priority-alert-box" id="priorityPreviewBox" aria-live="polite">
-  <div class="priority-alert-title">⚠️ Atendimento preferencial identificado</div>
-  <div class="priority-alert-text">Boa prática: quando marcado como preferencial, o paciente aparecerá com selo amarelo de alta visibilidade e destaque lateral nas filas, buscas, relatórios e tela de chamada para facilitar a identificação rápida pelos usuários.</div>
+<div aria-live="polite" class="priority-alert-box" id="priorityPreviewBox">
+<div class="priority-alert-title">⚠️ Atendimento preferencial identificado</div>
+<div class="priority-alert-text">Boa prática: quando marcado como preferencial, o paciente aparecerá com selo amarelo de alta visibilidade e destaque lateral nas filas, buscas, relatórios e tela de chamada para facilitar a identificação rápida pelos usuários.</div>
 </div>
 <div class="field"><label>Setor</label><input name="setor"/></div>
 <div class="field"><label>Função</label><input name="funcao"/></div>
 <div class="field">
 <label class="toggle-field">
-  <input type="checkbox" id="obraFlag" name="obraFlag">
-  <span>Obra?</span>
+<input id="obraFlag" name="obraFlag" type="checkbox"/>
+<span>Obra?</span>
 </label>
 </div>
 <div class="field hidden" id="obraNomeField"><label>Nome da Obra</label><input name="obra" placeholder="Informe o nome da obra"/></div>
@@ -2792,7 +4448,7 @@
 <div class="small">Seleção de unidade</div>
 <div style="font-size:22px;font-weight:700">Escolha a unidade desejada</div>
 </div>
-<button class="btn btn-ghost" onclick="closeUnitModal()">Fechar</button>
+<button class="btn btn-ghost" onclick="closeUnitModal()" type="button">Fechar</button>
 </div>
 <div class="modal-body">
 <div class="sticky-note">Ao trocar a unidade, todo o dashboard, relatórios e cadastros passam a exibir os dados da unidade selecionada.</div>
@@ -2803,7 +4459,6 @@
 </div>
 </div>
 </div>
-
 <div class="modal dashboard-tv-modal" id="dashboardTvModal">
 <div class="modal-card">
 <div class="modal-head">
@@ -2812,14 +4467,13 @@
 <div style="font-size:22px;font-weight:700">Painel TV dos Indicadores</div>
 </div>
 <div style="display:flex;gap:10px;flex-wrap:wrap">
-<button class="btn btn-ghost" id="toggleDashboardTvBtn" onclick="toggleDashboardTvFullscreen()">Tela cheia</button>
-<button class="btn btn-ghost" onclick="closeDashboardTvModal()">Fechar</button>
+<button class="btn btn-ghost" id="toggleDashboardTvBtn" onclick="toggleDashboardTvFullscreen()" type="button">Tela cheia</button>
+<button class="btn btn-ghost" onclick="closeDashboardTvModal()" type="button">Fechar</button>
 </div>
 </div>
 <div class="modal-body dashboard-tv-body" id="dashboardTvBody"></div>
 </div>
 </div>
-
 <div class="modal" id="globalSearchModal">
 <div class="modal-card" style="width:min(1120px, 100%)">
 <div class="modal-head">
@@ -2827,16 +4481,16 @@
 <div class="small">Busca global</div>
 <div style="font-size:22px;font-weight:700">Central de pesquisa do atendimento</div>
 </div>
-<button class="btn btn-ghost" onclick="closeGlobalSearchModal()">Fechar</button>
+<button class="btn btn-ghost" onclick="closeGlobalSearchModal()" type="button">Fechar</button>
 </div>
 <div class="modal-body">
 <div class="global-search-toolbar">
-<div class="search global-search-input"><span>🔎</span><input id="globalSearchModalInput" type="search" placeholder="Busque por paciente, CPF, ID, empresa, contrato, função, setor, obra ou CBO da obra"></div>
+<div class="search global-search-input"><span>🔎</span><input id="globalSearchModalInput" placeholder="Busque por paciente, CPF, ID, empresa, contrato, função, setor, obra ou CBO da obra" type="search"/></div>
 <div class="chips smart-filter-group">
-<button class="smart-filter active" type="button" data-global-filter="todos">Todos</button>
-<button class="smart-filter" type="button" data-global-filter="pendentes">Pendentes</button>
-<button class="smart-filter" type="button" data-global-filter="preferenciais">Preferenciais</button>
-<button class="smart-filter" type="button" data-global-filter="obra">Obra</button>
+<button class="smart-filter active" data-global-filter="todos" type="button">Todos</button>
+<button class="smart-filter" data-global-filter="pendentes" type="button">Pendentes</button>
+<button class="smart-filter" data-global-filter="preferenciais" type="button">Preferenciais</button>
+<button class="smart-filter" data-global-filter="obra" type="button">Obra</button>
 </div>
 </div>
 <div class="global-search-summary" id="globalSearchSummary">Nenhuma busca realizada.</div>
@@ -2844,10 +4498,8 @@
 </div>
 </div>
 </div>
-
-<input type="file" id="backupFileInput" accept="application/json" class="hidden" />
-<div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="true"></div>
-
+<input accept="application/json" class="hidden" id="backupFileInput" type="file">
+<div aria-atomic="true" aria-live="polite" class="toast-stack" id="toastStack"></div>
 <script>
     const STORAGE_KEY_PREFIX = 'sesi-fluxo-ocupacional-v7-clean';
     const UNIT_STORAGE_KEY = `${STORAGE_KEY_PREFIX}-selected-unit`;
@@ -3233,23 +4885,37 @@
       return tokens.every(token => blob.includes(token));
     }
 
-    function getQuickFilterFlags(patient) {
+    function getQuickFilterFlags(patient, { examKey = '', context = '' } = {}) {
+      const applicableExams = (patient.exames || [])
+        .filter(ex => ex.status !== 'Não se aplica')
+        .filter(ex => !examKey || ex.key === examKey);
+      const isExamesContext = context === 'exames';
+      const hasPendingExam = applicableExams.some(ex => ['Pendente', 'Em andamento', 'Bloqueado'].includes(ex.status));
+      const hasNotRealizedExam = applicableExams.some(ex => ex.status === 'Não realizado');
+      const hasNotReleasedExam = applicableExams.some(ex => !['Concluído', 'Exame liberado'].includes(ex.status));
       return {
         preferenciais: patient.preferencial === 'Sim' || isElderlyPriority(patient),
         semAso: !patient.asoCadastrado,
         obra: Boolean(sanitizeText(patient.obra)),
-        pendentes: pendingExamNames(patient).length > 0 || ['Recepção','Exames','Triagem','Médico'].includes(patient.etapa)
+        // Na aba Exames Ocupacionais, o botão “Não Realizado” deve listar
+        // somente exames com status exatamente “Não realizado”.
+        naoLiberado: isExamesContext ? hasNotRealizedExam : hasNotReleasedExam,
+        // Na aba Exames Ocupacionais, “Pendentes” não pode incluir “Não realizado”.
+        // Esses casos ficam exclusivamente no filtro “Não Realizado”.
+        pendentes: isExamesContext
+          ? hasPendingExam
+          : pendingExamNames(patient).length > 0 || ['Recepção','Exames','Triagem','Médico'].includes(patient.etapa)
       };
     }
 
-    function filterPatientsAdvanced(baseList, { term = '', flag = 'todos', examKey = '' } = {}) {
+    function filterPatientsAdvanced(baseList, { term = '', flag = 'todos', examKey = '', context = '' } = {}) {
       return baseList.filter(patient => {
         const matchesText = smartMatchText(patient, term);
-        const flags = getQuickFilterFlags(patient);
+        const flags = getQuickFilterFlags(patient, { examKey, context });
         const matchesFlag = flag === 'todos' ? true : Boolean(flags[flag]);
         const matchesExam = !examKey
           ? true
-          : patient.exames.some(ex => ex.key === examKey && ex.status !== 'Não se aplica' && ex.status !== 'Concluído');
+          : patient.exames.some(ex => ex.key === examKey && ex.status !== 'Não se aplica' && ex.status !== 'Concluído' && ex.status !== 'Exame liberado');
         return matchesText && matchesFlag && matchesExam;
       });
     }
@@ -4450,6 +6116,7 @@ function compareQueueOrder(a, b) {
                   <div class="call-actions">
                     <button class="btn btn-primary" onclick="callNextPatient('${room.key}')" ${hasActive ? 'disabled' : ''}>Chamar próximo</button>
                     <button class="btn btn-ghost" onclick="recallRoomPatient('${room.key}')" ${hasActive ? '' : 'disabled'}>Rechamar</button>
+<button class="btn btn-warning" id="btn-voltar-fila" type="button">Voltar a Fila</button>
                     <button class="btn btn-success" onclick="startRoomAttendance('${room.key}')" ${(hasActive && call?.status === 'Chamado') ? '' : 'disabled'}>Iniciar atendimento</button>
                     <button class="btn btn-warning" onclick="finalizeRoomAttendance('${room.key}')" ${hasActive ? '' : 'disabled'}>Finalizar atendimento</button>
                   </div>
@@ -5681,7 +7348,7 @@ function compareQueueOrder(a, b) {
       page.innerHTML = `
         <div class="card">
           <div class="filters">
-            <div class="search"><span>🔎</span><input id="search-exames" placeholder="Buscar por nome, ID, CPF, empresa, função ou obra" value="${(examsFilters.search || '').replace(/"/g, '&quot;')}"></div>
+            <div class="search" style="flex:0 1 360px;max-width:360px"><span>🔎</span><input id="search-exames" placeholder="Buscar por nome, ID, CPF, empresa, função ou obra" value="${(examsFilters.search || '').replace(/"/g, '&quot;')}"></div>
             <div class="field" style="flex:0 0 280px;min-width:240px;margin-bottom:0">
               <label for="filter-tipo-exame">Tipo de exame</label>
               <select id="filter-tipo-exame">
@@ -5694,6 +7361,8 @@ function compareQueueOrder(a, b) {
               <button class="smart-filter" type="button" data-flag="pendentes">Pendentes</button>
               <button class="smart-filter" type="button" data-flag="preferenciais">Preferenciais</button>
               <button class="smart-filter" type="button" data-flag="obra">Obra</button>
+              <button class="smart-filter" type="button" data-flag="semAso">Sem ASO</button>
+              <button class="smart-filter" type="button" data-flag="naoLiberado">Não Realizado</button>
             </div>
           </div>
           <div class="table-wrap">
@@ -5733,7 +7402,8 @@ function compareQueueOrder(a, b) {
         const filtered = filterPatientsAdvanced(queue, {
           term: searchInput.value || '',
           flag: activeFlag,
-          examKey: selectedExam
+          examKey: selectedExam,
+          context: 'exames'
         });
         tbody.innerHTML = filtered.length
           ? filtered.map(p => patientRow('exames', p, selectedExam)).join('')
@@ -8169,5 +9839,1695 @@ function compareQueueOrder(a, b) {
     setPage('dashboard');
     showToast('Sistema pronto', 'Use Ctrl+N para novo atendimento e Ctrl+S para salvar rapidamente.', '✨', 5000);
   </script>
-</body>
+<script>
+/* ===== MÓDULO WEB: CHAMADOR DE ATENDIMENTO OCUPACIONAL ===== */
+(function() {
+  const storageKey = "sesi_chamador_fila_v1";
+  const historyKey = "sesi_chamador_historico_v1";
+  const lastCallKey = "sesi_chamador_ultima_chamada_v1";
+
+  const rooms = [
+    "Recepção Térreo 1",
+    "Recepção Térreo 2",
+    "Recepção Térreo 3",
+    "Recepção Ocupacional 1",
+    "Recepção Ocupacional 2",
+    "Sala Triagem",
+    "Sala Médico",
+    "Sala Exames",
+    "Sala Coleta",
+    "Sala Audiometria"
+  ];
+
+  const seedQueue = [
+    { name: "Maria Aparecida Santos", company: "Empresa Modelo A", type: "ASO + Exames Ocupacionais", preferential: "Sim" },
+    { name: "João Pedro Oliveira", company: "Contrato 2025-001", type: "ASO", preferential: "Não" },
+    { name: "Ana Clara Lima", company: "Empresa Modelo B", type: "Exames Ocupacionais", preferential: "Não" },
+    { name: "Carlos Roberto Silva", company: "Contrato 2025-002", type: "ASO + Exames Ocupacionais", preferential: "Sim" }
+  ];
+
+  function safeParse(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) {
+      return fallback;
+    }
+  }
+
+  function saveQueue(queue) {
+    localStorage.setItem(storageKey, JSON.stringify(queue));
+  }
+
+  function saveHistory(history) {
+    localStorage.setItem(historyKey, JSON.stringify(history));
+  }
+
+  function getQueue() {
+    return safeParse(storageKey, []);
+  }
+
+  function getHistory() {
+    return safeParse(historyKey, []);
+  }
+
+  function getLastCall() {
+    return safeParse(lastCallKey, null);
+  }
+
+  function setLastCall(call) {
+    localStorage.setItem(lastCallKey, JSON.stringify(call));
+  }
+
+  function ticketFor(index) {
+    return "A" + String(index + 1).padStart(3, "0");
+  }
+
+  function nowTime() {
+    return new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  }
+
+  function typeBadge(type) {
+    if (type === "ASO") return "call-badge-aso";
+    if (type === "Exames Ocupacionais") return "call-badge-exams";
+    return "call-badge-aso";
+  }
+
+  function speakCall(call) {
+    if (!("speechSynthesis" in window) || !call) return;
+    try {
+      window.speechSynthesis.cancel();
+      const text = `Paciente ${call.name}, dirigir-se à ${call.room}.`;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "pt-BR";
+      utterance.rate = 0.92;
+      utterance.pitch = 1;
+      window.speechSynthesis.speak(utterance);
+    } catch (e) {
+      console.warn("Chamada por voz indisponível:", e);
+    }
+  }
+
+  function notifyCall(call) {
+    const toastFn = window.showToast || window.toast;
+    if (typeof toastFn === "function") {
+      try {
+        toastFn("Paciente chamado", `${call.name} • ${call.room}`, "📣");
+      } catch (e) {}
+    }
+  }
+
+  function sortQueue(queue) {
+    return [...queue].sort((a, b) => {
+      if (a.preferential === "Sim" && b.preferential !== "Sim") return -1;
+      if (a.preferential !== "Sim" && b.preferential === "Sim") return 1;
+      return (a.createdAt || 0) - (b.createdAt || 0);
+    });
+  }
+
+  function renderCaller() {
+    const queue = sortQueue(getQueue());
+    const history = getHistory();
+    const lastCall = getLastCall();
+
+    const waitingEl = document.getElementById("caller-kpi-waiting");
+    const prefEl = document.getElementById("caller-kpi-preferential");
+    const calledEl = document.getElementById("caller-kpi-called");
+
+    if (waitingEl) waitingEl.textContent = queue.length;
+    if (prefEl) prefEl.textContent = queue.filter(item => item.preferential === "Sim").length;
+    if (calledEl) calledEl.textContent = history.length;
+
+    renderQueue(queue);
+    renderHistory(history);
+    renderRooms(history);
+    renderTV(lastCall);
+  }
+
+  function renderQueue(queue) {
+    const el = document.getElementById("caller-queue-list");
+    if (!el) return;
+
+    if (!queue.length) {
+      el.innerHTML = `<div class="call-center-empty">Nenhum paciente aguardando. Adicione uma entrada ou carregue a fila exemplo.</div>`;
+      return;
+    }
+
+    el.innerHTML = queue.map((item, index) => {
+      const preferential = item.preferential === "Sim";
+      return `
+        <div class="call-center-queue-item ${preferential ? "is-preferential" : ""}" data-id="${item.id}">
+          <div class="call-center-ticket">${ticketFor(index)}</div>
+          <div class="call-center-queue-main">
+            <div class="call-center-queue-name">${escapeHtml(item.name)}</div>
+            <div class="call-center-queue-meta">
+              ${preferential ? `<span class="call-badge call-badge-preferential">⭐ Preferencial</span>` : ""}
+              <span class="call-badge ${typeBadge(item.type)}">${escapeHtml(item.type)}</span>
+              <span>${escapeHtml(item.company || "Sem empresa")}</span>
+              <span>Entrada: ${escapeHtml(item.time || "--:--")}</span>
+            </div>
+          </div>
+          <div class="call-center-actions">
+            <button class="btn btn-success" type="button" data-caller-action="call" data-id="${item.id}">Chamar</button>
+            <button class="btn btn-ghost" type="button" data-caller-action="remove" data-id="${item.id}">Remover</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    el.querySelectorAll("[data-caller-action='call']").forEach(btn => {
+      btn.addEventListener("click", () => callPatient(btn.dataset.id));
+    });
+
+    el.querySelectorAll("[data-caller-action='remove']").forEach(btn => {
+      btn.addEventListener("click", () => removePatient(btn.dataset.id));
+    });
+  }
+
+  function renderHistory(history) {
+    const el = document.getElementById("caller-history");
+    if (!el) return;
+
+    if (!history.length) {
+      el.innerHTML = `<div class="call-center-empty">Nenhuma chamada registrada.</div>`;
+      return;
+    }
+
+    el.innerHTML = history.slice(0, 15).map(item => `
+      <div class="call-center-history-item">
+        <div>
+          <div class="name">${escapeHtml(item.name)}</div>
+          <div class="meta">${escapeHtml(item.room)} • ${escapeHtml(item.type)} • ${escapeHtml(item.calledAt)}</div>
+        </div>
+        <div class="chips">
+          ${item.preferential === "Sim" ? `<span class="call-badge call-badge-preferential">Preferencial</span>` : ""}
+          <span class="call-badge call-badge-room">Chamado</span>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function renderRooms(history) {
+    const el = document.getElementById("caller-rooms");
+    if (!el) return;
+
+    el.innerHTML = rooms.map(room => {
+      const current = history.find(item => item.room === room);
+      return `
+        <div class="call-center-room">
+          <div class="room-title">${escapeHtml(room)}</div>
+          <div class="room-now">
+            ${current ? `Atual: <strong>${escapeHtml(current.name)}</strong><br>Chamado às ${escapeHtml(current.calledAt)}` : "Disponível para próxima chamada."}
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function renderTV(lastCall) {
+    const screen = document.getElementById("caller-tv-screen");
+    const patient = document.getElementById("caller-tv-patient");
+    const room = document.getElementById("caller-tv-room");
+    const meta = document.getElementById("caller-tv-meta");
+
+    if (!screen || !patient || !room || !meta) return;
+
+    if (!lastCall) {
+      screen.classList.remove("is-calling");
+      patient.classList.add("call-tv-empty");
+      patient.textContent = "Nenhum paciente chamado ainda.";
+      room.textContent = "";
+      meta.innerHTML = "";
+      return;
+    }
+
+    screen.classList.add("is-calling");
+    patient.classList.remove("call-tv-empty");
+    patient.textContent = lastCall.name;
+    room.textContent = lastCall.room;
+    meta.innerHTML = `
+      ${lastCall.preferential === "Sim" ? `<span class="call-badge call-badge-preferential">⭐ Atendimento Preferencial</span>` : ""}
+      <span class="call-badge ${typeBadge(lastCall.type)}">${escapeHtml(lastCall.type)}</span>
+      <span class="call-badge call-badge-room">Chamado às ${escapeHtml(lastCall.calledAt)}</span>
+    `;
+
+    setTimeout(() => screen.classList.remove("is-calling"), 4500);
+  }
+
+  function addPatient() {
+    const name = document.getElementById("caller-patient-name")?.value?.trim();
+    const company = document.getElementById("caller-company")?.value?.trim();
+    const type = document.getElementById("caller-service-type")?.value || "ASO + Exames Ocupacionais";
+    const preferential = document.getElementById("caller-preferential")?.value || "Não";
+
+    if (!name) {
+      alert("Informe o nome do paciente.");
+      return;
+    }
+
+    const queue = getQueue();
+    queue.push({
+      id: "call_" + Date.now() + "_" + Math.random().toString(16).slice(2),
+      name,
+      company,
+      type,
+      preferential,
+      time: nowTime(),
+      createdAt: Date.now()
+    });
+    saveQueue(queue);
+
+    const nameEl = document.getElementById("caller-patient-name");
+    const companyEl = document.getElementById("caller-company");
+    if (nameEl) nameEl.value = "";
+    if (companyEl) companyEl.value = "";
+
+    renderCaller();
+  }
+
+  function callNext() {
+    const queue = sortQueue(getQueue());
+    if (!queue.length) {
+      alert("Não há pacientes aguardando.");
+      return;
+    }
+    callPatient(queue[0].id);
+  }
+
+  function callPatient(id) {
+    const queue = getQueue();
+    const sorted = sortQueue(queue);
+    const item = sorted.find(patient => patient.id === id) || queue.find(patient => patient.id === id);
+    if (!item) return;
+
+    const room = document.getElementById("caller-default-room")?.value || rooms[0];
+    const call = {
+      ...item,
+      room,
+      calledAt: nowTime(),
+      calledTimestamp: Date.now()
+    };
+
+    const updatedQueue = queue.filter(patient => patient.id !== id);
+    const history = [call, ...getHistory()].slice(0, 60);
+
+    saveQueue(updatedQueue);
+    saveHistory(history);
+    setLastCall(call);
+    renderCaller();
+    speakCall(call);
+    notifyCall(call);
+  }
+
+  function removePatient(id) {
+    saveQueue(getQueue().filter(item => item.id !== id));
+    renderCaller();
+  }
+
+  function loadSeedQueue() {
+    const queue = getQueue();
+    const stamped = seedQueue.map((item, index) => ({
+      ...item,
+      id: "seed_" + Date.now() + "_" + index,
+      time: nowTime(),
+      createdAt: Date.now() + index
+    }));
+    saveQueue([...queue, ...stamped]);
+    renderCaller();
+  }
+
+  function clearHistory() {
+    if (!confirm("Deseja limpar o histórico de chamadas?")) return;
+    localStorage.removeItem(historyKey);
+    localStorage.removeItem(lastCallKey);
+    renderCaller();
+  }
+
+  function repeatLastCall() {
+    const lastCall = getLastCall();
+    if (!lastCall) {
+      alert("Nenhuma chamada disponível para repetir.");
+      return;
+    }
+    renderTV(lastCall);
+    speakCall(lastCall);
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function bindCallerEvents() {
+    document.getElementById("caller-add-btn")?.addEventListener("click", addPatient);
+    document.getElementById("caller-next-btn")?.addEventListener("click", callNext);
+    document.getElementById("caller-seed-btn")?.addEventListener("click", loadSeedQueue);
+    document.getElementById("caller-clear-history-btn")?.addEventListener("click", clearHistory);
+    document.getElementById("caller-repeat-btn")?.addEventListener("click", repeatLastCall);
+
+    ["caller-patient-name", "caller-company"].forEach(id => {
+      document.getElementById(id)?.addEventListener("keydown", e => {
+        if (e.key === "Enter") addPatient();
+      });
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      bindCallerEvents();
+      renderCaller();
+    });
+  } else {
+    bindCallerEvents();
+    renderCaller();
+  }
+
+  window.renderCaller = renderCaller;
+})();
+</script>
+<script>
+/* Compatibilidade de navegação para a aba Chamador */
+(function() {
+  function activatePage(page) {
+    document.querySelectorAll("[id^='page-']").forEach(section => {
+      section.classList.toggle("hidden", section.id !== "page-" + page);
+    });
+    document.querySelectorAll(".nav button[data-page]").forEach(button => {
+      button.classList.toggle("active", button.dataset.page === page);
+    });
+
+    const title = document.querySelector(".topbar h2");
+    const subtitle = document.querySelector(".topbar p");
+    if (page === "chamador") {
+      if (title) title.textContent = "Chamador de Atendimento";
+      if (subtitle) subtitle.textContent = "Fila, painel TV, chamada por voz e controle de salas.";
+      if (typeof window.renderCaller === "function") window.renderCaller();
+    }
+  }
+
+  document.addEventListener("click", function(event) {
+    const button = event.target.closest(".nav button[data-page='chamador']");
+    if (!button) return;
+    event.preventDefault();
+    activatePage("chamador");
+  }, true);
+})();
+</script>
+<div aria-hidden="true" class="call-display-modal" id="caller-display-modal">
+<div class="call-display-stage">
+<div class="call-display-top">
+<div class="call-display-brand">
+<div class="call-display-logo">📣</div>
+<div class="call-display-heading">
+<div class="title">Chamador de Atendimento Ocupacional</div>
+<div class="subtitle">Painel de chamada para recepções e salas de atendimento</div>
+</div>
+</div>
+<div class="call-display-actions">
+<button class="btn btn-success" id="caller-display-repeat-btn" type="button">🔊 Repetir chamada</button>
+<button class="btn btn-primary" id="caller-display-next-btn" type="button">Chamar próximo</button>
+<button class="btn btn-ghost" id="caller-display-close-btn" type="button">Fechar</button>
+</div>
+</div>
+<div class="call-display-body">
+<div class="call-display-main" id="caller-display-main">
+<div class="call-display-label">Paciente chamado</div>
+<div class="call-display-patient call-display-empty" id="caller-display-patient">
+          Aguardando chamada do atendimento.
+        </div>
+<div class="call-display-room" id="caller-display-room"></div>
+<div class="call-display-meta-row" id="caller-display-meta"></div>
+</div>
+<div class="call-display-side">
+<div class="call-display-side-card">
+<h3>Próximos da fila</h3>
+<div class="call-display-next-list" id="caller-display-next-list"></div>
+</div>
+<div class="call-display-side-card">
+<h3>Orientação ao paciente</h3>
+<div class="small">
+            Ao ouvir seu nome, dirija-se à sala indicada. Pacientes preferenciais são identificados com destaque visual.
+          </div>
+</div>
+</div>
+</div>
+<div class="call-display-footer">
+<div>SESI Saúde Paulista • Fluxo Ocupacional</div>
+<div class="call-display-clock" id="caller-display-clock">--:--</div>
+</div>
+</div>
+</div>
+<script>
+/* ===== MELHORIA UX DO CHAMADOR: ABRIR TELA DE CHAMADA ===== */
+(function() {
+  const queueKey = "sesi_chamador_fila_v1";
+  const lastCallKey = "sesi_chamador_ultima_chamada_v1";
+
+  function safeParse(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) {
+      return fallback;
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function sortQueue(queue) {
+    return [...queue].sort((a, b) => {
+      if (a.preferential === "Sim" && b.preferential !== "Sim") return -1;
+      if (a.preferential !== "Sim" && b.preferential === "Sim") return 1;
+      return (a.createdAt || 0) - (b.createdAt || 0);
+    });
+  }
+
+  function ticketFor(index) {
+    return "A" + String(index + 1).padStart(3, "0");
+  }
+
+  function typeBadge(type) {
+    if (type === "ASO") return "call-badge-aso";
+    if (type === "Exames Ocupacionais") return "call-badge-exams";
+    return "call-badge-aso";
+  }
+
+  function getQueue() {
+    return sortQueue(safeParse(queueKey, []));
+  }
+
+  function getLastCall() {
+    return safeParse(lastCallKey, null);
+  }
+
+  function renderDedicatedDisplay() {
+    const modal = document.getElementById("caller-display-modal");
+    if (!modal) return;
+
+    const lastCall = getLastCall();
+    const queue = getQueue();
+
+    const main = document.getElementById("caller-display-main");
+    const patient = document.getElementById("caller-display-patient");
+    const room = document.getElementById("caller-display-room");
+    const meta = document.getElementById("caller-display-meta");
+    const nextList = document.getElementById("caller-display-next-list");
+    const status = document.getElementById("caller-screen-status");
+
+    if (status) {
+      status.innerHTML = lastCall
+        ? `<span class="call-badge call-badge-room">Última chamada: ${escapeHtml(lastCall.room || "")}</span><span class="call-badge">${escapeHtml(lastCall.name || "")}</span>`
+        : `<span class="call-badge call-badge-room">Painel pronto</span><span class="call-badge">Clique para abrir</span>`;
+    }
+
+    if (patient && room && meta && main) {
+      if (!lastCall) {
+        main.classList.remove("is-calling");
+        patient.classList.add("call-display-empty");
+        patient.textContent = "Aguardando chamada do atendimento.";
+        room.textContent = "";
+        meta.innerHTML = "";
+      } else {
+        main.classList.add("is-calling");
+        patient.classList.remove("call-display-empty");
+        patient.textContent = lastCall.name;
+        room.textContent = lastCall.room;
+        meta.innerHTML = `
+          ${lastCall.preferential === "Sim" ? `<span class="call-badge call-badge-preferential">⭐ Atendimento Preferencial</span>` : ""}
+          <span class="call-badge ${typeBadge(lastCall.type)}">${escapeHtml(lastCall.type)}</span>
+          <span class="call-badge call-badge-room">Chamado às ${escapeHtml(lastCall.calledAt || "")}</span>
+        `;
+        setTimeout(() => main.classList.remove("is-calling"), 5200);
+      }
+    }
+
+    if (nextList) {
+      if (!queue.length) {
+        nextList.innerHTML = `<div class="call-center-empty">Nenhum paciente aguardando.</div>`;
+      } else {
+        nextList.innerHTML = queue.slice(0, 6).map((item, index) => `
+          <div class="call-display-next-item ${item.preferential === "Sim" ? "is-preferential" : ""}">
+            <div class="call-display-next-ticket">${ticketFor(index)}</div>
+            <div>
+              <div class="call-display-next-name">${escapeHtml(item.name)}</div>
+              <div class="call-display-next-meta">
+                ${item.preferential === "Sim" ? "⭐ Preferencial • " : ""}${escapeHtml(item.type || "")}<br>
+                ${escapeHtml(item.company || "Sem empresa")}
+              </div>
+            </div>
+          </div>
+        `).join("");
+      }
+    }
+  }
+
+  function openDisplay() {
+    const modal = document.getElementById("caller-display-modal");
+    if (!modal) return;
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+    renderDedicatedDisplay();
+  }
+
+  function closeDisplay() {
+    const modal = document.getElementById("caller-display-modal");
+    if (!modal) return;
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+  }
+
+  function updateClock() {
+    const clock = document.getElementById("caller-display-clock");
+    if (!clock) return;
+    clock.textContent = new Date().toLocaleString("pt-BR", {
+      weekday: "short",
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  }
+
+  function wireDisplayControls() {
+    document.getElementById("caller-open-display-btn")?.addEventListener("click", openDisplay);
+    document.getElementById("caller-display-close-btn")?.addEventListener("click", closeDisplay);
+
+    document.getElementById("caller-display-repeat-btn")?.addEventListener("click", function() {
+      document.getElementById("caller-repeat-btn")?.click();
+      renderDedicatedDisplay();
+    });
+
+    document.getElementById("caller-display-next-btn")?.addEventListener("click", function() {
+      document.getElementById("caller-next-btn")?.click();
+      setTimeout(renderDedicatedDisplay, 120);
+    });
+
+    document.addEventListener("keydown", function(event) {
+      if (event.key === "Escape") closeDisplay();
+      if (event.key === "F9") {
+        event.preventDefault();
+        openDisplay();
+      }
+    });
+
+    window.addEventListener("storage", renderDedicatedDisplay);
+  }
+
+  const originalRenderCaller = window.renderCaller;
+  window.renderCaller = function() {
+    if (typeof originalRenderCaller === "function") originalRenderCaller();
+    renderDedicatedDisplay();
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function() {
+      wireDisplayControls();
+      updateClock();
+      renderDedicatedDisplay();
+      setInterval(updateClock, 1000 * 20);
+    });
+  } else {
+    wireDisplayControls();
+    updateClock();
+    renderDedicatedDisplay();
+    setInterval(updateClock, 1000 * 20);
+  }
+})();
+</script>
+<script>
+/* ===== MÓDULO TOTEN DE ATENDIMENTO ===== */
+(function() {
+  const queueKey = "sesi_chamador_fila_v1";
+  const checkinKey = "sesi_toten_checkins_v1";
+  let cpfDigits = "";
+
+  const patients = [
+    {
+      cpf: "12345678909",
+      name: "Maria Aparecida Santos",
+      company: "Empresa Modelo A",
+      type: "ASO + Exames Ocupacionais",
+      preferential: "Sim"
+    },
+    {
+      cpf: "98765432100",
+      name: "João Pedro Oliveira",
+      company: "Contrato 2025-001",
+      type: "ASO",
+      preferential: "Não"
+    },
+    {
+      cpf: "11144477735",
+      name: "Ana Clara Lima",
+      company: "Empresa Modelo B",
+      type: "Exames Ocupacionais",
+      preferential: "Não"
+    },
+    {
+      cpf: "93541134780",
+      name: "Carlos Roberto Silva",
+      company: "Contrato 2025-002",
+      type: "ASO + Exames Ocupacionais",
+      preferential: "Sim"
+    }
+  ];
+
+  function safeParse(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) {
+      return fallback;
+    }
+  }
+
+  function save(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+
+  function onlyDigits(value) {
+    return String(value || "").replace(/\D/g, "");
+  }
+
+  function maskCpf(value) {
+    const d = onlyDigits(value).slice(0, 11);
+    if (!d) return "___.___.___-__";
+    return d
+      .replace(/^(\d{3})(\d)/, "$1.$2")
+      .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
+      .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4")
+      .padEnd(14, "_");
+  }
+
+  function isValidCpf(cpf) {
+    cpf = onlyDigits(cpf);
+    if (cpf.length !== 11) return false;
+    if (/^(\d)\1{10}$/.test(cpf)) return false;
+
+    let sum = 0;
+    for (let i = 0; i < 9; i++) sum += parseInt(cpf.charAt(i), 10) * (10 - i);
+    let digit1 = 11 - (sum % 11);
+    if (digit1 >= 10) digit1 = 0;
+    if (digit1 !== parseInt(cpf.charAt(9), 10)) return false;
+
+    sum = 0;
+    for (let i = 0; i < 10; i++) sum += parseInt(cpf.charAt(i), 10) * (11 - i);
+    let digit2 = 11 - (sum % 11);
+    if (digit2 >= 10) digit2 = 0;
+
+    return digit2 === parseInt(cpf.charAt(10), 10);
+  }
+
+  function nowTime() {
+    return new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function renderDisplay() {
+    const display = document.getElementById("toten-cpf-display");
+    const confirm = document.getElementById("toten-confirm-btn");
+    if (!display || !confirm) return;
+
+    display.textContent = maskCpf(cpfDigits);
+    display.classList.remove("valid", "invalid");
+
+    if (cpfDigits.length === 11) {
+      if (isValidCpf(cpfDigits)) {
+        display.classList.add("valid");
+        confirm.disabled = false;
+        setResult("CPF válido", "Toque em Confirmar Check-in para entrar na fila.", "success");
+      } else {
+        display.classList.add("invalid");
+        confirm.disabled = true;
+        setResult("CPF inválido", "Confira os números digitados antes de continuar.", "warning");
+      }
+    } else {
+      confirm.disabled = true;
+      setResult("Aguardando CPF.", "Digite os 11 números do CPF.", "");
+    }
+  }
+
+  function setResult(title, message, mode) {
+    const el = document.getElementById("toten-result");
+    if (!el) return;
+    el.className = "toten-result" + (mode ? " " + mode : "");
+    el.innerHTML = `
+      <div class="label">Status</div>
+      <div class="value">${escapeHtml(title)}</div>
+      <div class="small">${escapeHtml(message)}</div>
+    `;
+  }
+
+  function findPatient(cpf) {
+    return patients.find(patient => patient.cpf === onlyDigits(cpf));
+  }
+
+  function confirmCheckin() {
+    if (!isValidCpf(cpfDigits)) {
+      setResult("CPF inválido", "Não foi possível realizar o check-in.", "warning");
+      return;
+    }
+
+    const patient = findPatient(cpfDigits);
+    const displayName = patient ? patient.name : "CPF " + maskCpf(cpfDigits);
+    const company = patient ? patient.company : "Paciente sem cadastro";
+    const type = patient ? patient.type : "ASO + Exames Ocupacionais";
+    const preferential = patient ? patient.preferential : "Não";
+
+    const queue = safeParse(queueKey, []);
+    const alreadyWaiting = queue.some(item => item.cpf === cpfDigits);
+    if (!alreadyWaiting) {
+      queue.push({
+        id: "toten_" + Date.now() + "_" + Math.random().toString(16).slice(2),
+        cpf: cpfDigits,
+        name: displayName,
+        company,
+        type,
+        preferential,
+        time: nowTime(),
+        createdAt: Date.now(),
+        source: "TOTEN"
+      });
+      save(queueKey, queue);
+    }
+
+    const checkins = safeParse(checkinKey, []);
+    checkins.unshift({
+      cpf: maskCpf(cpfDigits),
+      name: displayName,
+      company,
+      type,
+      preferential,
+      status: patient ? "Cadastro localizado" : "CPF sem cadastro",
+      time: nowTime()
+    });
+    save(checkinKey, checkins.slice(0, 40));
+
+    setResult(
+      patient ? "Olá, " + patient.name : "CPF registrado",
+      patient ? "Seu cadastro foi localizado e você entrou na fila." : "Não localizamos cadastro, mas seu CPF foi enviado para a fila.",
+      patient ? "success" : "warning"
+    );
+
+    cpfDigits = "";
+    renderCheckins();
+    renderDisplay();
+
+    if (typeof window.renderCaller === "function") window.renderCaller();
+  }
+
+  function renderPatientTable() {
+    const tbody = document.getElementById("toten-patient-table");
+    if (!tbody) return;
+    tbody.innerHTML = patients.map(patient => `
+      <tr>
+        <td class="mono">${maskCpf(patient.cpf)}</td>
+        <td><strong>${escapeHtml(patient.name)}</strong></td>
+        <td>${escapeHtml(patient.company)}</td>
+        <td>${escapeHtml(patient.type)}</td>
+        <td>${patient.preferential === "Sim" ? '<span class="call-badge call-badge-preferential">Preferencial</span>' : '<span class="call-badge">Não</span>'}</td>
+      </tr>
+    `).join("");
+  }
+
+  function renderCheckins() {
+    const el = document.getElementById("toten-checkin-list");
+    if (!el) return;
+    const checkins = safeParse(checkinKey, []);
+
+    if (!checkins.length) {
+      el.innerHTML = `<div class="call-center-empty">Nenhum check-in realizado pelo TOTEN.</div>`;
+      return;
+    }
+
+    el.innerHTML = checkins.slice(0, 12).map((item, index) => `
+      <div class="toten-checkin-item">
+        <div class="toten-checkin-badge">${String(index + 1).padStart(2, "0")}</div>
+        <div>
+          <div class="toten-checkin-name">${escapeHtml(item.name)}</div>
+          <div class="toten-checkin-meta">${escapeHtml(item.cpf)} • ${escapeHtml(item.company)} • ${escapeHtml(item.time)}</div>
+        </div>
+        <div class="chips">
+          ${item.preferential === "Sim" ? '<span class="call-badge call-badge-preferential">Preferencial</span>' : ""}
+          <span class="call-badge">${escapeHtml(item.status)}</span>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function bindToten() {
+    document.querySelectorAll("[data-toten-key]").forEach(button => {
+      button.addEventListener("click", () => {
+        if (cpfDigits.length < 11) cpfDigits += button.dataset.totenKey;
+        renderDisplay();
+      });
+    });
+
+    document.querySelector("[data-toten-action='clear']")?.addEventListener("click", () => {
+      cpfDigits = "";
+      renderDisplay();
+    });
+
+    document.querySelector("[data-toten-action='backspace']")?.addEventListener("click", () => {
+      cpfDigits = cpfDigits.slice(0, -1);
+      renderDisplay();
+    });
+
+    document.getElementById("toten-confirm-btn")?.addEventListener("click", confirmCheckin);
+
+    document.getElementById("toten-clear-checkins")?.addEventListener("click", () => {
+      if (!confirm("Deseja limpar os check-ins do TOTEN?")) return;
+      localStorage.removeItem(checkinKey);
+      renderCheckins();
+    });
+
+    document.addEventListener("keydown", event => {
+      const totenVisible = !document.getElementById("page-toten")?.classList.contains("hidden");
+      if (!totenVisible) return;
+
+      if (/^\d$/.test(event.key) && cpfDigits.length < 11) {
+        cpfDigits += event.key;
+        renderDisplay();
+      }
+
+      if (event.key === "Backspace") {
+        cpfDigits = cpfDigits.slice(0, -1);
+        renderDisplay();
+      }
+
+      if (event.key === "Enter" && isValidCpf(cpfDigits)) {
+        confirmCheckin();
+      }
+    });
+  }
+
+  function activateTotenNav() {
+    document.addEventListener("click", function(event) {
+      const button = event.target.closest(".nav button[data-page='toten']");
+      if (!button) return;
+      event.preventDefault();
+
+      document.querySelectorAll("[id^='page-']").forEach(section => {
+        section.classList.toggle("hidden", section.id !== "page-toten");
+      });
+
+      document.querySelectorAll(".nav button[data-page]").forEach(nav => {
+        nav.classList.toggle("active", nav.dataset.page === "toten");
+      });
+
+      const title = document.querySelector(".topbar h2");
+      const subtitle = document.querySelector(".topbar p");
+      if (title) title.textContent = "TOTEN de Atendimento";
+      if (subtitle) subtitle.textContent = "Check-in touch por CPF integrado ao Chamador.";
+    }, true);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      bindToten();
+      activateTotenNav();
+      renderDisplay();
+      renderPatientTable();
+      renderCheckins();
+    });
+  } else {
+    bindToten();
+    activateTotenNav();
+    renderDisplay();
+    renderPatientTable();
+    renderCheckins();
+  }
+})();
+</script>
+<script>
+/* ===== FLUXO FULLSCREEN DO TOTEN ===== */
+(function() {
+  let fullscreenCpf = "";
+
+  function maskCpf(value) {
+    const d = String(value || "").replace(/\D/g, "").slice(0, 11);
+    if (!d) return "___.___.___-__";
+    return d
+      .replace(/^(\d{3})(\d)/, "$1.$2")
+      .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
+      .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4")
+      .padEnd(14, "_");
+  }
+
+  function isValidCpf(cpf) {
+    cpf = String(cpf || "").replace(/\D/g, "");
+    if (cpf.length !== 11) return false;
+    if (/^(\d)\1{10}$/.test(cpf)) return false;
+
+    let sum = 0;
+    for (let i = 0; i < 9; i++) sum += parseInt(cpf.charAt(i), 10) * (10 - i);
+    let digit1 = 11 - (sum % 11);
+    if (digit1 >= 10) digit1 = 0;
+    if (digit1 !== parseInt(cpf.charAt(9), 10)) return false;
+
+    sum = 0;
+    for (let i = 0; i < 10; i++) sum += parseInt(cpf.charAt(i), 10) * (11 - i);
+    let digit2 = 11 - (sum % 11);
+    if (digit2 >= 10) digit2 = 0;
+
+    return digit2 === parseInt(cpf.charAt(10), 10);
+  }
+
+  function updateFullscreenDisplay() {
+    const display = document.getElementById("toten-fullscreen-cpf");
+    const nextBtn = document.getElementById("toten-next-step-btn");
+
+    if (!display || !nextBtn) return;
+
+    display.textContent = maskCpf(fullscreenCpf);
+    display.classList.remove("valid", "invalid");
+
+    if (fullscreenCpf.length === 11) {
+      if (isValidCpf(fullscreenCpf)) {
+        display.classList.add("valid");
+        nextBtn.disabled = false;
+      } else {
+        display.classList.add("invalid");
+        nextBtn.disabled = true;
+      }
+    } else {
+      nextBtn.disabled = true;
+    }
+  }
+
+  function openFullscreenToten() {
+    document.getElementById("toten-fullscreen-modal")?.classList.add("open");
+    document.getElementById("toten-fullscreen-modal")?.setAttribute("aria-hidden", "false");
+  }
+
+  function closeFullscreenToten() {
+    document.getElementById("toten-fullscreen-modal")?.classList.remove("open");
+    document.getElementById("toten-fullscreen-modal")?.setAttribute("aria-hidden", "true");
+
+    fullscreenCpf = "";
+    updateFullscreenDisplay();
+
+    const step = document.getElementById("toten-preferential-step");
+    if (step) step.style.display = "none";
+  }
+
+  function nextStep() {
+    if (!isValidCpf(fullscreenCpf)) return;
+    document.getElementById("toten-preferential-step").style.display = "block";
+  }
+
+  function nowClock() {
+    const clock = document.getElementById("toten-clock");
+    if (!clock) return;
+    clock.textContent = new Date().toLocaleString("pt-BR", {
+      weekday: "short",
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  }
+
+  function processPreferential(choice) {
+    const result = document.getElementById("toten-fullscreen-result");
+
+    const event = new CustomEvent("toten-checkin-fullscreen", {
+      detail: {
+        cpf: fullscreenCpf,
+        preferential: choice
+      }
+    });
+
+    window.dispatchEvent(event);
+
+    if (result) {
+      result.className = "toten-result success";
+      result.innerHTML = `
+        <div class="label">Check-in realizado</div>
+        <div class="value">Seu atendimento foi registrado.</div>
+        <div class="small">
+          Atendimento ${choice === "Sim" ? "preferencial" : "convencional"} enviado para a fila.
+        </div>
+      `;
+    }
+
+    setTimeout(() => {
+      closeFullscreenToten();
+    }, 2600);
+  }
+
+  function bindFullscreen() {
+    document.getElementById("open-toten-fullscreen-btn")?.addEventListener("click", openFullscreenToten);
+    document.getElementById("close-toten-fullscreen-btn")?.addEventListener("click", closeFullscreenToten);
+    document.getElementById("toten-next-step-btn")?.addEventListener("click", nextStep);
+
+    document.querySelectorAll("[data-fullscreen-key]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (fullscreenCpf.length < 11) fullscreenCpf += btn.dataset.fullscreenKey;
+        updateFullscreenDisplay();
+      });
+    });
+
+    document.querySelector("[data-fullscreen-action='clear']")?.addEventListener("click", () => {
+      fullscreenCpf = "";
+      updateFullscreenDisplay();
+    });
+
+    document.querySelector("[data-fullscreen-action='backspace']")?.addEventListener("click", () => {
+      fullscreenCpf = fullscreenCpf.slice(0, -1);
+      updateFullscreenDisplay();
+    });
+
+    document.querySelectorAll("[data-preferential]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        processPreferential(btn.dataset.preferential);
+      });
+    });
+
+    document.addEventListener("keydown", e => {
+      const modal = document.getElementById("toten-fullscreen-modal");
+      if (!modal?.classList.contains("open")) return;
+
+      if (/^\d$/.test(e.key) && fullscreenCpf.length < 11) {
+        fullscreenCpf += e.key;
+        updateFullscreenDisplay();
+      }
+
+      if (e.key === "Backspace") {
+        fullscreenCpf = fullscreenCpf.slice(0, -1);
+        updateFullscreenDisplay();
+      }
+
+      if (e.key === "Escape") {
+        closeFullscreenToten();
+      }
+    });
+
+    setInterval(nowClock, 1000 * 20);
+    nowClock();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bindFullscreen);
+  } else {
+    bindFullscreen();
+  }
+})();
+</script>
+<div aria-hidden="true" class="toten-fullscreen-modal" id="toten-fullscreen-modal">
+<div class="toten-fullscreen-stage">
+<div class="toten-fullscreen-top">
+<div class="call-display-brand">
+<div class="call-display-logo">🖥️</div>
+<div class="call-display-heading">
+<div class="title">TOTEM DE ATENDIMENTO</div>
+<div class="subtitle">Seja bem-vindo! Informe seu CPF para iniciar.</div>
+</div>
+</div>
+<div class="call-display-actions">
+<button class="btn btn-ghost" id="close-toten-fullscreen-btn" type="button">Fechar</button>
+</div>
+</div>
+<div class="toten-fullscreen-body">
+<div class="toten-fullscreen-panel">
+<div class="toten-cpf-display" id="toten-fullscreen-cpf">000.000.000-00</div>
+<div class="toten-screen-head">
+<div class="toten-screen-icon">📄</div>
+<div>
+<h3>Informe seu CPF</h3>
+<p>Digite os números do CPF para localizar seu atendimento.</p>
+</div>
+</div>
+<div class="toten-keypad" id="toten-fullscreen-keypad">
+<button class="toten-key" data-fullscreen-key="1" type="button">1</button>
+<button class="toten-key" data-fullscreen-key="2" type="button">2</button>
+<button class="toten-key" data-fullscreen-key="3" type="button">3</button>
+<button class="toten-key" data-fullscreen-key="4" type="button">4</button>
+<button class="toten-key" data-fullscreen-key="5" type="button">5</button>
+<button class="toten-key" data-fullscreen-key="6" type="button">6</button>
+<button class="toten-key" data-fullscreen-key="7" type="button">7</button>
+<button class="toten-key" data-fullscreen-key="8" type="button">8</button>
+<button class="toten-key" data-fullscreen-key="9" type="button">9</button>
+<button class="toten-key action" data-fullscreen-action="clear" type="button">Limpar</button>
+<button class="toten-key" data-fullscreen-key="0" type="button">0</button>
+<button class="toten-key action" data-fullscreen-action="backspace" type="button">Apagar</button>
+</div>
+<button class="toten-key confirm" disabled="" id="toten-next-step-btn" type="button">Continuar</button>
+<div class="toten-result" id="toten-fullscreen-result">
+<div class="label">Status</div>
+<div class="value">Aguardando CPF...</div>
+<div class="small">Digite seu CPF para iniciar.</div>
+</div>
+<div aria-hidden="true" class="toten-preferential-popup" id="toten-preferential-step">
+<div class="toten-preferential-card">
+<div class="toten-screen-head">
+<div class="toten-screen-icon">⭐</div>
+<div>
+<h3>Seu atendimento é preferencial?</h3>
+<p>Selecione uma das opções abaixo.</p>
+</div>
+</div>
+<div class="toten-question-grid">
+<button class="toten-question-btn preferential" data-preferential="Sim" type="button">
+<div class="toten-question-title">⭐ Sim</div>
+<div class="toten-question-desc">Atendimento preferencial para prioridades legais.</div>
+</button>
+<button class="toten-question-btn" data-preferential="Não" type="button">
+<div class="toten-question-title">✔️ Não</div>
+<div class="toten-question-desc">Atendimento convencional conforme ordem operacional.</div>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="call-display-footer">
+      🛡️ Seus dados são usados exclusivamente para identificação e organização do atendimento. LGPD – Lei nº 13.709/2018
+    </div>
+</div>
+</div>
+<script id="toten-final-fix-script">
+(function(){
+  const queueKey="sesi_chamador_fila_v1", checkinKey="sesi_toten_checkins_v1";
+  let cpf="";
+  const pacientes=[
+    {cpf:"12345678909",name:"Maria Aparecida Santos",company:"Empresa Modelo A",type:"ASO + Exames Ocupacionais"},
+    {cpf:"98765432100",name:"João Pedro Oliveira",company:"Contrato 2025-001",type:"ASO"},
+    {cpf:"11144477735",name:"Ana Clara Lima",company:"Empresa Modelo B",type:"Exames Ocupacionais"},
+    {cpf:"93541134780",name:"Carlos Roberto Silva",company:"Contrato 2025-002",type:"ASO + Exames Ocupacionais"}
+  ];
+  const $=id=>document.getElementById(id);
+  const dig=v=>String(v||"").replace(/\D/g,"");
+  const maskZero=v=>{const p=(dig(v).slice(0,11)+"00000000000").slice(0,11);return `${p.slice(0,3)}.${p.slice(3,6)}.${p.slice(6,9)}-${p.slice(9,11)}`};
+  const maskReal=v=>{const x=dig(v).slice(0,11);return `${x.slice(0,3)}.${x.slice(3,6)}.${x.slice(6,9)}-${x.slice(9,11)}`};
+  function valid(c){c=dig(c);if(c.length!==11||/^(\d)\1{10}$/.test(c))return false;let s=0;for(let i=0;i<9;i++)s+=parseInt(c[i])*(10-i);let a=11-(s%11);if(a>=10)a=0;if(a!==parseInt(c[9]))return false;s=0;for(let i=0;i<10;i++)s+=parseInt(c[i])*(11-i);let b=11-(s%11);if(b>=10)b=0;return b===parseInt(c[10])}
+  function parse(k,f){try{const r=localStorage.getItem(k);return r?JSON.parse(r):f}catch(e){return f}}
+  function save(k,v){localStorage.setItem(k,JSON.stringify(v))}
+  function time(){return new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}
+  function setResult(t,m,cls){const r=$("toten-fullscreen-result"); if(!r)return; r.className="toten-result "+(cls||""); r.innerHTML=`<div class="label">Status</div><div class="value">${t}</div><div class="small">${m||""}</div>`}
+  function render(){const d=$("toten-fullscreen-cpf"),b=$("toten-next-step-btn"); if(!d||!b)return; d.textContent=maskZero(cpf); d.classList.remove("valid","invalid"); if(cpf.length===11){ if(valid(cpf)){d.classList.add("valid");b.disabled=false;setResult("CPF válido","Toque em Continuar para seguir.","success")} else {d.classList.add("invalid");b.disabled=true;setResult("CPF inválido","Confira os números digitados.","warning")} } else {b.disabled=true;setResult("Aguardando CPF...","Digite seu CPF para iniciar.","")}}
+  function openModal(){const m=$("toten-fullscreen-modal"); if(m){m.classList.add("open");m.setAttribute("aria-hidden","false"); render();}}
+  function closeModal(){const m=$("toten-fullscreen-modal"); if(m){m.classList.remove("open");m.setAttribute("aria-hidden","true");}}
+  function openPref(){ if(!valid(cpf)){setResult("CPF inválido","Confira os números digitados.","warning");return;} const p=$("toten-preferential-step"); if(p){p.classList.add("open");p.setAttribute("aria-hidden","false");}}
+  function closePref(){const p=$("toten-preferential-step"); if(p){p.classList.remove("open");p.setAttribute("aria-hidden","true");}}
+  function finish(pref){ if(!valid(cpf))return; const pac=pacientes.find(p=>p.cpf===cpf); const name=pac?pac.name:"CPF "+maskReal(cpf), company=pac?pac.company:"Paciente sem cadastro", type=pac?pac.type:"ASO + Exames Ocupacionais"; const q=parse(queueKey,[]); if(!q.some(i=>i.cpf===cpf)){q.push({id:"toten_"+Date.now()+"_"+Math.random().toString(16).slice(2),cpf,name,company,type,preferential:pref,time:time(),createdAt:Date.now(),source:"TOTEM"});save(queueKey,q)} const c=parse(checkinKey,[]); c.unshift({cpf:maskReal(cpf),name,company,type,preferential:pref,status:pac?"Cadastro localizado":"CPF sem cadastro",time:time()}); save(checkinKey,c.slice(0,40)); closePref(); setResult("Atendimento registrado","Aguarde ser chamado. A tela será liberada em 3 segundos.","success"); try{window.registrarCheckinTotemRules&&window.registrarCheckinTotemRules(cpf,pref);window.renderCaller&&window.renderCaller()}catch(e){} setTimeout(()=>{cpf="";render();openModal();},3000);}
+  function openPage(){const page=$("page-toten"); if(!page)return; document.querySelectorAll("[id^='page-']").forEach(s=>s.classList.toggle("hidden",s.id!=="page-toten")); document.querySelectorAll(".nav button[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page==="toten")); const h=document.querySelector(".topbar h2"),p=document.querySelector(".topbar p"); if(h)h.textContent="TOTEM de Atendimento"; if(p)p.textContent="Check-in touch por CPF integrado ao Chamador."; window.scrollTo({top:0,behavior:"smooth"});}
+  document.addEventListener("click",e=>{
+    const nav=e.target.closest(".nav button[data-page='toten']"); if(nav){e.preventDefault();e.stopPropagation();openPage();return;}
+    const open=e.target.closest("#open-toten-fullscreen-btn"); if(open){e.preventDefault();e.stopPropagation();openModal();return;}
+    const close=e.target.closest("#close-toten-fullscreen-btn"); if(close){e.preventDefault();e.stopPropagation();closeModal();return;}
+    const key=e.target.closest("[data-fullscreen-key]"); if(key){e.preventDefault();e.stopPropagation(); if(cpf.length<11)cpf+=key.dataset.fullscreenKey; render(); return;}
+    const clear=e.target.closest("[data-fullscreen-action='clear']"); if(clear){e.preventDefault();e.stopPropagation(); cpf=""; render(); return;}
+    const back=e.target.closest("[data-fullscreen-action='backspace']"); if(back){e.preventDefault();e.stopPropagation(); cpf=cpf.slice(0,-1); render(); return;}
+    const next=e.target.closest("#toten-next-step-btn"); if(next){e.preventDefault();e.stopPropagation(); openPref(); return;}
+    const pref=e.target.closest("[data-preferential]"); if(pref){e.preventDefault();e.stopPropagation(); finish(pref.dataset.preferential||"Não"); return;}
+  },true);
+  document.addEventListener("keydown",e=>{const m=$("toten-fullscreen-modal"); if(!m||!m.classList.contains("open"))return; if(/^\d$/.test(e.key)){if(cpf.length<11)cpf+=e.key;render();} if(e.key==="Backspace"){cpf=cpf.slice(0,-1);render();} if(e.key==="Enter")openPref(); if(e.key==="Escape")closePref();},true);
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",render); else render();
+})();
+</script>
+<script id="toten-caller-priority-rules-script">
+(function(){
+  const queueKey="sesi_chamador_fila_v1",historyKey="sesi_chamador_historico_v1",lastCallKey="sesi_chamador_ultima_chamada_v1",checkinKey="sesi_toten_checkins_v1";
+  const cad=[
+    {cpf:"12345678909",name:"Maria Aparecida Santos",company:"Empresa Modelo A",type:"ASO + Exames Ocupacionais"},
+    {cpf:"98765432100",name:"João Pedro Oliveira",company:"Contrato 2025-001",type:"ASO"},
+    {cpf:"11144477735",name:"Ana Clara Lima",company:"Empresa Modelo B",type:"Exames Ocupacionais"},
+    {cpf:"93541134780",name:"Carlos Roberto Silva",company:"Contrato 2025-002",type:"ASO + Exames Ocupacionais"}
+  ];
+  const d=v=>String(v||"").replace(/\D/g,"");
+  const mask=c=>{c=d(c).slice(0,11);return c.length===11?`${c.slice(0,3)}.${c.slice(3,6)}.${c.slice(6,9)}-${c.slice(9,11)}`:c};
+  const parse=(k,f)=>{try{const r=localStorage.getItem(k);return r?JSON.parse(r):f}catch(e){return f}};
+  const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+  const esc=v=>String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+  const time=()=>new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+  function patient(cpf){return cad.find(p=>p.cpf===d(cpf))||null}
+  function norm(item,i=0){
+    const cpf=d(item.cpf||"");
+    const p=cpf?patient(cpf):null;
+    const pref=item.preferential==="Sim"||item.preferential===true||item.preferencial==="Sim";
+    const name=p?p.name:(cpf?"CPF "+mask(cpf):(item.name||"Paciente sem identificação"));
+    return {...item,cpf,name,displayName:name,company:p?p.company:(item.company||"Paciente sem cadastro"),type:p?p.type:(item.type||"ASO + Exames Ocupacionais"),preferential:pref?"Sim":"Não",source:item.source|| (cpf?"TOTEM":"Manual"),createdAt:Number(item.createdAt||Date.now()+i),time:item.time||time()};
+  }
+  function sorted(){const q=parse(queueKey,[]).map(norm);save(queueKey,q);return [...q].sort((a,b)=>((b.preferential==="Sim")-(a.preferential==="Sim"))||((a.createdAt||0)-(b.createdAt||0)))}
+  function badge(type){return type==="Exames Ocupacionais"?"call-badge-exams":"call-badge-aso"}
+  function ticket(i){return "A"+String(i+1).padStart(3,"0")}
+  function renderQueue(){
+    const el=document.getElementById("caller-queue-list"); if(!el)return;
+    const q=sorted(),h=parse(historyKey,[]);
+    const w=document.getElementById("caller-kpi-waiting"),p=document.getElementById("caller-kpi-preferential"),c=document.getElementById("caller-kpi-called");
+    if(w)w.textContent=q.length; if(p)p.textContent=q.filter(x=>x.preferential==="Sim").length; if(c)c.textContent=h.length;
+    if(!q.length){el.innerHTML='<div class="call-center-empty">Nenhum paciente aguardando. Os check-ins do TOTEM aparecerão automaticamente aqui.</div>';return}
+    el.innerHTML=q.map((it,i)=>`<div class="call-center-queue-item ${it.preferential==="Sim"?"is-preferential":""}" data-id="${esc(it.id)}">
+      <div class="call-center-ticket">${ticket(i)}</div>
+      <div class="call-center-queue-main">
+        <div class="call-center-queue-name">${esc(it.displayName)}</div>
+        <div class="call-center-queue-meta">
+          ${it.preferential==="Sim"?'<span class="call-badge call-badge-preferential">⭐ Preferencial</span>':""}
+          ${it.source==="TOTEM"?'<span class="call-badge call-badge-toten">🖥️ TOTEM</span>':""}
+          <span class="call-badge ${badge(it.type)}">${esc(it.type)}</span>
+          <span>${esc(it.company)}</span>
+          ${it.cpf?`<span>CPF: ${esc(mask(it.cpf))}</span>`:""}
+          <span>Entrada: ${esc(it.time)}</span>
+        </div>
+      </div>
+      <div class="call-center-actions">
+        <button class="btn btn-success" type="button" data-priority-call="${esc(it.id)}">Chamar</button>
+        <button class="btn btn-ghost" type="button" data-priority-remove="${esc(it.id)}">Remover</button>
+      </div>
+    </div>`).join("");
+  }
+  function renderTV(){
+    const last=parse(lastCallKey,null),patientEl=document.getElementById("caller-tv-patient"),room=document.getElementById("caller-tv-room"),meta=document.getElementById("caller-tv-meta");
+    if(!patientEl||!room||!meta)return;
+    if(!last){patientEl.textContent="Nenhum paciente chamado ainda.";room.textContent="";meta.innerHTML="";return}
+    const it=norm(last); patientEl.classList.remove("call-tv-empty"); patientEl.textContent=it.displayName; room.textContent=it.room||"";
+    meta.innerHTML=`${it.preferential==="Sim"?'<span class="call-badge call-badge-preferential">⭐ Atendimento Preferencial</span>':""}${it.source==="TOTEM"?'<span class="call-badge call-badge-toten">🖥️ TOTEM</span>':""}<span class="call-badge ${badge(it.type)}">${esc(it.type)}</span>${it.cpf?`<span class="call-badge">CPF ${esc(mask(it.cpf))}</span>`:""}<span class="call-badge call-badge-room">Chamado às ${esc(it.calledAt||"")}</span>`;
+  }
+  function renderHistory(){
+    const el=document.getElementById("caller-history"); if(!el)return;
+    const h=parse(historyKey,[]).map(norm);
+    if(!h.length){el.innerHTML='<div class="call-center-empty">Nenhuma chamada registrada.</div>';return}
+    el.innerHTML=h.slice(0,15).map(it=>`<div class="call-center-history-item ${it.preferential==="Sim"?"toten-priority-row":""}"><div><div class="name">${esc(it.displayName)}</div><div class="meta">${esc(it.room||"")} • ${esc(it.type)} • ${esc(it.calledAt||"")}${it.cpf?` • CPF ${esc(mask(it.cpf))}`:""}</div></div><div class="chips">${it.preferential==="Sim"?'<span class="call-badge call-badge-preferential">Preferencial</span>':""}${it.source==="TOTEM"?'<span class="call-badge call-badge-toten">TOTEM</span>':""}<span class="call-badge call-badge-room">Chamado</span></div></div>`).join("");
+  }
+  function renderAll(){renderQueue();renderTV();renderHistory()}
+  function call(id){
+    const base=parse(queueKey,[]).map(norm),q=[...base].sort((a,b)=>((b.preferential==="Sim")-(a.preferential==="Sim"))||((a.createdAt||0)-(b.createdAt||0)));
+    const sel=q.find(x=>x.id===id)||q[0]; if(!sel){alert("Não há pacientes aguardando.");return}
+    const room=document.getElementById("caller-default-room")?.value||"Recepção Térreo 1";
+    const called=norm({...sel,room,calledAt:time(),calledTimestamp:Date.now()});
+    save(queueKey,base.filter(x=>x.id!==sel.id));
+    save(historyKey,[called,...parse(historyKey,[])].slice(0,80));
+    save(lastCallKey,called);
+    renderAll();
+    try{if("speechSynthesis" in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(`Paciente ${called.displayName}, dirigir-se à ${room}.`);u.lang="pt-BR";u.rate=.92;speechSynthesis.speak(u)}}catch(e){}
+  }
+  function remove(id){save(queueKey,parse(queueKey,[]).filter(x=>x.id!==id));renderAll()}
+  function register(cpf,pref){
+    cpf=d(cpf); const p=patient(cpf), name=p?p.name:"CPF "+mask(cpf), company=p?p.company:"Paciente sem cadastro", type=p?p.type:"ASO + Exames Ocupacionais", preferential=pref==="Sim"?"Sim":"Não";
+    const q=parse(queueKey,[]).map(norm);
+    if(!q.some(x=>x.cpf===cpf)){q.push(norm({id:"toten_"+Date.now()+"_"+Math.random().toString(16).slice(2),cpf,name,displayName:name,company,type,preferential,time:time(),createdAt:Date.now(),source:"TOTEM"}));save(queueKey,q)}
+    const ch=parse(checkinKey,[]);ch.unshift({cpf:mask(cpf),name,company,type,preferential,status:p?"Cadastro localizado":"CPF sem cadastro",time:time()});save(checkinKey,ch.slice(0,40));
+    renderAll();
+  }
+  document.addEventListener("click",e=>{
+    const cb=e.target.closest("[data-priority-call]"); if(cb){e.preventDefault();e.stopPropagation();call(cb.dataset.priorityCall);return}
+    const rb=e.target.closest("[data-priority-remove]"); if(rb){e.preventDefault();e.stopPropagation();remove(rb.dataset.priorityRemove);return}
+    const nb=e.target.closest("#caller-next-btn"); if(nb){e.preventDefault();e.stopPropagation();const q=sorted();if(!q.length){alert("Não há pacientes aguardando.");return}call(q[0].id);return}
+  },true);
+  window.registrarCheckinTotemRules=register;
+  window.renderCallerRules=renderAll;
+  const old=window.renderCaller;
+  window.renderCaller=function(){try{old&&old()}catch(e){}renderAll()};
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",renderAll);else renderAll();
+})();
+</script>
+<script id="exames-nao-realizado-filter-script">
+/* ===== Filtro Não Realizado - Exames Ocupacionais ===== */
+(function() {
+  function normalizeText(value) {
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+  }
+
+  function findExamesContainer() {
+    return document.getElementById("page-exames") ||
+           document.getElementById("page-exames-ocupacionais") ||
+           document.querySelector("[data-page-content='exames']") ||
+           Array.from(document.querySelectorAll("section[id^='page-'], .content, main, body"))
+             .find(el => normalizeText(el.textContent).includes("exames ocupacionais")) ||
+           document.body;
+  }
+
+  function candidateItems(container) {
+    const selectors = [
+      "tbody tr",
+      ".exam-status-card",
+      ".exam-card",
+      ".exam-item",
+      ".task-card",
+      ".queue-item",
+      ".summary-item",
+      ".locator-card"
+    ];
+
+    const found = [];
+    selectors.forEach(sel => {
+      container.querySelectorAll(sel).forEach(el => {
+        if (!found.includes(el)) found.push(el);
+      });
+    });
+
+    return found.filter(el => {
+      const text = normalizeText(el.textContent);
+      return text.includes("exame") ||
+             text.includes("aso") ||
+             text.includes("pendente") ||
+             text.includes("realizado") ||
+             text.includes("preferencial") ||
+             text.includes("obra") ||
+             text.includes("audiometria") ||
+             text.includes("ecg") ||
+             text.includes("eeg") ||
+             text.includes("espirometria");
+    });
+  }
+
+  function matchesFilter(el, filter) {
+    const text = normalizeText(el.textContent);
+
+    if (filter === "todos") return true;
+    if (filter === "pendentes") return text.includes("pendente");
+    if (filter === "preferenciais") return text.includes("preferencial");
+    if (filter === "obra") return text.includes("obra");
+    if (filter === "semAso" || filter === "sem-aso") return text.includes("sem aso");
+    if (filter === "naoLiberado" || filter === "nao-liberado") return text.includes("nao liberado") || text.includes("não liberado") || (text.includes("pendente") && !text.includes("exame liberado"));
+    if (filter === "nao-realizado") {
+      return text.includes("nao realizado") ||
+             text.includes("não realizado") ||
+             text.includes("nao-realizado") ||
+             text.includes("não-realizado");
+    }
+
+    return true;
+  }
+
+  function applyExameFilter(filter) {
+    const container = findExamesContainer();
+    const items = candidateItems(container);
+
+    items.forEach(item => {
+      item.classList.toggle("hidden", !matchesFilter(item, filter));
+    });
+
+    document.querySelectorAll("[data-exam-filter], [data-filter-exames], [data-flag], .exam-filter-btn").forEach(btn => {
+      const value = btn.dataset.examFilter || btn.dataset.filterExames || btn.dataset.filter || btn.dataset.flag || "";
+      btn.classList.toggle("active", value === filter);
+    });
+  }
+
+  document.addEventListener("click", function(event) {
+    const btn = event.target.closest("[data-exam-filter], [data-filter-exames], [data-flag], .exam-filter-btn");
+    if (!btn) return;
+
+    const filter = btn.dataset.examFilter || btn.dataset.filterExames || btn.dataset.filter || btn.dataset.flag;
+    if (!filter) return;
+
+    const label = normalizeText(btn.textContent);
+    if (filter === "nao-realizado" || label.includes("nao realizado") || label.includes("não realizado")) {
+      event.preventDefault();
+      event.stopPropagation();
+      applyExameFilter("nao-realizado");
+      return;
+    }
+
+    if (["todos", "pendentes", "preferenciais", "obra", "semAso", "sem-aso", "naoLiberado", "nao-liberado"].includes(filter)) {
+      setTimeout(() => applyExameFilter(filter), 0);
+    }
+  }, true);
+
+  window.applyExameFilter = applyExameFilter;
+})();
+</script>
+<script id="exam-filter-order-script">
+/* ===== Ordenação padronizada dos filtros =====
+   Ordem:
+   Todos → Pendentes → Preferenciais → Obra → Sem ASO → Não Realizado → Não Realizado
+*/
+(function() {
+  const desiredOrder = [
+    { key: "todos", label: "Todos" },
+    { key: "pendentes", label: "Pendentes" },
+    { key: "preferenciais", label: "Preferenciais" },
+    { key: "obra", label: "Obra" },
+    { key: "semAso", label: "Sem ASO" },
+    { key: "naoLiberado", label: "Não Realizado" },
+    { key: "nao-realizado", label: "Não Realizado" }
+  ];
+
+  function normalize(value) {
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim();
+  }
+
+  function getFilterValue(btn) {
+    return normalize(
+      btn.dataset.examFilter ||
+      btn.dataset.filterExames ||
+      btn.dataset.filter ||
+      btn.dataset.flag ||
+      btn.textContent
+    );
+  }
+
+  function createButton(baseButton, item) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+
+    btn.className = baseButton?.className || "btn btn-ghost exam-filter-btn";
+
+    if (baseButton?.dataset?.examFilter !== undefined) {
+      btn.dataset.examFilter = item.key;
+    } else if (baseButton?.dataset?.filterExames !== undefined) {
+      btn.dataset.filterExames = item.key;
+    } else if (baseButton?.dataset?.flag !== undefined) {
+      btn.dataset.flag = item.key;
+    } else {
+      btn.dataset.filter = item.key;
+    }
+
+    btn.textContent = item.label;
+    return btn;
+  }
+
+  function processContainer(container) {
+    const buttons = Array.from(container.querySelectorAll("button"));
+    if (!buttons.length) return;
+
+    const relevant = buttons.filter(btn => {
+      const value = getFilterValue(btn);
+      return (
+        value.includes("todos") ||
+        value.includes("pendentes") ||
+        value.includes("preferenciais") ||
+        value.includes("preferencial") ||
+        value.includes("sem aso") ||
+        value.includes("semaso") ||
+        value.includes("sem-aso") ||
+        value.includes("obra") ||
+        value.includes("nao liberado") ||
+        value.includes("não liberado") ||
+        value.includes("naoliberado") ||
+        value.includes("nao realizado") ||
+        value.includes("não realizado") ||
+        value.includes("nao-realizado")
+      );
+    });
+
+    if (!relevant.length) return;
+
+    const baseButton = relevant[0];
+    const map = new Map();
+
+    relevant.forEach(btn => {
+      const value = getFilterValue(btn);
+
+      if (value.includes("todos")) map.set("todos", btn);
+      else if (value.includes("pendentes")) map.set("pendentes", btn);
+      else if (value.includes("preferenciais") || value.includes("preferencial")) map.set("preferenciais", btn);
+      else if (value.includes("obra")) map.set("obra", btn);
+      else if (value.includes("sem aso") || value.includes("semaso") || value.includes("sem-aso")) map.set("semAso", btn);
+      else if (value.includes("nao liberado") || value.includes("não liberado") || value.includes("naoliberado")) map.set("naoLiberado", btn);
+      else if (value.includes("nao realizado") || value.includes("não realizado") || value.includes("nao-realizado")) map.set("nao-realizado", btn);
+    });
+
+    // Remove duplicates outside ordered rebuild
+    relevant.forEach(btn => btn.remove());
+
+    const fragment = document.createDocumentFragment();
+
+    desiredOrder.forEach(item => {
+      let btn = map.get(item.key);
+
+      if (!btn) {
+        btn = createButton(baseButton, item);
+      }
+
+      // normalize visible text
+      btn.textContent = item.label;
+
+      // normalize dataset
+      if (btn.dataset.examFilter !== undefined) btn.dataset.examFilter = item.key;
+      if (btn.dataset.filterExames !== undefined) btn.dataset.filterExames = item.key;
+      if (btn.dataset.filter !== undefined) btn.dataset.filter = item.key;
+      if (btn.dataset.flag !== undefined) btn.dataset.flag = item.key;
+
+      fragment.appendChild(btn);
+    });
+
+    container.prepend(fragment);
+  }
+
+  function locateFilterContainers() {
+    const containers = [];
+    const primary = document.getElementById("quickfilters-exames");
+    if (primary) containers.push(primary);
+
+    const examesPage = document.getElementById("page-exames");
+    if (examesPage) {
+      examesPage.querySelectorAll(".smart-filter-group, div, section, header").forEach(el => {
+        const buttons = Array.from(el.querySelectorAll(":scope > button"));
+        if (buttons.length < 2) return;
+
+        const text = normalize(buttons.map(b => b.textContent).join(" "));
+        if (
+          text.includes("todos") &&
+          (
+            text.includes("pendentes") ||
+            text.includes("preferenciais") ||
+            text.includes("obra")
+          )
+        ) {
+          containers.push(el);
+        }
+      });
+    }
+
+    return [...new Set(containers)];
+  }
+
+  function applyFilterButtonOrder() {
+    locateFilterContainers().forEach(processContainer);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", applyFilterButtonOrder);
+  } else {
+    applyFilterButtonOrder();
+  }
+
+  // reaplica caso alguma aba renderize dinamicamente
+  window.applyFilterButtonOrder = applyFilterButtonOrder;
+
+  setTimeout(applyFilterButtonOrder, 300);
+  setTimeout(applyFilterButtonOrder, 1200);
+})();
+</script>
+<script id="caller-return-to-queue-fix">
+/* ===== Chamador: Voltar a Fila ===== */
+(function() {
+  const queueKey = "sesi_chamador_fila_v1";
+  const historyKey = "sesi_chamador_historico_v1";
+  const lastCallKey = "sesi_chamador_ultima_chamada_v1";
+
+  function parseStore(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) {
+      return fallback;
+    }
+  }
+
+  function saveStore(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+
+  function nowTime() {
+    return new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  }
+
+  function showMessage(title, text) {
+    const toastFn = window.showToast || window.toast;
+    if (typeof toastFn === "function") {
+      try {
+        toastFn(title, text, "↩️");
+        return;
+      } catch (e) {}
+    }
+    alert(text || title);
+  }
+
+  function returnLastCallToQueue() {
+    const lastCall = parseStore(lastCallKey, null);
+    if (!lastCall || !lastCall.id) {
+      alert("Nenhum atendimento chamado para voltar à fila.");
+      return;
+    }
+
+    const queue = parseStore(queueKey, []);
+    const history = parseStore(historyKey, []);
+
+    const alreadyInQueue = queue.some(item => item.id === lastCall.id);
+    const returnedPatient = {
+      ...lastCall,
+      time: nowTime(),
+      createdAt: Date.now(),
+      returnedToQueueAt: Date.now()
+    };
+
+    delete returnedPatient.room;
+    delete returnedPatient.calledAt;
+    delete returnedPatient.calledTimestamp;
+
+    if (!alreadyInQueue) {
+      queue.push(returnedPatient);
+    }
+
+    const updatedHistory = history.filter(item => item.id !== lastCall.id);
+    saveStore(queueKey, queue);
+    saveStore(historyKey, updatedHistory);
+
+    if (updatedHistory.length) {
+      saveStore(lastCallKey, updatedHistory[0]);
+    } else {
+      localStorage.removeItem(lastCallKey);
+    }
+
+    if (typeof window.renderCallerRules === "function") {
+      window.renderCallerRules();
+    }
+    if (typeof window.renderCaller === "function") {
+      window.renderCaller();
+    }
+
+    showMessage("Atendimento retornado", "O paciente voltou para a fila de atendimento.");
+  }
+
+  document.addEventListener("click", function(e) {
+    const btn = e.target.closest("#btn-voltar-fila");
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    returnLastCallToQueue();
+  }, true);
+
+  window.returnLastCallToQueue = returnLastCallToQueue;
+})();
+</script>
+</input></body>
 </html>
