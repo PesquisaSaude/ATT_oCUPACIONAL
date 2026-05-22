@@ -3958,6 +3958,110 @@ button[data-totem-key] {
   width: 100% !important;
 }
 </style>
+
+<style id="toten-cpf-ux-refresh-style">
+/* UX refresh — campo de CPF do TOTEM de Atendimento */
+.toten-fullscreen-panel {
+  grid-template-columns: minmax(0, .98fr) minmax(360px, .78fr) !important;
+  gap: 20px 26px !important;
+}
+#toten-fullscreen-cpf {
+  isolation: isolate !important;
+  min-height: 178px !important;
+  padding: 56px 34px 58px !important;
+  border-radius: 30px !important;
+  background:
+    radial-gradient(circle at top left, rgba(59,130,246,.18), transparent 34%),
+    linear-gradient(180deg, #ffffff 0%, #f3f8ff 62%, #e7f1ff 100%) !important;
+  border: 1px solid rgba(59,130,246,.46) !important;
+  color: #07152b !important;
+  letter-spacing: .015em !important;
+  font-size: clamp(40px, 5.8vw, 78px) !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  box-shadow:
+    0 0 0 6px rgba(37,99,235,.10),
+    0 24px 56px rgba(0,0,0,.30),
+    inset 0 1px 0 rgba(255,255,255,.95) !important;
+}
+#toten-fullscreen-cpf::before {
+  content: "CPF do paciente";
+  position: absolute;
+  top: 20px;
+  left: 28px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(0,91,170,.10);
+  border: 1px solid rgba(0,91,170,.14);
+  color: #064a99;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: clamp(13px, 1.1vw, 17px);
+  font-weight: 900;
+  letter-spacing: .02em;
+}
+#toten-fullscreen-cpf::after {
+  content: attr(data-helper) !important;
+  left: 28px !important;
+  right: 28px !important;
+  bottom: 20px !important;
+  padding-top: 14px;
+  border-top: 1px solid rgba(7,21,43,.10);
+  color: #1d5fb8 !important;
+  font-size: clamp(14px, 1.25vw, 20px) !important;
+  font-weight: 850 !important;
+}
+#toten-fullscreen-cpf.is-empty {
+  color: #8aa1bd !important;
+  letter-spacing: .05em !important;
+}
+#toten-fullscreen-cpf.valid {
+  border-color: rgba(34,197,94,.72) !important;
+  box-shadow: 0 0 0 6px rgba(34,197,94,.14), 0 24px 56px rgba(0,0,0,.30) !important;
+}
+#toten-fullscreen-cpf.invalid {
+  border-color: rgba(239,68,68,.70) !important;
+  box-shadow: 0 0 0 6px rgba(239,68,68,.14), 0 24px 56px rgba(0,0,0,.30) !important;
+}
+#toten-fullscreen-keypad {
+  gap: 12px !important;
+}
+#toten-fullscreen-keypad .toten-key {
+  min-height: clamp(76px, 8.4vh, 112px) !important;
+  border-radius: 24px !important;
+  background: linear-gradient(180deg, rgba(28,52,88,.98), rgba(9,29,57,.98)) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 14px 28px rgba(0,0,0,.20) !important;
+}
+#toten-fullscreen-keypad .toten-key:hover,
+#toten-fullscreen-keypad .toten-key:focus {
+  transform: translateY(-2px) !important;
+  border-color: rgba(125,211,252,.36) !important;
+  background: linear-gradient(180deg, rgba(36,70,118,.98), rgba(11,43,82,.98)) !important;
+}
+#toten-fullscreen-keypad [data-fullscreen-action="clear"],
+#toten-fullscreen-keypad [data-fullscreen-action="backspace"] {
+  font-size: clamp(16px, 1.35vw, 22px) !important;
+}
+#toten-next-step-btn {
+  min-height: 96px !important;
+  border-radius: 26px !important;
+}
+#toten-fullscreen-result {
+  border-radius: 26px !important;
+}
+@media(max-width:980px){
+  #toten-fullscreen-cpf {
+    min-height: 156px !important;
+    padding: 54px 18px 58px !important;
+    font-size: clamp(34px, 8.5vw, 58px) !important;
+  }
+  #toten-fullscreen-cpf::before { left: 18px; top: 18px; }
+  #toten-fullscreen-cpf::after { left: 18px !important; right: 18px !important; }
+}
+</style>
+
 </head>
 <body>
 <div class="app">
@@ -11037,14 +11141,14 @@ function compareQueueOrder(a, b) {
   ];
   const $=id=>document.getElementById(id);
   const dig=v=>String(v||"").replace(/\D/g,"");
-  const maskZero=v=>{const p=(dig(v).slice(0,11)+"00000000000").slice(0,11);return `${p.slice(0,3)}.${p.slice(3,6)}.${p.slice(6,9)}-${p.slice(9,11)}`};
+  const maskZero=v=>{const x=dig(v).slice(0,11);const p=(x+"___________").slice(0,11);return `${p.slice(0,3)}.${p.slice(3,6)}.${p.slice(6,9)}-${p.slice(9,11)}`};
   const maskReal=v=>{const x=dig(v).slice(0,11);return `${x.slice(0,3)}.${x.slice(3,6)}.${x.slice(6,9)}-${x.slice(9,11)}`};
   function valid(c){c=dig(c);if(c.length!==11||/^(\d)\1{10}$/.test(c))return false;let s=0;for(let i=0;i<9;i++)s+=parseInt(c[i])*(10-i);let a=11-(s%11);if(a>=10)a=0;if(a!==parseInt(c[9]))return false;s=0;for(let i=0;i<10;i++)s+=parseInt(c[i])*(11-i);let b=11-(s%11);if(b>=10)b=0;return b===parseInt(c[10])}
   function parse(k,f){try{const r=localStorage.getItem(k);return r?JSON.parse(r):f}catch(e){return f}}
   function save(k,v){localStorage.setItem(k,JSON.stringify(v))}
   function time(){return new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}
   function setResult(t,m,cls){const r=$("toten-fullscreen-result"); if(!r)return; r.className="toten-result "+(cls||""); r.innerHTML=`<div class="label">Status</div><div class="value">${t}</div><div class="small">${m||""}</div>`}
-  function render(){const d=$("toten-fullscreen-cpf"),b=$("toten-next-step-btn"); if(!d||!b)return; d.textContent=maskZero(cpf); d.classList.remove("valid","invalid"); if(cpf.length===11){ if(valid(cpf)){d.classList.add("valid");b.disabled=false;setResult("CPF válido","Toque em Continuar para seguir.","success")} else {d.classList.add("invalid");b.disabled=true;setResult("CPF inválido","Confira os números digitados.","warning")} } else {b.disabled=true;setResult("Aguardando CPF...","Digite seu CPF para iniciar.","")}}
+  function render(){const d=$("toten-fullscreen-cpf"),b=$("toten-next-step-btn"); if(!d||!b)return; d.textContent=maskZero(cpf); d.dataset.helper=cpf.length?`${cpf.length}/11 dígitos informados — confira antes de continuar`:"Digite apenas os 11 números do CPF no teclado abaixo"; d.classList.remove("valid","invalid","is-empty"); if(!cpf.length)d.classList.add("is-empty"); if(cpf.length===11){ if(valid(cpf)){d.classList.add("valid");b.disabled=false;setResult("CPF válido","Toque em Continuar para seguir.","success")} else {d.classList.add("invalid");b.disabled=true;setResult("CPF inválido","Confira os números digitados.","warning")} } else {b.disabled=true;setResult("Aguardando CPF...","Digite seu CPF para iniciar.","")}}
   function openModal(){const m=$("toten-fullscreen-modal"); if(m){m.classList.add("open");m.setAttribute("aria-hidden","false"); render();}}
   function closeModal(){const m=$("toten-fullscreen-modal"); if(m){m.classList.remove("open");m.setAttribute("aria-hidden","true");}}
   function openPref(){ if(!valid(cpf)){setResult("CPF inválido","Confira os números digitados.","warning");return;} const p=$("toten-preferential-step"); if(p){p.classList.add("open");p.setAttribute("aria-hidden","false");}}
