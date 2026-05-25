@@ -4415,6 +4415,7 @@ button[data-totem-key] {
 <option>Sala EEG</option>
 <option>Sala Avaliação Psicossocial 1</option>
 <option>Sala Avaliação Psicossocial 2</option>
+<option value="Sala de Raio X">Sala de Raio X</option>
 </select>
 </div>
 <button class="btn btn-success" id="caller-next-btn" type="button">Chamar próximo</button>
@@ -4739,7 +4740,7 @@ button[data-totem-key] {
       { key: 'espirometria-01', label: 'Sala Espirometria', stage: 'Exames', icon: '🌬️', description: 'Chamada exclusiva para pacientes com Espirometria pendente.' },
       { key: 'ecg-01', label: 'Sala ECG', stage: 'Exames', icon: '🫀', description: 'Chamada exclusiva para pacientes com ECG pendente.' },
       { key: 'eeg-01', label: 'Sala EEG', stage: 'Exames', icon: '🧠', description: 'Chamada exclusiva para pacientes com EEG pendente.' },
-      { key: 'rx-01', label: 'Sala RX', stage: 'Exames', icon: '🩻', description: 'Chamada exclusiva para pacientes com RX pendente.' },
+      { key: 'rx-01', label: 'Sala de Raio X', stage: 'Exames', icon: '🩻', description: 'Chamada exclusiva para pacientes com RX/Raio X pendente.' },
       { key: 'coleta-01', label: 'Sala Coleta / Laboratório', stage: 'Exames', icon: '🧪', description: 'Chamada para exames laboratoriais e coleta.' },
       { key: 'psicossocial-01', label: 'Sala Avaliação Psicossocial', stage: 'Exames', icon: '💬', description: 'Chamada exclusiva para Avaliação Psicossocial.' },
       { key: 'triagem-01', label: 'Sala Triagem 01', stage: 'Triagem', icon: '🚦', description: 'Chamada para avaliação inicial e aferições.' },
@@ -4776,7 +4777,7 @@ button[data-totem-key] {
       if (label.includes('espirometria')) return 'Espirometria';
       if (label.includes('ecg')) return 'ECG';
       if (label.includes('eeg')) return 'EEG';
-      if (label.includes('rx')) return 'RX';
+      if (label.includes('rx') || label.includes('raio x')) return 'RX';
       if (label.includes('coleta') || label.includes('laborat')) return 'Exames Laboratoriais';
       if (label.includes('psicossocial')) return 'Avaliação Psicossocial';
       return 'Audiometria';
@@ -7837,6 +7838,16 @@ function compareQueueOrder(a, b) {
               <div class="sub">Pesquise um paciente ou clique em um status para focar apenas na faixa desejada.</div>
             </div>
             <div class="search" style="max-width:460px; width:100%;"><span>🔎</span><input id="search-acompanhamento" placeholder="Buscar por paciente, CPF, empresa, setor ou função"></div>
+            <div class="toolbar-inline" style="gap:10px; align-items:end;">
+              <div class="field" style="width:170px; margin:0;">
+                <label>Data inicial</label>
+                <input id="acomp-data-inicial" type="date" aria-label="Data inicial do acompanhamento">
+              </div>
+              <div class="field" style="width:170px; margin:0;">
+                <label>Data final</label>
+                <input id="acomp-data-final" type="date" aria-label="Data final do acompanhamento">
+              </div>
+            </div>
           </div>
           <div class="acomp-filter-pills" id="acomp-status-filters">
             <button class="acomp-filter-pill active" data-status="Todos"><span>📋</span><span>Todos</span></button>
@@ -7978,6 +7989,8 @@ function compareQueueOrder(a, b) {
       `;
 
       const searchInput = document.getElementById('search-acompanhamento');
+      const startDateInput = document.getElementById('acomp-data-inicial');
+      const endDateInput = document.getElementById('acomp-data-final');
       const filterButtons = Array.from(document.querySelectorAll('#acomp-status-filters .acomp-filter-pill[data-status]'));
       const resetButton = document.getElementById('acomp-reset-btn');
       const kanbanWrap = document.getElementById('acompanhamento-kanban-wrap');
@@ -7996,13 +8009,22 @@ function compareQueueOrder(a, b) {
         }, 180);
       }
 
+      function normalizeDateFilterValue(value) {
+        return /^\d{4}-\d{2}-\d{2}$/.test(value || '') ? value : '';
+      }
+
       function applyAcompanhamentoFilters(options = {}) {
         const { clearKanban = false } = options;
         const term = (searchInput.value || '').toLowerCase();
+        const startDate = normalizeDateFilterValue(startDateInput?.value || '');
+        const endDate = normalizeDateFilterValue(endDateInput?.value || '');
         const filtered = items.filter(patient => {
+          const atendimentoDate = normalizeDateFilterValue(patient.dataAtendimento || '');
           const matchesTerm = [patient.nome, patient.id, patient.cpf, patient.empresa, patient.setor, patient.funcao].some(v => (v || '').toLowerCase().includes(term));
           const matchesStatus = activeStatus === 'Todos' || getAcompanhamentoStatus(patient) === activeStatus;
-          return matchesTerm && matchesStatus;
+          const matchesStartDate = !startDate || (atendimentoDate && atendimentoDate >= startDate);
+          const matchesEndDate = !endDate || (atendimentoDate && atendimentoDate <= endDate);
+          return matchesTerm && matchesStatus && matchesStartDate && matchesEndDate;
         });
 
         tableBody.innerHTML = filtered.length
@@ -8016,10 +8038,15 @@ function compareQueueOrder(a, b) {
         }
 
         animateKanbanSwap(buildAcompanhamentoKanban(filtered));
-        summaryText.textContent = `${filtered.length} paciente(s) visíveis${activeStatus !== 'Todos' ? ` • status ${displayStatusLabel(activeStatus)}` : ''}.`;
+        const periodLabel = startDate || endDate
+          ? ` • período ${startDate ? formatDate(startDate) : 'início'} até ${endDate ? formatDate(endDate) : 'hoje'}`
+          : '';
+        summaryText.textContent = `${filtered.length} atendimento(s) visível(is)${activeStatus !== 'Todos' ? ` • status ${displayStatusLabel(activeStatus)}` : ''}${periodLabel}.`;
       }
 
       searchInput.addEventListener('input', () => applyAcompanhamentoFilters());
+      startDateInput?.addEventListener('change', () => applyAcompanhamentoFilters());
+      endDateInput?.addEventListener('change', () => applyAcompanhamentoFilters());
       filterButtons.forEach(button => {
         button.addEventListener('click', () => {
           activeStatus = button.dataset.status || 'Todos';
@@ -8031,6 +8058,8 @@ function compareQueueOrder(a, b) {
       if (resetButton) {
         resetButton.addEventListener('click', () => {
           searchInput.value = '';
+          if (startDateInput) startDateInput.value = '';
+          if (endDateInput) endDateInput.value = '';
           activeStatus = 'Todos';
           filterButtons.forEach(item => item.classList.toggle('active', item.dataset.status === 'Todos'));
           applyAcompanhamentoFilters({ clearKanban: true });
@@ -10203,7 +10232,7 @@ function compareQueueOrder(a, b) {
     "Sala Espirometria",
     "Sala ECG",
     "Sala EEG",
-    "Sala RX",
+    "Sala de Raio X",
     "Sala Coleta / Laboratório",
     "Sala Avaliação Psicossocial",
     "Sala Triagem 01",
@@ -10267,23 +10296,51 @@ function compareQueueOrder(a, b) {
   }
 
   function speakCall(call) {
-    if (!call) return;
+    if (!call || !call.name) return;
+
+    const patientName = String(call.name).trim();
+    const roomName = String(call.room || "atendimento").trim();
+
     const speakNow = () => {
       if (!("speechSynthesis" in window)) return;
+
       try {
         window.speechSynthesis.cancel();
-        const text = `Paciente ${call.name}, dirigir-se à ${call.room}.`;
+
+        const text = `Paciente ${patientName}, dirigir-se à ${roomName}.`;
+
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = "pt-BR";
-        utterance.rate = 0.92;
+        utterance.rate = 0.9;
         utterance.pitch = 1;
-        window.speechSynthesis.speak(utterance);
+
+        const voices = window.speechSynthesis.getVoices?.() || [];
+        const ptVoice = voices.find(v => (v.lang || '').toLowerCase().includes('pt'));
+        if (ptVoice) {
+          utterance.voice = ptVoice;
+        }
+
+        setTimeout(() => {
+          window.speechSynthesis.speak(utterance);
+        }, 1600);
+
       } catch (e) {
         console.warn("Chamada por voz indisponível:", e);
       }
     };
+
     if (typeof window.playSesiChamadorSound === 'function') {
-      window.playSesiChamadorSound().finally(speakNow);
+      try {
+        const result = window.playSesiChamadorSound();
+
+        if (result && typeof result.finally === 'function') {
+          result.finally(speakNow);
+        } else {
+          setTimeout(speakNow, 1500);
+        }
+      } catch (e) {
+        setTimeout(speakNow, 1500);
+      }
     } else {
       speakNow();
     }
@@ -10424,7 +10481,7 @@ function compareQueueOrder(a, b) {
 
     screen.classList.add("is-calling");
     patient.classList.remove("call-tv-empty");
-    patient.textContent = lastCall.name;
+    patient.textContent = String(lastCall.name || "Paciente não identificado").trim();
     room.textContent = lastCall.room;
     meta.innerHTML = `
       ${lastCall.preferential === "Sim" ? `<span class="call-badge call-badge-preferential">⭐ Atendimento Preferencial</span>` : ""}
@@ -10722,7 +10779,7 @@ function compareQueueOrder(a, b) {
       } else {
         main.classList.add("is-calling");
         patient.classList.remove("call-display-empty");
-        patient.textContent = lastCall.name;
+        patient.textContent = String(lastCall.name || "Paciente não identificado").trim();
         room.textContent = lastCall.room;
         meta.innerHTML = `
           ${lastCall.preferential === "Sim" ? `<span class="call-badge call-badge-preferential">⭐ Atendimento Preferencial</span>` : ""}
@@ -12707,6 +12764,7 @@ function compareQueueOrder(a, b) {
     if (!queue.length) {
       const blocked = all.length ? `<div class="small" style="margin-top:8px">Existem ${all.length} paciente(s) em outras etapas, mas nenhum liberado para <strong>${esc(rule.label)}</strong>.</div>` : "";
       el.innerHTML = `<div class="call-center-empty">Nenhum paciente disponível para ${esc(room)} obedecendo o fluxo de atendimento.${blocked}</div>`;
+      renderTv(parse(LAST_KEY, null));
       return;
     }
 
@@ -12740,12 +12798,21 @@ function compareQueueOrder(a, b) {
     const meta = document.getElementById("caller-tv-meta");
     if (!patient || !room || !meta) return;
     if (!call) call = parse(LAST_KEY, null);
-    if (!call) return;
+    if (!call) {
+      if (screen) screen.classList.remove("is-calling");
+      patient.classList.add("call-tv-empty");
+      patient.textContent = "Nenhum paciente chamado ainda.";
+      room.textContent = "";
+      meta.innerHTML = "";
+      return;
+    }
+    const normalizedCall = normalizeItem(call, 0);
+    const patientName = String(normalizedCall.displayName || normalizedCall.name || "Paciente não identificado").trim();
     if (screen) { screen.classList.add("is-calling"); setTimeout(() => screen.classList.remove("is-calling"), 4500); }
     patient.classList.remove("call-tv-empty");
-    patient.textContent = call.displayName || call.name;
-    room.textContent = call.room || selectedRoom();
-    meta.innerHTML = `${call.preferential === "Sim" ? '<span class="call-badge call-badge-preferential">⭐ Atendimento Preferencial</span>' : ""}<span class="call-badge ${typeBadge(call.type)}">${esc(call.type || "Atendimento")}</span>${call.cpf ? `<span class="call-badge">CPF ${esc(maskCpf(call.cpf))}</span>` : ""}<span class="call-badge call-badge-room">Chamado às ${esc(call.calledAt || "")}</span>`;
+    patient.textContent = patientName;
+    room.textContent = normalizedCall.room || selectedRoom();
+    meta.innerHTML = `${normalizedCall.preferential === "Sim" ? '<span class="call-badge call-badge-preferential">⭐ Atendimento Preferencial</span>' : ""}<span class="call-badge ${typeBadge(normalizedCall.type)}">${esc(normalizedCall.type || "Atendimento")}</span>${normalizedCall.cpf ? `<span class="call-badge">CPF ${esc(maskCpf(normalizedCall.cpf))}</span>` : ""}<span class="call-badge call-badge-room">Chamado às ${esc(normalizedCall.calledAt || "")}</span>`;
   }
 
   function playAttentionSound(){
@@ -12773,13 +12840,35 @@ function compareQueueOrder(a, b) {
   function callFilteredPatient(id){
     const queue = readQueue();
     const visible = filteredQueue();
-    const selected = visible.find(item => item.id === id) || visible[0];
+    let selected = null;
+
+    if (id) {
+      selected = visible.find(item => String(item.id) === String(id));
+      if (!selected) {
+        const clicked = queue.find(item => String(item.id) === String(id));
+        const rule = roomRule(selectedRoom());
+        if (clicked && !isAvailableForRoom(clicked, rule)) {
+          alert(`Este paciente não está liberado para ${rule.label} na sala selecionada.`);
+          return;
+        }
+        if (!clicked) {
+          alert("Paciente não encontrado na fila. Atualize a tela e tente novamente.");
+          renderFilteredCaller();
+          return;
+        }
+        selected = clicked;
+      }
+    } else {
+      selected = visible[0];
+    }
+
     if (!selected) { alert("Não há pacientes disponíveis para a sala selecionada obedecendo o fluxo."); return; }
     const room = selectedRoom();
     const call = normalizeItem({...selected, room, calledAt: now(), calledTimestamp: Date.now()}, 0);
     save(QUEUE_KEY, queue.filter(item => item.id !== selected.id));
     save(HISTORY_KEY, [call, ...parse(HISTORY_KEY, [])].slice(0, 80));
     save(LAST_KEY, call);
+    renderTv(call);
     renderFilteredCaller();
     playAttentionSound().finally(() => {
       renderTv(call);
@@ -13181,6 +13270,521 @@ function compareQueueOrder(a, b) {
       }
     });
   };
+})();
+</script>
+
+
+<script id="chamador-tv-nome-sync-final">
+/* Correção final: a tela do Chamador sempre usa exatamente a última chamada gravada. */
+(function(){
+  const LAST_KEY = "sesi_chamador_ultima_chamada_v1";
+  const esc = value => String(value ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+  function parse(key, fallback){ try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; } catch(e) { return fallback; } }
+  function callName(call){ return String(call?.displayName || call?.name || call?.nome || "Paciente não identificado").trim(); }
+  function typeBadge(type){ return String(type || "").includes("Exames") ? "call-badge-exams" : "call-badge-aso"; }
+  function syncCallerTv(call){
+    const screen = document.getElementById("caller-tv-screen");
+    const patient = document.getElementById("caller-tv-patient");
+    const room = document.getElementById("caller-tv-room");
+    const meta = document.getElementById("caller-tv-meta");
+    if (!patient || !room || !meta) return;
+    const last = call || parse(LAST_KEY, null);
+    if (!last) {
+      screen?.classList.remove("is-calling");
+      patient.classList.add("call-tv-empty");
+      patient.textContent = "Nenhum paciente chamado ainda.";
+      room.textContent = "";
+      meta.innerHTML = "";
+      return;
+    }
+    patient.classList.remove("call-tv-empty");
+    patient.textContent = callName(last);
+    room.textContent = String(last.room || "").trim();
+    meta.innerHTML = `${last.preferential === "Sim" ? '<span class="call-badge call-badge-preferential">⭐ Atendimento Preferencial</span>' : ""}<span class="call-badge ${typeBadge(last.type)}">${esc(last.type || "Atendimento")}</span><span class="call-badge call-badge-room">Chamado às ${esc(last.calledAt || "")}</span>`;
+  }
+  window.syncCallerTvLastCall = syncCallerTv;
+  document.addEventListener("click", function(event){
+    if (event.target.closest?.("#caller-next-btn, [data-filtered-room-call], [data-priority-call], [data-caller-action='call'], #caller-repeat-btn")) {
+      setTimeout(() => syncCallerTv(), 80);
+      setTimeout(() => syncCallerTv(), 650);
+    }
+  }, true);
+  window.addEventListener("storage", event => { if (event.key === LAST_KEY) syncCallerTv(); });
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => setTimeout(syncCallerTv, 200));
+  else setTimeout(syncCallerTv, 200);
+})();
+</script>
+
+<script id="chamador-raio-x-tv-rechamar-final-fix">
+/* ===== Correção final Chamador: Sala de Raio X, tela sincronizada e Rechamar seguro ===== */
+(function(){
+  const QUEUE_KEY = "sesi_chamador_fila_v1";
+  const HISTORY_KEY = "sesi_chamador_historico_v1";
+  const LAST_KEY = "sesi_chamador_ultima_chamada_v1";
+  const ROOM_NAME = "Sala de Raio X";
+
+  const parse = (key, fallback) => {
+    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+    catch(e) { return fallback; }
+  };
+  const save = (key, value) => localStorage.setItem(key, JSON.stringify(value));
+  const esc = value => String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+  const nowTime = () => new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+
+  function callName(call) {
+    return String(call?.displayName || call?.name || call?.nome || "Paciente não identificado").trim();
+  }
+  function callRoom(call) {
+    return String(call?.room || call?.roomLabel || call?.displayRoomLabel || document.getElementById("caller-default-room")?.value || "Atendimento").trim();
+  }
+  function callType(call) {
+    return String(call?.type || call?.workflowExamName || call?.displayExamLabel || "Atendimento").trim();
+  }
+  function typeBadge(type) {
+    return String(type || "").toLowerCase().includes("exame") ? "call-badge-exams" : "call-badge-aso";
+  }
+  function normalizeCall(call) {
+    if (!call) return null;
+    const normalized = {
+      ...call,
+      name: callName(call),
+      displayName: callName(call),
+      room: callRoom(call),
+      type: callType(call),
+      calledAt: call.calledAt || nowTime(),
+      calledTimestamp: call.calledTimestamp || Date.now()
+    };
+    return normalized;
+  }
+
+  function ensureRaioXRoom() {
+    const select = document.getElementById("caller-default-room");
+    if (select && !Array.from(select.options).some(option => option.textContent.trim() === ROOM_NAME)) {
+      const option = document.createElement("option");
+      option.textContent = ROOM_NAME;
+      option.value = ROOM_NAME;
+      select.appendChild(option);
+    }
+    const roomGrid = document.getElementById("caller-rooms");
+    if (roomGrid && !Array.from(roomGrid.querySelectorAll(".room-title")).some(el => el.textContent.trim() === ROOM_NAME)) {
+      const card = document.createElement("div");
+      card.className = "call-center-room";
+      card.innerHTML = `<div class="room-title">${ROOM_NAME}</div><div class="room-now">Disponível para próxima chamada.</div>`;
+      roomGrid.appendChild(card);
+    }
+  }
+
+  function renderSmallTv(call) {
+    const normalized = normalizeCall(call || parse(LAST_KEY, null));
+    const screen = document.getElementById("caller-tv-screen");
+    const patient = document.getElementById("caller-tv-patient");
+    const room = document.getElementById("caller-tv-room");
+    const meta = document.getElementById("caller-tv-meta");
+    if (!patient || !room || !meta) return;
+    if (!normalized) {
+      screen?.classList.remove("is-calling");
+      patient.classList.add("call-tv-empty");
+      patient.textContent = "Nenhum paciente chamado ainda.";
+      room.textContent = "";
+      meta.innerHTML = "";
+      return;
+    }
+    patient.classList.remove("call-tv-empty");
+    patient.textContent = normalized.name;
+    room.textContent = normalized.room;
+    meta.innerHTML = `${normalized.preferential === "Sim" ? '<span class="call-badge call-badge-preferential">⭐ Atendimento Preferencial</span>' : ""}<span class="call-badge ${typeBadge(normalized.type)}">${esc(normalized.type)}</span><span class="call-badge call-badge-room">Chamado às ${esc(normalized.calledAt || "")}</span>`;
+  }
+
+  function renderDedicatedDisplay(call) {
+    const normalized = normalizeCall(call || parse(LAST_KEY, null));
+    const main = document.getElementById("caller-display-main");
+    const patient = document.getElementById("caller-display-patient");
+    const room = document.getElementById("caller-display-room");
+    const meta = document.getElementById("caller-display-meta");
+    const status = document.getElementById("caller-screen-status");
+    if (status) {
+      status.innerHTML = normalized
+        ? `<span class="call-badge call-badge-room">Última chamada: ${esc(normalized.room)}</span><span class="call-badge">${esc(normalized.name)}</span>`
+        : `<span class="call-badge call-badge-room">Painel pronto</span><span class="call-badge">Clique para abrir</span>`;
+    }
+    if (!patient || !room || !meta) return;
+    if (!normalized) {
+      main?.classList.remove("is-calling");
+      patient.classList.add("call-display-empty");
+      patient.textContent = "Aguardando chamada do atendimento.";
+      room.textContent = "";
+      meta.innerHTML = "";
+      return;
+    }
+    patient.classList.remove("call-display-empty");
+    patient.textContent = normalized.name;
+    room.textContent = normalized.room;
+    meta.innerHTML = `${normalized.preferential === "Sim" ? '<span class="call-badge call-badge-preferential">⭐ Atendimento Preferencial</span>' : ""}<span class="call-badge ${typeBadge(normalized.type)}">${esc(normalized.type)}</span><span class="call-badge call-badge-room">Chamado às ${esc(normalized.calledAt || "")}</span>`;
+  }
+
+  function syncScreens(call) {
+    const normalized = normalizeCall(call || parse(LAST_KEY, null));
+    if (normalized) save(LAST_KEY, normalized);
+    renderSmallTv(normalized);
+    renderDedicatedDisplay(normalized);
+    ensureRaioXRoom();
+  }
+
+  function playSoundThenSpeak(call) {
+    const normalized = normalizeCall(call || parse(LAST_KEY, null));
+    if (!normalized) return;
+    const speak = () => {
+      try {
+        if (!("speechSynthesis" in window)) return;
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(`Paciente ${normalized.name}, dirigir-se à ${normalized.room}.`);
+        utterance.lang = "pt-BR";
+        utterance.rate = 0.9;
+        const voices = window.speechSynthesis.getVoices?.() || [];
+        const ptVoice = voices.find(v => String(v.lang || "").toLowerCase().includes("pt"));
+        if (ptVoice) utterance.voice = ptVoice;
+        window.speechSynthesis.speak(utterance);
+      } catch(e) {}
+    };
+    try {
+      if (typeof window.playSesiChamadorSound === "function") {
+        const result = window.playSesiChamadorSound();
+        if (result && typeof result.finally === "function") result.finally(() => setTimeout(speak, 250));
+        else setTimeout(speak, 1200);
+      } else speak();
+    } catch(e) { setTimeout(speak, 250); }
+  }
+
+  function recallLastCall(event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+    }
+    const last = normalizeCall(parse(LAST_KEY, null));
+    if (!last) {
+      alert("Nenhuma chamada disponível para rechamar.");
+      return;
+    }
+    last.recalledAt = nowTime();
+    save(LAST_KEY, last);
+    const history = parse(HISTORY_KEY, []);
+    save(HISTORY_KEY, [{ ...last, action: "recalled", recalled: true, calledAt: last.calledAt || nowTime() }, ...history.filter(item => item.id !== last.id)].slice(0, 80));
+    syncScreens(last);
+    playSoundThenSpeak(last);
+    try {
+      const toastFn = window.showToast || window.toast;
+      if (typeof toastFn === "function") toastFn("Paciente rechamado", `${last.name} • ${last.room}`, "🔊");
+    } catch(e) {}
+  }
+
+  function replaceRepeatButtons() {
+    ["caller-repeat-btn", "caller-display-repeat-btn"].forEach(id => {
+      const btn = document.getElementById(id);
+      if (!btn || btn.dataset.recallFixed === "true") return;
+      const clone = btn.cloneNode(true);
+      clone.dataset.recallFixed = "true";
+      clone.addEventListener("click", recallLastCall, true);
+      clone.addEventListener("click", recallLastCall, false);
+      btn.replaceWith(clone);
+    });
+  }
+
+  function scheduleSync() {
+    setTimeout(() => syncScreens(), 40);
+    setTimeout(() => syncScreens(), 300);
+    setTimeout(() => syncScreens(), 1000);
+  }
+
+  const previousRenderCaller = window.renderCaller;
+  window.renderCaller = function() {
+    try { if (typeof previousRenderCaller === "function") previousRenderCaller.apply(this, arguments); } catch(e) {}
+    scheduleSync();
+  };
+  const previousRenderCallerRules = window.renderCallerRules;
+  window.renderCallerRules = function() {
+    try { if (typeof previousRenderCallerRules === "function") previousRenderCallerRules.apply(this, arguments); } catch(e) {}
+    scheduleSync();
+  };
+
+  document.addEventListener("click", function(event){
+    if (event.target.closest?.("#caller-repeat-btn, #caller-display-repeat-btn")) return recallLastCall(event);
+    if (event.target.closest?.("#caller-next-btn, #caller-display-next-btn, [data-filtered-room-call], [data-priority-call], [data-caller-action='call']")) scheduleSync();
+  }, true);
+  document.addEventListener("change", function(event){
+    if (event.target?.id === "caller-default-room") ensureRaioXRoom();
+  }, true);
+  window.addEventListener("storage", event => { if ([QUEUE_KEY, HISTORY_KEY, LAST_KEY].includes(event.key)) scheduleSync(); });
+
+  function init() {
+    ensureRaioXRoom();
+    replaceRepeatButtons();
+    syncScreens();
+    setTimeout(replaceRepeatButtons, 500);
+    setTimeout(ensureRaioXRoom, 800);
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+  window.syncCallerTvLastCall = syncScreens;
+  window.recallLastCallerPatient = recallLastCall;
+})();
+</script>
+
+
+
+<script id="final-fix-sala-raio-x-totem-recepcao-cpf">
+/* Correção final solicitada:
+   1) Garante "Sala de Raio X" na configuração das salas de atendimento.
+   2) Garante que o CPF digitado no TOTEM apareça imediatamente na aba Recepção,
+      usando a mesma ficha para completar o cadastro do atendimento. */
+(function(){
+  const PREFIX = "sesi-fluxo-ocupacional-v7-clean";
+  const UNIT_KEY = `${PREFIX}-selected-unit`;
+  const CHECKIN_KEY = "sesi_toten_checkins_v1";
+  const QUEUE_KEY = "sesi_chamador_fila_v1";
+
+  const digits = value => String(value || "").replace(/\D/g, "").slice(0, 11);
+  const maskCpf = value => {
+    const d = digits(value);
+    return d.length === 11 ? `${d.slice(0,3)}.${d.slice(3,6)}.${d.slice(6,9)}-${d.slice(9,11)}` : d;
+  };
+  const parse = (key, fallback) => {
+    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+    catch(e) { return fallback; }
+  };
+  const save = (key, value) => localStorage.setItem(key, JSON.stringify(value));
+  const selectedUnitKey = () => {
+    try { return typeof selectedUnit !== "undefined" ? selectedUnit : (localStorage.getItem(UNIT_KEY) || "paulista"); }
+    catch(e) { return localStorage.getItem(UNIT_KEY) || "paulista"; }
+  };
+  const patientStorageKey = () => `${PREFIX}-${selectedUnitKey()}`;
+  const today = () => new Date().toISOString().slice(0, 10);
+  const nowTime = () => new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  const isCpfOnlyName = name => /^CPF\s/i.test(String(name || "").trim());
+
+  function readPatients(){
+    try { if (Array.isArray(patients)) return patients; } catch(e) {}
+    return parse(patientStorageKey(), []);
+  }
+
+  function persistPatients(list){
+    try {
+      if (Array.isArray(patients) && patients !== list) {
+        patients.length = 0;
+        list.forEach(item => patients.push(item));
+      }
+    } catch(e) {}
+    try { if (typeof savePatients === "function") savePatients(); }
+    catch(e) { save(patientStorageKey(), list); }
+    save(patientStorageKey(), list);
+  }
+
+  function defaultExams(){
+    try {
+      if (Array.isArray(EXAM_ORDER)) return EXAM_ORDER.map(ex => ({ key: ex.key, nome: ex.nome, status: "Não se aplica" }));
+    } catch(e) {}
+    return [
+      { key:"audiometria", nome:"Audiometria", status:"Não se aplica" },
+      { key:"acuidade", nome:"Acuidade Visual", status:"Não se aplica" },
+      { key:"espirometria", nome:"Espirometria", status:"Não se aplica" },
+      { key:"ecg", nome:"ECG", status:"Não se aplica" },
+      { key:"eeg", nome:"EEG", status:"Não se aplica" },
+      { key:"rx", nome:"RX", status:"Não se aplica" },
+      { key:"lab", nome:"Exames Laboratoriais", status:"Não se aplica" },
+      { key:"psicossocial", nome:"Avaliação Psicossocial", status:"Não se aplica" }
+    ];
+  }
+
+  function makeReceptionRecord(cpf, preferential){
+    const list = readPatients();
+    const maxOrder = list.reduce((max, patient) => Math.max(max, Number(patient && patient.ordem || 0)), 0);
+    const nextIdNum = list.reduce((max, patient) => {
+      const match = String(patient && patient.id || "").match(/AT-(\d+)/);
+      return Math.max(max, match ? Number(match[1]) : 0);
+    }, 0) + 1;
+    const masked = maskCpf(cpf);
+    return {
+      ordem: maxOrder + 1,
+      id: "AT-" + String(nextIdNum).padStart(4, "0"),
+      dataAtendimento: today(),
+      retorno: "Não",
+      dataRetorno: "",
+      cnpj: "",
+      empresa: "",
+      contratoNumero: "",
+      contratoStatus: "Pendente",
+      contratoStatusFinanceiro: "Pendente",
+      contratoTipo: "ASO + Exames Ocupacionais",
+      obra: "",
+      cboObra: "",
+      cei: "",
+      preferencial: preferential === "Sim" ? "Sim" : "Não",
+      nome: `CPF ${masked}`,
+      nomeSocial: "",
+      setor: "",
+      funcao: "",
+      cpf: masked,
+      dataNascimento: "",
+      sexo: "",
+      telefone: "",
+      email: "",
+      endereco: "",
+      cep: "",
+      tipoAtendimento: "Aguardando cadastro nominal",
+      grupoServico: "EXAMES OCUPACIONAIS",
+      servico: "SERVIÇOS MÉDICOS OCUPACIONAIS",
+      rxTipo: "",
+      labTipo: "",
+      rxTipos: [],
+      labTipos: [],
+      obsCadastro: "CPF informado no TOTEM. A Recepção deve completar esta mesma ficha para transformar em atendimento nominal.",
+      asoCadastrado: false,
+      etapa: "Recepção",
+      statusAtendimento: "Pendente",
+      exames: defaultExams(),
+      triagem: { status: "Bloqueado", data: "", observacoes: "" },
+      medico: { nome: "", resultado: "", data: "", pendencia: "", observacoes: "" },
+      source: "TOTEM",
+      origem: "TOTEM",
+      cadastroNominal: false
+    };
+  }
+
+  function ensureCpfInReception(cpf, preferential){
+    const d = digits(cpf);
+    if (d.length !== 11) return null;
+    const masked = maskCpf(d);
+    const list = readPatients();
+    let idx = list.findIndex(patient => digits(patient && patient.cpf) === d);
+    if (idx < 0) {
+      list.push(makeReceptionRecord(d, preferential));
+      idx = list.length - 1;
+    } else {
+      const patient = list[idx] || {};
+      patient.cpf = masked;
+      patient.preferencial = patient.preferencial === "Sim" || preferential === "Sim" ? "Sim" : "Não";
+      if (!String(patient.nome || "").trim() || isCpfOnlyName(patient.nome)) patient.nome = `CPF ${masked}`;
+      if (!patient.cadastroNominal && isCpfOnlyName(patient.nome)) {
+        patient.etapa = "Recepção";
+        patient.statusAtendimento = "Pendente";
+        patient.tipoAtendimento = patient.tipoAtendimento || "Aguardando cadastro nominal";
+        patient.source = patient.source || "TOTEM";
+        patient.origem = patient.origem || "TOTEM";
+        patient.cadastroNominal = false;
+        patient.obsCadastro = patient.obsCadastro || "CPF informado no TOTEM. A Recepção deve completar esta mesma ficha.";
+      }
+      list[idx] = patient;
+    }
+    persistPatients(list);
+    return list[idx];
+  }
+
+  function upsertReceptionQueueItem(record){
+    if (!record) return;
+    const d = digits(record.cpf);
+    if (d.length !== 11) return;
+    const nominal = String(record.nome || "").trim() && !isCpfOnlyName(record.nome);
+    let queue = parse(QUEUE_KEY, []);
+    let found = false;
+    queue = queue.map(item => {
+      if (digits(item && item.cpf) !== d) return item;
+      found = true;
+      return Object.assign({}, item, {
+        cpf: d,
+        patientId: record.id || item.patientId || "",
+        name: nominal ? record.nome : `CPF ${maskCpf(d)}`,
+        displayName: nominal ? record.nome : `CPF ${maskCpf(d)}`,
+        company: record.empresa || record.contratoNumero || item.company || "Cadastro aguardando recepção",
+        type: nominal ? (record.tipoAtendimento || record.contratoTipo || item.type || "Recepção") : "Recepção / CPF do TOTEM",
+        preferential: record.preferencial || item.preferential || "Não",
+        workflowStage: "Recepção",
+        suggestedRoom: item.suggestedRoom || "Recepção",
+        source: item.source || "TOTEM"
+      });
+    });
+    if (!found) {
+      queue.push({
+        id: `recepcao_${d}`,
+        cpf: d,
+        patientId: record.id || "",
+        name: nominal ? record.nome : `CPF ${maskCpf(d)}`,
+        displayName: nominal ? record.nome : `CPF ${maskCpf(d)}`,
+        company: record.empresa || record.contratoNumero || "Cadastro aguardando recepção",
+        type: nominal ? (record.tipoAtendimento || record.contratoTipo || "Recepção") : "Recepção / CPF do TOTEM",
+        preferential: record.preferencial || "Não",
+        workflowStage: "Recepção",
+        suggestedRoom: "Recepção",
+        source: record.source || "TOTEM",
+        createdAt: Date.now(),
+        time: nowTime()
+      });
+    }
+    save(QUEUE_KEY, queue);
+  }
+
+  function ensureCheckinsVisibleInReception(){
+    parse(CHECKIN_KEY, []).forEach(item => {
+      const record = ensureCpfInReception(item && item.cpf, item && (item.preferential || item.preferencial));
+      upsertReceptionQueueItem(record);
+    });
+  }
+
+  // Garante que usuários com configuração antiga vejam o nome novo da sala.
+  function normalizeRaioXRoomSettings(){
+    try {
+      if (Array.isArray(PAPA_FILA_ROOMS)) {
+        const room = PAPA_FILA_ROOMS.find(item => item && item.key === "rx-01");
+        if (room) {
+          room.label = "Sala de Raio X";
+          room.description = "Chamada exclusiva para pacientes com RX/Raio X pendente.";
+        }
+      }
+      if (typeof papaFilaRoomSettings !== "undefined" && papaFilaRoomSettings && papaFilaRoomSettings["rx-01"]) {
+        if (!papaFilaRoomSettings["rx-01"].displayRoomLabel || /sala\s*rx/i.test(papaFilaRoomSettings["rx-01"].displayRoomLabel)) {
+          papaFilaRoomSettings["rx-01"].displayRoomLabel = "Sala de Raio X";
+        }
+        if (typeof savePapaFilaRoomSettings === "function") savePapaFilaRoomSettings();
+      }
+    } catch(e) {}
+  }
+
+  const previousUpsert = window.upsertTotemCpfReceptionRecord;
+  window.upsertTotemCpfReceptionRecord = function(cpf, preferential){
+    let record = null;
+    try { if (typeof previousUpsert === "function") record = previousUpsert.apply(this, arguments); } catch(e) {}
+    record = ensureCpfInReception(cpf, preferential) || record;
+    upsertReceptionQueueItem(record);
+    try { if (typeof renderRecepcao === "function") renderRecepcao(); } catch(e) {}
+    try { if (typeof window.renderCallerRules === "function") window.renderCallerRules(); } catch(e) {}
+    try { if (typeof window.renderCaller === "function") window.renderCaller(); } catch(e) {}
+    return record;
+  };
+
+  const previousRenderRecepcao = typeof renderRecepcao === "function" ? renderRecepcao : null;
+  if (previousRenderRecepcao) {
+    renderRecepcao = function(){
+      ensureCheckinsVisibleInReception();
+      normalizeRaioXRoomSettings();
+      previousRenderRecepcao.apply(this, arguments);
+      setTimeout(() => {
+        document.querySelectorAll('#page-recepcao button').forEach(btn => {
+          if (/Editar cadastro/i.test(btn.textContent || "")) btn.textContent = "Editar cadastro / completar dados";
+        });
+      }, 0);
+    };
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    normalizeRaioXRoomSettings();
+    ensureCheckinsVisibleInReception();
+    try { if (typeof renderRecepcao === "function") renderRecepcao(); } catch(e) {}
+    try { if (typeof renderPapaFila === "function" && typeof currentPage !== "undefined" && currentPage === "papa-fila") renderPapaFila(); } catch(e) {}
+  });
 })();
 </script>
 
