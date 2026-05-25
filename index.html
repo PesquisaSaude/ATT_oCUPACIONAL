@@ -4427,6 +4427,7 @@ button[data-totem-key] {
 <div class="small">Abra uma tela dedicada para exibir a chamada em monitor, TV ou recepção.</div>
 </div>
 <button class="btn btn-ghost" id="caller-repeat-btn" type="button">Rechamar</button>
+<button class="btn btn-danger" id="btn-marcar-ausente" type="button">Ausente</button>
 <button class="btn btn-warning" id="btn-voltar-fila" type="button">Voltar a Fila</button>
 </div>
 <button class="call-screen-open-btn" id="caller-open-display-btn" type="button">
@@ -11581,6 +11582,134 @@ function compareQueueOrder(a, b) {
   setTimeout(applyFilterButtonOrder, 1200);
 })();
 </script>
+
+<script id="caller-absent-button-fix">
+/* ===== Chamador: Marcar paciente Ausente ===== */
+(function() {
+  const historyKey = "sesi_chamador_historico_v1";
+  const lastCallKey = "sesi_chamador_ultima_chamada_v1";
+
+  function parseStore(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) {
+      return fallback;
+    }
+  }
+
+  function saveStore(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+
+  function nowTime() {
+    return new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  }
+
+  function showMessage(title, text) {
+    const toastFn = window.showToast || window.toast;
+    if (typeof toastFn === "function") {
+      try {
+        toastFn(title, text, "🚫");
+        return;
+      } catch (e) {}
+    }
+    alert(text || title);
+  }
+
+  function clearCallScreen() {
+    const screen = document.getElementById("caller-tv-screen");
+    const patient = document.getElementById("caller-tv-patient");
+    const room = document.getElementById("caller-tv-room");
+    const meta = document.getElementById("caller-tv-meta");
+    if (screen) screen.classList.remove("is-calling");
+    if (patient) {
+      patient.classList.add("call-tv-empty");
+      patient.textContent = "Nenhum paciente chamado ainda.";
+    }
+    if (room) room.textContent = "";
+    if (meta) meta.innerHTML = "";
+  }
+
+  function markLastCallAbsent() {
+    const lastCall = parseStore(lastCallKey, null);
+    if (!lastCall || !lastCall.id) {
+      alert("Nenhum paciente chamado para marcar como ausente.");
+      return;
+    }
+
+    const history = parseStore(historyKey, []);
+    const absentCall = {
+      ...lastCall,
+      status: "Ausente",
+      absent: true,
+      absentAt: nowTime(),
+      absentTimestamp: Date.now()
+    };
+
+    const updatedHistory = history.length
+      ? history.map((item, index) => item.id === lastCall.id || index === 0 ? { ...item, ...absentCall } : item)
+      : [absentCall];
+
+    saveStore(historyKey, updatedHistory.slice(0, 60));
+    localStorage.removeItem(lastCallKey);
+
+    if (typeof window.renderCallerRules === "function") {
+      window.renderCallerRules();
+    }
+    if (typeof window.renderCaller === "function") {
+      window.renderCaller();
+    }
+    clearCallScreen();
+    showMessage("Paciente marcado como ausente", `${absentCall.name || "Paciente"} foi registrado como ausente.`);
+  }
+
+  function decorateAbsentHistory() {
+    const history = parseStore(historyKey, []);
+    if (!history.some(item => item.absent || item.status === "Ausente")) return;
+
+    document.querySelectorAll("#caller-history .call-center-history-item").forEach(row => {
+      const name = row.querySelector(".name")?.textContent?.trim();
+      const meta = row.querySelector(".meta")?.textContent || "";
+      const item = history.find(entry => (entry.absent || entry.status === "Ausente") && entry.name === name && meta.includes(entry.calledAt || ""));
+      if (!item || row.querySelector("[data-absent-badge]")) return;
+      const chips = row.querySelector(".chips") || row;
+      chips.insertAdjacentHTML("beforeend", '<span class="call-badge" data-absent-badge style="background:rgba(239,68,68,.16);border-color:rgba(248,113,113,.28);color:#fecaca;">Ausente</span>');
+      const metaEl = row.querySelector(".meta");
+      if (metaEl && !metaEl.textContent.includes("Ausente")) {
+        metaEl.textContent += ` • Ausente às ${item.absentAt || "--:--"}`;
+      }
+    });
+  }
+
+  document.addEventListener("click", function(e) {
+    const btn = e.target.closest("#btn-marcar-ausente");
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    markLastCallAbsent();
+  }, true);
+
+  const originalRenderCaller = window.renderCaller;
+  if (typeof originalRenderCaller === "function" && !originalRenderCaller.__absentDecorated) {
+    const wrapped = function() {
+      originalRenderCaller.apply(this, arguments);
+      decorateAbsentHistory();
+    };
+    wrapped.__absentDecorated = true;
+    window.renderCaller = wrapped;
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", decorateAbsentHistory);
+  } else {
+    decorateAbsentHistory();
+  }
+
+  window.markLastCallAbsent = markLastCallAbsent;
+})();
+</script>
+
 <script id="caller-return-to-queue-fix">
 /* ===== Chamador: Voltar a Fila ===== */
 (function() {
@@ -11673,5 +11802,180 @@ function compareQueueOrder(a, b) {
   window.returnLastCallToQueue = returnLastCallToQueue;
 })();
 </script>
+
+<script id="caller-absent-dashboard-reports">
+/* ===== Chamador: Ausentes no Dashboard e Relatórios ===== */
+(function() {
+  const historyKey = "sesi_chamador_historico_v1";
+
+  function parseStore(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch (e) {
+      return fallback;
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function todayIso() {
+    return new Date().toISOString().slice(0, 10);
+  }
+
+  function formatDateTime(ts, fallbackTime) {
+    if (ts) {
+      try {
+        return new Date(ts).toLocaleString("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+      } catch (e) {}
+    }
+    return fallbackTime ? `Hoje às ${fallbackTime}` : "Sem horário registrado";
+  }
+
+  function getAbsentCalls() {
+    return parseStore(historyKey, [])
+      .filter(item => item && (item.absent === true || item.status === "Ausente"))
+      .sort((a, b) => (b.absentTimestamp || b.timestamp || 0) - (a.absentTimestamp || a.timestamp || 0));
+  }
+
+  function getAbsentStats() {
+    const absent = getAbsentCalls();
+    const today = todayIso();
+    const absentToday = absent.filter(item => {
+      const stamp = item.absentTimestamp || item.timestamp;
+      if (!stamp) return false;
+      try { return new Date(stamp).toISOString().slice(0, 10) === today; } catch(e) { return false; }
+    });
+    return { absent, absentToday };
+  }
+
+  function absentListHtml(items, limit = 8) {
+    const visible = items.slice(0, limit);
+    if (!visible.length) {
+      return '<div class="sticky-note">Nenhum paciente foi marcado como ausente no Chamador até o momento.</div>';
+    }
+    return `
+      <div class="report-list">
+        ${visible.map(item => `
+          <div class="report-list-item">
+            <div>
+              <div class="row-title">${escapeHtml(item.name || item.nome || "Paciente sem nome")}</div>
+              <div class="small">
+                ${escapeHtml(item.company || item.empresa || "Empresa não informada")}
+                ${item.room ? ` • Sala: ${escapeHtml(item.room)}` : ""}
+                ${item.type ? ` • ${escapeHtml(item.type)}` : ""}
+              </div>
+              <div class="chips" style="margin-top:8px">
+                <span class="chip" style="background:rgba(239,68,68,.16);border-color:rgba(248,113,113,.28);color:#fecaca;">Ausente</span>
+                <span class="chip">Chamado: ${escapeHtml(item.calledAt || "--:--")}</span>
+                <span class="chip">Marcado: ${escapeHtml(item.absentAt || "--:--")}</span>
+              </div>
+            </div>
+            <div class="metric">
+              <div class="big">${escapeHtml(item.absentAt || item.calledAt || "--:--")}</div>
+              <div class="small">${escapeHtml(formatDateTime(item.absentTimestamp || item.timestamp, item.absentAt))}</div>
+            </div>
+          </div>
+        `).join("")}
+      </div>`;
+  }
+
+  function dashboardCardHtml() {
+    const { absent, absentToday } = getAbsentStats();
+    return `
+      <div class="card" id="dashboard-ausentes-card">
+        <div class="dashboard-chart-head">
+          <div>
+            <div class="row-title">Ausentes no Chamador</div>
+            <div class="small">Pacientes chamados/rechamados que não compareceram ao atendimento.</div>
+          </div>
+          <span class="pill-alert">🚫 ${absent.length} ausente(s)</span>
+        </div>
+        <div class="report-highlight-grid" style="margin-bottom:14px">
+          <div class="report-highlight-card"><div class="small">Total registrado</div><div class="value">${absent.length}</div></div>
+          <div class="report-highlight-card"><div class="small">Hoje</div><div class="value">${absentToday.length}</div></div>
+          <div class="report-highlight-card"><div class="small">Último registro</div><div class="value" style="font-size:20px">${absent[0] ? escapeHtml(absent[0].absentAt || absent[0].calledAt || "--:--") : "--"}</div></div>
+        </div>
+        ${absentListHtml(absent, 5)}
+      </div>`;
+  }
+
+  function reportsCardHtml() {
+    const { absent, absentToday } = getAbsentStats();
+    return `
+      <div class="card" id="reports-ausentes-card">
+        <div class="dashboard-chart-head">
+          <div>
+            <div class="row-title">Relatório de pacientes ausentes</div>
+            <div class="small">Localização: Chamador → Histórico de chamadas, Dashboard e Relatórios.</div>
+          </div>
+          <span class="pill-alert">🚫 ${absentToday.length} hoje • ${absent.length} total</span>
+        </div>
+        ${absentListHtml(absent, 20)}
+      </div>`;
+  }
+
+  function injectAbsentPanel(pageId, htmlFactory) {
+    const page = document.getElementById(pageId);
+    if (!page) return;
+    const existing = page.querySelector(pageId === "page-dashboard" ? "#dashboard-ausentes-card" : "#reports-ausentes-card");
+    if (existing) existing.remove();
+    page.insertAdjacentHTML("beforeend", htmlFactory());
+  }
+
+  function renderAbsentDashboardAndReports() {
+    injectAbsentPanel("page-dashboard", dashboardCardHtml);
+    injectAbsentPanel("page-relatorios", reportsCardHtml);
+  }
+
+  function wrapRenderFunction(name) {
+    const original = window[name];
+    if (typeof original !== "function" || original.__absentPanelWrapped) return;
+    const wrapped = function() {
+      const result = original.apply(this, arguments);
+      renderAbsentDashboardAndReports();
+      return result;
+    };
+    wrapped.__absentPanelWrapped = true;
+    window[name] = wrapped;
+  }
+
+  wrapRenderFunction("renderDashboard");
+  wrapRenderFunction("renderReports");
+
+  document.addEventListener("DOMContentLoaded", renderAbsentDashboardAndReports);
+  window.addEventListener("storage", function(e) {
+    if (e.key === historyKey) renderAbsentDashboardAndReports();
+  });
+
+  const originalMarkLastCallAbsent = window.markLastCallAbsent;
+  if (typeof originalMarkLastCallAbsent === "function" && !originalMarkLastCallAbsent.__absentPanelWrapped) {
+    const wrappedAbsent = function() {
+      const result = originalMarkLastCallAbsent.apply(this, arguments);
+      setTimeout(renderAbsentDashboardAndReports, 50);
+      return result;
+    };
+    wrappedAbsent.__absentPanelWrapped = true;
+    window.markLastCallAbsent = wrappedAbsent;
+  }
+
+  window.renderAbsentDashboardAndReports = renderAbsentDashboardAndReports;
+  setTimeout(renderAbsentDashboardAndReports, 300);
+})();
+</script>
+
 </input></body>
 </html>
