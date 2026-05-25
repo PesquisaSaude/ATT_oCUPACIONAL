@@ -11977,5 +11977,231 @@ function compareQueueOrder(a, b) {
 })();
 </script>
 
+
+
+<script id="workflow-exam-caller-integration-v2">
+/* ===== Integração Tipo de Exame → Chamador/TOTEM/Fluxo Clínico ===== */
+(function(){
+  const CALLER_QUEUE_KEY = "sesi_chamador_fila_v1";
+  const ACTIVE_FILTER_KEY = "sesi_fluxo_tipo_exame_ativo_v2";
+
+  function safeParse(key, fallback){
+    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; } catch(e){ return fallback; }
+  }
+  function saveJson(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+  function nowTime(){ return new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }); }
+  function esc(value){
+    return String(value ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+  }
+  function cpfDigits(value){ return String(value || "").replace(/\D/g, ""); }
+  function getPatients(){ try { return Array.isArray(patients) ? patients : []; } catch(e){ return []; } }
+  function getExamList(){ try { return Array.isArray(EXAM_ORDER) ? EXAM_ORDER : []; } catch(e){ return []; } }
+  function examByKey(key){ return getExamList().find(ex => ex.key === key) || null; }
+  function examName(key){ return examByKey(key)?.nome || key || "Todos os exames"; }
+  function patientHasExam(patient, examKey){
+    if (!examKey) return true;
+    return (patient.exames || []).some(ex => ex.key === examKey && ex.status !== "Não se aplica");
+  }
+  function patientHasOpenExam(patient, examKey){
+    return (patient.exames || []).some(ex => ex.key === examKey && !["Não se aplica", "Concluído", "Exame liberado"].includes(ex.status));
+  }
+  function isEligibleForWorkflow(patient, stage, examKey){
+    if (!patient) return false;
+    if (stage === "Exames") return patient.etapa === "Exames" && (examKey ? patientHasOpenExam(patient, examKey) : (patient.exames || []).some(ex => !["Não se aplica", "Concluído", "Exame liberado"].includes(ex.status)));
+    if (stage === "Triagem") return patient.etapa === "Triagem" && patient.asoCadastrado && patientHasExam(patient, examKey);
+    if (stage === "Médico") return patient.etapa === "Médico" && patientHasExam(patient, examKey);
+    return false;
+  }
+  function stageRoom(stage, examKey){
+    if (stage === "Triagem") return "Sala Triagem";
+    if (stage === "Médico") return "Sala Médico";
+    const name = examName(examKey);
+    if (/audiometria/i.test(name)) return "Sala Audiometria";
+    if (/laborator/i.test(name)) return "Sala Coleta";
+    return "Sala Exames";
+  }
+  function stageType(stage, examKey){
+    if (stage === "Exames") return examKey ? `Exame: ${examName(examKey)}` : "Exames Ocupacionais";
+    if (stage === "Triagem") return examKey ? `Triagem após ${examName(examKey)}` : "Triagem";
+    if (stage === "Médico") return examKey ? `Médico do Trabalho após ${examName(examKey)}` : "Médico do Trabalho";
+    return stage;
+  }
+  function workflowItemId(patient, stage, examKey){
+    return `workflow_${stage}_${examKey || "todos"}_${patient.id || cpfDigits(patient.cpf) || patient.nome}`.replace(/[^\w-]+/g, "_");
+  }
+  function removeWorkflowQueueItems(queue, stage){
+    return queue.filter(item => !(item && item.source === "Fluxo Ocupacional" && item.workflowStage === stage));
+  }
+  function syncCallerWorkflow(stage, examKey){
+    const all = getPatients();
+    const selected = all.filter(patient => isEligibleForWorkflow(patient, stage, examKey));
+    let queue = safeParse(CALLER_QUEUE_KEY, []);
+    queue = removeWorkflowQueueItems(queue, stage);
+    selected.forEach((patient, index) => {
+      const id = workflowItemId(patient, stage, examKey);
+      queue.push({
+        id,
+        patientId: patient.id || "",
+        cpf: cpfDigits(patient.cpf),
+        name: patient.nome || "Paciente sem nome",
+        displayName: patient.nome || "Paciente sem nome",
+        company: patient.empresa || patient.contratoNumero || "Empresa não informada",
+        type: stageType(stage, examKey),
+        preferential: patient.preferencial === "Sim" ? "Sim" : "Não",
+        time: nowTime(),
+        createdAt: Date.now() + index,
+        source: "Fluxo Ocupacional",
+        workflowStage: stage,
+        workflowExamKey: examKey || "",
+        workflowExamName: examKey ? examName(examKey) : "Todos os exames",
+        suggestedRoom: stageRoom(stage, examKey)
+      });
+    });
+    saveJson(CALLER_QUEUE_KEY, queue);
+    localStorage.setItem(ACTIVE_FILTER_KEY, JSON.stringify({ stage, examKey: examKey || "", examName: examKey ? examName(examKey) : "Todos", updatedAt: new Date().toISOString(), count: selected.length }));
+    try { if (typeof renderCallerRules === "function") renderCallerRules(); else if (typeof renderCaller === "function") renderCaller(); } catch(e){}
+    try { if (typeof showToast === "function") showToast("Chamador atualizado", `${selected.length} paciente(s) sincronizado(s) para ${stageType(stage, examKey)}.`, "📣"); } catch(e){}
+    return selected.length;
+  }
+
+  function renderExamOptions(selected){
+    return `<option value="">Todos os exames</option>` + getExamList().map(ex => `<option value="${esc(ex.key)}" ${selected === ex.key ? "selected" : ""}>${esc(ex.nome)}</option>`).join("");
+  }
+  function addWorkflowNotice(pageKey, stage, examKey){
+    const page = document.getElementById(`page-${pageKey}`);
+    if (!page || page.querySelector(".workflow-caller-notice")) return;
+    const filters = page.querySelector(".filters");
+    if (!filters) return;
+    filters.insertAdjacentHTML("afterend", `<div class="sticky-note workflow-caller-notice" style="margin:0 0 12px">📣 Regra ativa: ao selecionar <strong>Tipo de exame</strong>, somente pacientes que possuem esse exame nesta etapa aparecem na lista e são sincronizados para o Chamador/Tela de chamada. Fluxo: TOTEM/Recepção → Exames Ocupacionais → Triagem → Médico do Trabalho.</div>`);
+  }
+  function injectStageExamFilter(pageKey, stage){
+    const page = document.getElementById(`page-${pageKey}`);
+    if (!page || page.querySelector(`#filter-tipo-exame-${pageKey}`)) return;
+    const filters = page.querySelector(".filters");
+    if (!filters) return;
+    const saved = safeParse(ACTIVE_FILTER_KEY, {});
+    const selected = saved.stage === stage ? (saved.examKey || "") : "";
+    const field = document.createElement("div");
+    field.className = "field workflow-stage-exam-filter";
+    field.style.cssText = "flex:0 0 280px;min-width:240px;margin-bottom:0";
+    field.innerHTML = `<label for="filter-tipo-exame-${pageKey}">Tipo de exame</label><select id="filter-tipo-exame-${pageKey}">${renderExamOptions(selected)}</select>`;
+    const quick = filters.querySelector(`#quickfilters-${pageKey}`);
+    filters.insertBefore(field, quick || null);
+    addWorkflowNotice(pageKey, stage, selected);
+  }
+  function applyStageFilter(pageKey, stage){
+    const page = document.getElementById(`page-${pageKey}`);
+    const tbody = document.getElementById(`tbody-${pageKey}`);
+    const searchInput = document.getElementById(`search-${pageKey}`);
+    const select = document.getElementById(`filter-tipo-exame-${pageKey}`);
+    if (!page || !tbody || !select) return;
+    const activeButton = page.querySelector(`#quickfilters-${pageKey} .smart-filter.active`);
+    const flag = activeButton?.dataset?.flag || "todos";
+    const examKey = select.value || "";
+    const base = getPatients().slice().sort(typeof compareQueueOrder === "function" ? compareQueueOrder : undefined).filter(patient => isEligibleForWorkflow(patient, stage, ""));
+    const filtered = (typeof filterPatientsAdvanced === "function" ? filterPatientsAdvanced(base, { term: searchInput?.value || "", flag, examKey, context: pageKey }) : base)
+      .filter(patient => patientHasExam(patient, examKey));
+    tbody.innerHTML = filtered.length
+      ? filtered.map(patient => typeof patientRow === "function" ? patientRow(pageKey, patient, examKey) : `<tr><td>${esc(patient.nome)}</td></tr>`).join("")
+      : `<tr><td colspan="7"><div class="small">Nenhum paciente encontrado para este tipo de exame nesta etapa.</div></td></tr>`;
+    syncCallerWorkflow(stage, examKey);
+  }
+
+  const originalRenderQueuePage = typeof renderQueuePage === "function" ? renderQueuePage : null;
+  if (originalRenderQueuePage && !originalRenderQueuePage.__workflowExamCallerWrapped) {
+    const wrapped = function(pageId, pageKey, filterFn, extraColumns){
+      const result = originalRenderQueuePage.apply(this, arguments);
+      if (pageKey === "triagem" || pageKey === "medico") {
+        const stage = pageKey === "triagem" ? "Triagem" : "Médico";
+        injectStageExamFilter(pageKey, stage);
+        const select = document.getElementById(`filter-tipo-exame-${pageKey}`);
+        const searchInput = document.getElementById(`search-${pageKey}`);
+        const page = document.getElementById(`page-${pageKey}`);
+        const rerender = () => applyStageFilter(pageKey, stage);
+        select?.addEventListener("change", rerender);
+        searchInput?.addEventListener("input", rerender);
+        page?.querySelectorAll(`#quickfilters-${pageKey} .smart-filter`).forEach(btn => btn.addEventListener("click", () => setTimeout(rerender, 0)));
+        rerender();
+      }
+      return result;
+    };
+    wrapped.__workflowExamCallerWrapped = true;
+    renderQueuePage = wrapped;
+    window.renderQueuePage = wrapped;
+  }
+
+  const originalRenderExames = typeof renderExames === "function" ? renderExames : null;
+  if (originalRenderExames && !originalRenderExames.__workflowExamCallerWrapped) {
+    const wrappedExames = function(){
+      const result = originalRenderExames.apply(this, arguments);
+      addWorkflowNotice("exames", "Exames", document.getElementById("filter-tipo-exame")?.value || "");
+      const select = document.getElementById("filter-tipo-exame");
+      if (select && !select.__workflowCallerBound) {
+        select.__workflowCallerBound = true;
+        select.addEventListener("change", () => syncCallerWorkflow("Exames", select.value || ""));
+      }
+      syncCallerWorkflow("Exames", select?.value || "");
+      return result;
+    };
+    wrappedExames.__workflowExamCallerWrapped = true;
+    renderExames = wrappedExames;
+    window.renderExames = wrappedExames;
+  }
+
+  const originalRenderCallerRules = window.renderCallerRules;
+  window.renderCallerRules = function(){
+    if (typeof originalRenderCallerRules === "function") originalRenderCallerRules.apply(this, arguments);
+    document.querySelectorAll("#caller-queue-list .call-center-queue-item").forEach(card => {
+      const id = card.getAttribute("data-id");
+      const item = safeParse(CALLER_QUEUE_KEY, []).find(q => q.id === id);
+      if (item?.source === "Fluxo Ocupacional" && !card.querySelector(".workflow-caller-badge")) {
+        const meta = card.querySelector(".call-center-queue-meta");
+        meta?.insertAdjacentHTML("afterbegin", `<span class="call-badge workflow-caller-badge">🔁 ${esc(item.workflowStage)}${item.workflowExamName ? " • " + esc(item.workflowExamName) : ""}</span>`);
+      }
+    });
+  };
+
+  const originalRegisterTotem = window.registrarCheckinTotemRules;
+  window.registrarCheckinTotemRules = function(cpf, pref){
+    const digits = cpfDigits(cpf);
+    const patient = getPatients().find(p => cpfDigits(p.cpf) === digits);
+    if (patient) {
+      let queue = safeParse(CALLER_QUEUE_KEY, []);
+      const id = `toten_${patient.id || digits}`.replace(/[^\w-]+/g, "_");
+      if (!queue.some(item => item.id === id || cpfDigits(item.cpf) === digits)) {
+        queue.push({
+          id,
+          patientId: patient.id || "",
+          cpf: digits,
+          name: patient.nome || "Paciente sem nome",
+          displayName: patient.nome || "Paciente sem nome",
+          company: patient.empresa || "Empresa não informada",
+          type: patient.asoCadastrado ? "Recepção / ASO cadastrado" : "Recepção / cadastro ocupacional",
+          preferential: pref === "Sim" || patient.preferencial === "Sim" ? "Sim" : "Não",
+          time: nowTime(),
+          createdAt: Date.now(),
+          source: "TOTEM",
+          workflowStage: "Recepção",
+          suggestedRoom: "Recepção Ocupacional 1"
+        });
+        saveJson(CALLER_QUEUE_KEY, queue);
+      }
+      try { if (typeof renderCallerRules === "function") renderCallerRules(); } catch(e){}
+      return;
+    }
+    if (typeof originalRegisterTotem === "function") return originalRegisterTotem.apply(this, arguments);
+  };
+
+  window.syncCallerWorkflowByExam = syncCallerWorkflow;
+  window.addEventListener("storage", e => { if (e.key === CALLER_QUEUE_KEY && typeof window.renderCallerRules === "function") window.renderCallerRules(); });
+  setTimeout(() => {
+    try { if (typeof renderExames === "function") renderExames(); } catch(e){}
+    try { if (typeof renderTriagem === "function") renderTriagem(); } catch(e){}
+    try { if (typeof renderMedico === "function") renderMedico(); } catch(e){}
+    try { if (typeof window.renderCallerRules === "function") window.renderCallerRules(); } catch(e){}
+  }, 350);
+})();
+</script>
+
 </input></body>
 </html>
