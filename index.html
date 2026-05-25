@@ -4541,7 +4541,7 @@ button[data-totem-key] {
 </label>
 </div>
 <div class="field hidden" id="obraNomeField"><label>Nome da Obra</label><input name="obra" placeholder="Informe o nome da obra"/></div>
-<div class="field hidden" id="obraCboField"><label>CBO da Obra</label><input name="cboObra" placeholder="Informe o CBO da obra"/></div>
+<div class="field hidden" id="obraCeiField"><label>CEI</label><input name="cei" placeholder="Informe o CEI da obra"/></div>
 </div>
 <div class="field">
 <label>Atendimento Possui ASO?</label>
@@ -4631,7 +4631,7 @@ button[data-totem-key] {
 </div>
 <div class="modal-body">
 <div class="global-search-toolbar">
-<div class="search global-search-input"><span>🔎</span><input id="globalSearchModalInput" placeholder="Busque por paciente, CPF, ID, empresa, contrato, função, setor, obra ou CBO da obra" type="search"/></div>
+<div class="search global-search-input"><span>🔎</span><input id="globalSearchModalInput" placeholder="Busque por paciente, CPF, ID, empresa, contrato, função, setor, obra ou CEI" type="search"/></div>
 <div class="chips smart-filter-group">
 <button class="smart-filter active" data-global-filter="todos" type="button">Todos</button>
 <button class="smart-filter" data-global-filter="pendentes" type="button">Pendentes</button>
@@ -5069,12 +5069,12 @@ button[data-totem-key] {
     function syncObraFields(forceClear = false) {
       const checked = Boolean(document.getElementById('obraFlag')?.checked);
       document.getElementById('obraNomeField')?.classList.toggle('hidden', !checked);
-      document.getElementById('obraCboField')?.classList.toggle('hidden', !checked);
+      document.getElementById('obraCeiField')?.classList.toggle('hidden', !checked);
       if (!checked && forceClear) {
         const obraInput = document.querySelector('#newAttendanceForm [name="obra"]');
-        const cboInput = document.querySelector('#newAttendanceForm [name="cboObra"]');
+        const ceiInput = document.querySelector('#newAttendanceForm [name="cei"]');
         if (obraInput) obraInput.value = '';
-        if (cboInput) cboInput.value = '';
+        if (ceiInput) ceiInput.value = '';
       }
     }
 
@@ -5098,7 +5098,7 @@ button[data-totem-key] {
             <div class="result-meta-card"><div class="label">Atendimento</div><div>${maskText(patient.tipoAtendimento || 'Não informado')}</div></div>
             <div class="result-meta-card"><div class="label">Fluxo</div><div>${patient.asoCadastrado ? 'Completo' : 'Somente exames'}</div></div>
             <div class="result-meta-card"><div class="label">Exames</div><div>${counts.done}/${counts.total} realizado(s)</div></div>
-            <div class="result-meta-card"><div class="label">Obra / CBO</div><div>${maskText(patient.obra || '—')} ${patient.cboObra ? `• ${maskText(patient.cboObra)}` : ''}</div></div>
+            <div class="result-meta-card"><div class="label">Obra / CEI</div><div>${maskText(patient.obra || '—')} ${patient.cboObra ? `• ${maskText(patient.cboObra)}` : ''}</div></div>
           </div>
           <div style="display:flex;justify-content:flex-end">
             <button class="btn btn-ghost" type="button" onclick="openPatientModal('${patient.id}','localizar-atendimento')">Abrir ficha</button>
@@ -6694,6 +6694,19 @@ function compareQueueOrder(a, b) {
     }
 
     function updateFlow(patient) {
+      // Regra TOTEM → Recepção: ficha aberta apenas por CPF deve permanecer na Recepção
+      // até a atendente transformar o cadastro em nominal.
+      const cpfOnlyReception = patient && (patient.source === 'TOTEM' || patient.origem === 'TOTEM' || patient.cadastroNominal === false)
+        && String(patient.nome || '').trim().match(/^CPF\s/i)
+        && !patient.asoCadastrado;
+      if (cpfOnlyReception) {
+        patient.etapa = 'Recepção';
+        patient.statusAtendimento = 'Pendente';
+        patient.triagem = patient.triagem || { status: 'Bloqueado', data: '', observacoes: '' };
+        patient.triagem.status = 'Bloqueado';
+        patient.medico = patient.medico || { nome: '', resultado: '', data: '', pendencia: '', observacoes: '' };
+        return;
+      }
       const counts = getExamCounts(patient);
       const allDone = counts.done === counts.total;
       const hasApplicable = counts.total > 0;
@@ -8115,8 +8128,8 @@ function compareQueueOrder(a, b) {
               <div class="value">${maskText(patient.preferencial || 'Não')}</div>
             </div>
             <div class="locator-field">
-              <div class="label">Obra / CBO da obra</div>
-              <div class="value">${maskText(patient.obra || 'Não informado')}${patient.cboObra ? ` • ${maskText(patient.cboObra)}` : ''}</div>
+              <div class="label">Obra / CEI</div>
+              <div class="value">${maskText(patient.obra || 'Não informado')}${patient.cei ? ` • ${maskText(patient.cei)}` : ''}</div>
             </div>
           </div>
 
@@ -8253,7 +8266,7 @@ function compareQueueOrder(a, b) {
           'CPF': patient.cpf || '',
           'Empresa': patient.empresa || '',
           'Obra': patient.obra || '',
-          'CBO da Obra': patient.cboObra || '',
+          'CEI': patient.cboObra || '',
           'Setor': patient.setor || '',
           'Função': patient.funcao || '',
           'Preferencial': patient.preferencial || 'Não',
@@ -9177,8 +9190,9 @@ function compareQueueOrder(a, b) {
               <div class="field"><label>Endereço</label><input id="edit-endereco" value="${patient.endereco || ''}"></div>
               <div class="field"><label>CEP</label><input id="edit-cep" value="${patient.cep || ''}"></div>
               <div class="field"><label>CNPJ</label><input id="edit-cnpj" value="${patient.cnpj || ''}"></div>
-              <div class="field"><label>Obra</label><input id="edit-obra" value="${patient.obra || ''}"></div>
-              <div class="field"><label>CEI</label><input id="edit-cei" value="${patient.cei || ''}"></div>
+              <div class="field"><label class="toggle-field"><input id="edit-obra-flag" type="checkbox" ${(patient.obra || patient.cei) ? 'checked' : ''}/><span>Obra?</span></label></div>
+              <div class="field ${(patient.obra || patient.cei) ? '' : 'hidden'}" id="edit-obra-nome-field"><label>OBRA</label><input id="edit-obra" value="${patient.obra || ''}" placeholder="Informe o nome da obra"></div>
+              <div class="field ${(patient.obra || patient.cei) ? '' : 'hidden'}" id="edit-obra-cei-field"><label>CEI</label><input id="edit-cei" value="${patient.cei || ''}" placeholder="Informe o CEI da obra"></div>
               <div class="field"><label>Retorno?</label>
                 <select id="edit-retorno">
                   <option value="Não" ${patient.retorno !== 'Sim' ? 'selected' : ''}>Não</option>
@@ -9551,7 +9565,28 @@ function compareQueueOrder(a, b) {
       });
     }
 
+    function syncEditObraFields(forceClear = false) {
+      const checked = Boolean(document.getElementById('edit-obra-flag')?.checked);
+      document.getElementById('edit-obra-nome-field')?.classList.toggle('hidden', !checked);
+      document.getElementById('edit-obra-cei-field')?.classList.toggle('hidden', !checked);
+      if (!checked && forceClear) {
+        const obraInput = document.getElementById('edit-obra');
+        const ceiInput = document.getElementById('edit-cei');
+        if (obraInput) obraInput.value = '';
+        if (ceiInput) ceiInput.value = '';
+      }
+    }
+
     function initializeReceptionEditForm(patient) {
+      const patientModalCard = document.querySelector('#patientModal .modal-card');
+      if (patientModalCard && !patientModalCard.dataset.noAutoCloseGuard) {
+        patientModalCard.dataset.noAutoCloseGuard = 'true';
+        patientModalCard.addEventListener('click', event => event.stopPropagation());
+        patientModalCard.addEventListener('input', event => event.stopPropagation());
+        patientModalCard.addEventListener('change', event => event.stopPropagation());
+      }
+      document.getElementById('edit-obra-flag')?.addEventListener('change', () => syncEditObraFields(true));
+      syncEditObraFields(false);
       const editChecklist = document.querySelectorAll('#editExamChecklist input[type="checkbox"]');
       editChecklist.forEach(input => {
         input.addEventListener('change', syncEditReceptionExamFields);
@@ -9603,8 +9638,9 @@ function compareQueueOrder(a, b) {
       patient.endereco = sanitizeText(document.getElementById('edit-endereco').value);
       patient.cep = sanitizeText(document.getElementById('edit-cep').value);
       patient.cnpj = sanitizeText(document.getElementById('edit-cnpj').value);
-      patient.obra = sanitizeText(document.getElementById('edit-obra').value);
-      patient.cei = sanitizeText(document.getElementById('edit-cei').value);
+      const editObraMarcada = Boolean(document.getElementById('edit-obra-flag')?.checked);
+      patient.obra = editObraMarcada ? sanitizeText(document.getElementById('edit-obra')?.value || '') : '';
+      patient.cei = editObraMarcada ? sanitizeText(document.getElementById('edit-cei')?.value || '') : '';
       patient.retorno = sanitizeText(document.getElementById('edit-retorno').value) || 'Não';
       patient.dataRetorno = sanitizeText(document.getElementById('edit-data-retorno').value);
       patient.grupoServico = sanitizeText(document.getElementById('edit-grupo-servico').value) || 'EXAMES OCUPACIONAIS';
@@ -9616,6 +9652,10 @@ function compareQueueOrder(a, b) {
       patient.rxTipo = serializeExamTypeList(rxTipos);
       patient.labTipo = serializeExamTypeList(labTipos);
       patient.medico.resultado = patient.medico.resultado || '';
+      // Ao salvar pela Recepção, o atendimento deixa de ser apenas CPF do TOTEM
+      // e passa a ser a ficha nominal única do paciente.
+      patient.cadastroNominal = !String(patient.nome || '').trim().match(/^CPF\s/i);
+      patient.source = patient.source || 'Recepção';
 
       patient.exames = EXAM_ORDER.map(ex => {
         const existing = (patient.exames || []).find(item => item.key === ex.key) || { key: ex.key, nome: ex.nome, status: 'Não se aplica' };
@@ -9637,7 +9677,14 @@ function compareQueueOrder(a, b) {
 
       updateFlow(patient);
       savePatients();
-      refreshAll();
+      try {
+        if (typeof window.syncTotemReceptionEditToCaller === 'function') window.syncTotemReceptionEditToCaller(patient);
+      } catch (error) {
+        console.warn('Não foi possível sincronizar o cadastro nominal com o Chamador:', error);
+      }
+      // Mantém a janela de edição aberta após salvar, sem fechar/reabrir a tela inteira.
+      try { renderRecepcao(); } catch (error) {}
+      try { renderDashboard(); } catch (error) {}
       openPatientModal(id, 'recepcao');
     }
 
@@ -9889,7 +9936,7 @@ function compareQueueOrder(a, b) {
           observacoesIniciais,
           form.get('preferencial') === 'Sim' ? 'ATENDIMENTO PREFERENCIAL: identificar com prioridade na fila e na chamada' : '',
           form.get('obraFlag') && sanitizeText(form.get('obra')) ? `Obra: ${sanitizeText(form.get('obra'))}` : '',
-          form.get('obraFlag') && sanitizeText(form.get('cboObra')) ? `CBO da obra: ${sanitizeText(form.get('cboObra'))}` : '',
+          form.get('obraFlag') && sanitizeText(form.get('cei')) ? `CEI: ${sanitizeText(form.get('cei'))}` : '',
           selected.has('rx') && rxTipo ? `RX: ${rxTipo}` : '',
           selected.has('lab') && labTipo ? `Laboratorial: ${labTipo}` : ''
         ].filter(Boolean).join(' • ');
@@ -9906,8 +9953,8 @@ function compareQueueOrder(a, b) {
           contratoStatusFinanceiro: contratoSelecionado?.statusFinanceiro || sanitizeText(form.get('contratoStatusFinanceiro')) || 'Adimplente',
           contratoTipo: contratoSelecionado?.tipoContrato || sanitizeText(form.get('contratoTipo')) || 'ASO + Exames Ocupacionais',
           obra: form.get('obraFlag') ? sanitizeText(form.get('obra')) : '',
-          cboObra: form.get('obraFlag') ? sanitizeText(form.get('cboObra')) : '',
-          cei: '',
+          cboObra: '',
+          cei: form.get('obraFlag') ? sanitizeText(form.get('cei')) : '',
           preferencial: form.get('preferencial') || 'Não',
           nome: sanitizeText(form.get('nome')),
           nomeSocial: '',
@@ -10067,7 +10114,13 @@ function compareQueueOrder(a, b) {
     });
     document.getElementById('openUnitSelector').addEventListener('click', openUnitModal);
         document.getElementById('patientModal').addEventListener('click', (e) => {
-      if (e.target.id === 'patientModal') closePatientModal();
+      // Correção: durante a edição do cadastro, o modal não deve fechar sozinho
+      // por clique acidental fora do formulário. O fechamento fica restrito
+      // ao botão "Fechar" da própria janela.
+      if (e.target.id === 'patientModal') {
+        e.preventDefault();
+        e.stopPropagation();
+      }
     });
     document.getElementById('newModal').addEventListener('click', (e) => {
       if (e.target.id === 'newModal') closeNewModal();
@@ -12692,6 +12745,301 @@ function compareQueueOrder(a, b) {
   window.addEventListener("storage", event => { if ([QUEUE_KEY, HISTORY_KEY, LAST_KEY].includes(event.key)) renderFilteredCaller(); });
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => setTimeout(renderFilteredCaller, 120));
   else setTimeout(renderFilteredCaller, 120);
+})();
+</script>
+
+
+<script id="totem-cpf-recepcao-editar-cadastro-rule">
+/* ===== Regra final: CPF do TOTEM aparece na Recepção e vira cadastro nominal único =====
+   - O TOTEM registra somente o CPF e cria/atualiza a ficha digital única.
+   - A aba Recepção lista essa ficha como "CPF 000.000.000-00".
+   - O botão "Editar cadastro" abre a mesma ficha para completar nome, empresa, ASO e exames.
+   - Ao salvar, o Chamador passa a chamar pelo nome informado, sem criar um segundo cadastro. */
+(function(){
+  const PREFIX = "sesi-fluxo-ocupacional-v7-clean";
+  const UNIT_KEY = `${PREFIX}-selected-unit`;
+  const QUEUE_KEY = "sesi_chamador_fila_v1";
+  const CHECKIN_KEY = "sesi_toten_checkins_v1";
+  const digits = value => String(value || "").replace(/\D/g, "").slice(0, 11);
+  const parse = (key, fallback) => { try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; } catch(e) { return fallback; } };
+  const save = (key, value) => localStorage.setItem(key, JSON.stringify(value));
+  const nowDate = () => new Date().toISOString().slice(0,10);
+  const nowTime = () => new Date().toLocaleTimeString("pt-BR", {hour:"2-digit", minute:"2-digit"});
+  function maskCpf(value){ const d = digits(value); return d.length === 11 ? `${d.slice(0,3)}.${d.slice(3,6)}.${d.slice(6,9)}-${d.slice(9)}` : d; }
+  function unit(){ return localStorage.getItem(UNIT_KEY) || "paulista"; }
+  function patientKey(){ return `${PREFIX}-${unit()}`; }
+  function getPatients(){ return parse(patientKey(), []); }
+  function setPatients(list){ save(patientKey(), list); try { if (Array.isArray(window.patients)) { window.patients.length = 0; list.forEach(p => window.patients.push(p)); } } catch(e) {} }
+  function isCpfOnlyName(name){ return /^CPF\s/i.test(String(name || "").trim()); }
+  function findIndexByCpf(list, cpf){ const d = digits(cpf); return list.findIndex(p => digits(p && p.cpf) === d); }
+  function makeReceptionCpfRecord(cpf, preferential){
+    const list = getPatients();
+    const maxOrder = list.reduce((m,p)=>Math.max(m, Number(p && p.ordem || 0)),0);
+    const nextId = list.reduce((m,p)=>{ const mm=String(p && p.id || "").match(/AT-(\d+)/); return Math.max(m, mm ? Number(mm[1]) : 0); },0)+1;
+    const masked = maskCpf(cpf);
+    return {
+      ordem: maxOrder + 1,
+      id: `AT-${String(nextId).padStart(4,"0")}`,
+      dataAtendimento: nowDate(), retorno: "Não", dataRetorno: "", cnpj: "", empresa: "", contratoNumero: "",
+      contratoStatus: "Pendente", contratoStatusFinanceiro: "Pendente", contratoTipo: "ASO + Exames Ocupacionais",
+      obra: "", cboObra: "", cei: "", preferencial: preferential === "Sim" ? "Sim" : "Não",
+      nome: `CPF ${masked}`, nomeSocial: "", setor: "", funcao: "", cpf: masked, dataNascimento: "", sexo: "", telefone: "", email: "", endereco: "", cep: "",
+      tipoAtendimento: "Aguardando cadastro nominal", grupoServico: "EXAMES OCUPACIONAIS", servico: "SERVIÇOS MÉDICOS OCUPACIONAIS",
+      rxTipo: "", labTipo: "", rxTipos: [], labTipos: [],
+      obsCadastro: "CPF informado no TOTEM. Recepção deve chamar o CPF no Chamador e completar esta mesma ficha para transformar em cadastro nominal, sem criar novo atendimento.",
+      asoCadastrado: false, etapa: "Recepção", statusAtendimento: "Pendente",
+      exames: [], triagem: {status:"Bloqueado", data:"", observacoes:""}, medico: {nome:"", resultado:"", data:"", pendencia:"", observacoes:""},
+      source: "TOTEM", origem: "TOTEM", cadastroNominal: false
+    };
+  }
+  function ensureReceptionRecord(cpf, preferential){
+    const d = digits(cpf); if (d.length !== 11) return null;
+    let list = getPatients();
+    let idx = findIndexByCpf(list, d);
+    if (idx >= 0) {
+      const p = {...list[idx]};
+      p.cpf = p.cpf || maskCpf(d);
+      if (!String(p.nome || "").trim()) p.nome = `CPF ${maskCpf(d)}`;
+      if (isCpfOnlyName(p.nome) && !p.cadastroNominal) {
+        p.nome = `CPF ${maskCpf(d)}`;
+        p.etapa = "Recepção";
+        p.statusAtendimento = "Pendente";
+        p.source = p.source || "TOTEM";
+        p.origem = p.origem || "TOTEM";
+        p.cadastroNominal = false;
+        p.asoCadastrado = false;
+        p.obsCadastro = p.obsCadastro || "CPF informado no TOTEM. Completar cadastro nominal nesta mesma ficha.";
+      }
+      if (preferential === "Sim") p.preferencial = "Sim";
+      list[idx] = p;
+    } else {
+      list.push(makeReceptionCpfRecord(d, preferential));
+    }
+    setPatients(list);
+    return list[findIndexByCpf(list, d)];
+  }
+  function ensureReceptionRecordsFromTotem(){
+    const checkins = parse(CHECKIN_KEY, []);
+    checkins.forEach(item => ensureReceptionRecord(item && item.cpf, item && (item.preferential || item.preferencial)));
+    parse(QUEUE_KEY, []).forEach(item => {
+      const stage = String(item && (item.workflowStage || item.stage || item.etapa || item.type) || "Recepção").toLowerCase();
+      if (stage.includes("recep") || item.source === "TOTEM") ensureReceptionRecord(item && item.cpf, item && (item.preferential || item.preferencial));
+    });
+  }
+  window.syncTotemReceptionEditToCaller = function(patient){
+    const d = digits(patient && patient.cpf); if (!d) return;
+    const nome = String(patient && patient.nome || "").trim();
+    const nominal = nome && !isCpfOnlyName(nome);
+    let queue = parse(QUEUE_KEY, []);
+    let found = false;
+    queue = queue.map(item => {
+      if (digits(item && item.cpf) !== d) return item;
+      found = true;
+      return {
+        ...item,
+        cpf: d,
+        patientId: patient.id || item.patientId || "",
+        name: nominal ? nome : `CPF ${maskCpf(d)}`,
+        displayName: nominal ? nome : `CPF ${maskCpf(d)}`,
+        company: patient.empresa || patient.contratoNumero || item.company || "Cadastro aguardando recepção",
+        empresa: patient.empresa || item.empresa || "",
+        type: nominal ? (patient.contratoTipo || item.type || "Recepção / ficha ocupacional") : "Recepção / CPF do TOTEM",
+        preferential: patient.preferencial || item.preferential || "Não",
+        cadastroNominal: Boolean(nominal),
+        workflowStage: item.workflowStage || "Recepção",
+        suggestedRoom: item.suggestedRoom || "Recepção",
+        source: item.source || "TOTEM"
+      };
+    });
+    if (!found) {
+      queue.push({
+        id: `recepcao_${d}`, cpf: d, patientId: patient.id || "",
+        name: nominal ? nome : `CPF ${maskCpf(d)}`, displayName: nominal ? nome : `CPF ${maskCpf(d)}`,
+        company: patient.empresa || patient.contratoNumero || "Cadastro aguardando recepção",
+        type: nominal ? (patient.contratoTipo || "Recepção / ficha ocupacional") : "Recepção / CPF do TOTEM",
+        preferential: patient.preferencial || "Não", cadastroNominal: Boolean(nominal), workflowStage: "Recepção", suggestedRoom: "Recepção",
+        source: patient.source || "TOTEM", createdAt: Date.now(), time: nowTime()
+      });
+    }
+    save(QUEUE_KEY, queue);
+    try { if (typeof window.renderCallerRules === "function") window.renderCallerRules(); } catch(e) {}
+    try { if (typeof window.renderCaller === "function") window.renderCaller(); } catch(e) {}
+  };
+  const previousUpsert = window.upsertTotemCpfReceptionRecord;
+  window.upsertTotemCpfReceptionRecord = function(cpf, preferential){
+    let record = null;
+    try { if (typeof previousUpsert === "function") record = previousUpsert.apply(this, arguments); } catch(e) {}
+    record = ensureReceptionRecord(cpf, preferential) || record;
+    if (record) window.syncTotemReceptionEditToCaller(record);
+    try { if (typeof window.renderRecepcao === "function" && (!window.currentPage || window.currentPage === "recepcao")) window.renderRecepcao(); } catch(e) {}
+    return record;
+  };
+  const previousRenderRecepcao = window.renderRecepcao;
+  window.renderRecepcao = function(){
+    ensureReceptionRecordsFromTotem();
+    if (typeof previousRenderRecepcao === "function") previousRenderRecepcao.apply(this, arguments);
+    setTimeout(() => {
+      document.querySelectorAll('#page-recepcao button').forEach(btn => {
+        if (/Editar cadastro/i.test(btn.textContent || "")) btn.textContent = "Editar cadastro / completar dados";
+      });
+    }, 0);
+  };
+  document.addEventListener("DOMContentLoaded", () => { ensureReceptionRecordsFromTotem(); try { if (typeof window.renderRecepcao === "function") window.renderRecepcao(); } catch(e) {} });
+})();
+</script>
+
+
+
+<script id="fix-exames-ocupacionais-pacientes-disponiveis">
+/* ===== Correção: pacientes liberados aparecem em Exames Ocupacionais =====
+   Regra:
+   - CPF do TOTEM fica somente na Recepção enquanto não for transformado em cadastro nominal.
+   - Após a Recepção completar a ficha e selecionar exames, a mesma ficha entra em Exames Ocupacionais.
+   - A aba Exames Ocupacionais lista pacientes com exames aplicáveis pendentes/em andamento/não realizados/bloqueados,
+     obedecendo o fluxo e sem criar segundo cadastro. */
+(function(){
+  function cpfOnlyName(patient){
+    return /^CPF\s/i.test(String(patient && patient.nome || '').trim());
+  }
+  function isDigitalCpfOnly(patient){
+    return patient && cpfOnlyName(patient) && patient.cadastroNominal === false && !patient.asoCadastrado;
+  }
+  function applicableExams(patient){
+    return Array.isArray(patient && patient.exames) ? patient.exames.filter(ex => ex && ex.status !== 'Não se aplica') : [];
+  }
+  function openExams(patient){
+    return applicableExams(patient).filter(ex => !['Concluído','Exame liberado'].includes(ex.status));
+  }
+  function ensureExamStageEligibility(){
+    try {
+      if (!Array.isArray(patients)) return;
+      let changed = false;
+      patients.forEach(patient => {
+        if (!patient) return;
+        if (isDigitalCpfOnly(patient)) {
+          patient.etapa = 'Recepção';
+          patient.statusAtendimento = 'Pendente';
+          changed = true;
+          return;
+        }
+        const hasOpenExams = openExams(patient).length > 0;
+        const hasApplicable = applicableExams(patient).length > 0;
+        const nominal = !cpfOnlyName(patient) || patient.cadastroNominal === true;
+        if (nominal && hasOpenExams && !['Exames','Triagem','Médico','Concluído'].includes(patient.etapa)) {
+          patient.etapa = 'Exames';
+          patient.statusAtendimento = patient.asoCadastrado ? 'Em andamento' : 'Bloqueado';
+          changed = true;
+        }
+        if (nominal && hasApplicable && patient.etapa === 'Recepção') {
+          patient.etapa = 'Exames';
+          patient.statusAtendimento = patient.asoCadastrado ? 'Em andamento' : 'Bloqueado';
+          changed = true;
+        }
+      });
+      if (changed && typeof savePatients === 'function') savePatients();
+    } catch(error) {
+      console.warn('Não foi possível normalizar a fila de Exames Ocupacionais:', error);
+    }
+  }
+  function patientEligibleForExames(patient){
+    if (!patient || isDigitalCpfOnly(patient)) return false;
+    if (patient.etapa === 'Concluído') return false;
+    return patient.etapa === 'Exames' || openExams(patient).length > 0;
+  }
+  function renderExamesFixed(){
+    ensureExamStageEligibility();
+    const queue = (Array.isArray(patients) ? patients : [])
+      .slice()
+      .sort(typeof compareQueueOrder === 'function' ? compareQueueOrder : ((a,b)=>(a.ordem||0)-(b.ordem||0)))
+      .filter(patientEligibleForExames);
+
+    const examOptions = (typeof EXAM_ORDER !== 'undefined' ? EXAM_ORDER : [])
+      .map(ex => `<option value="${ex.key}">${ex.nome}</option>`).join('');
+    const page = document.getElementById('page-exames');
+    if (!page) return;
+    const currentSearch = (typeof examsFilters !== 'undefined' && examsFilters.search ? examsFilters.search : '').replace(/"/g, '&quot;');
+    page.innerHTML = `
+      <div class="card">
+        <div class="sticky-note" style="margin-bottom:12px">🔬 Regra ativa: a aba Exames Ocupacionais mostra apenas fichas nominais já completadas pela Recepção e com exames aplicáveis para atendimento. CPF puro do TOTEM permanece na Recepção até completar cadastro.</div>
+        <div class="filters">
+          <div class="search" style="flex:0 1 360px;max-width:360px"><span>🔎</span><input id="search-exames" placeholder="Buscar por nome, ID, CPF, empresa, função ou obra" value="${currentSearch}"></div>
+          <div class="field" style="flex:0 0 280px;min-width:240px;margin-bottom:0">
+            <label for="filter-tipo-exame">Tipo de exame</label>
+            <select id="filter-tipo-exame">
+              <option value="">Todos os exames</option>
+              ${examOptions}
+            </select>
+          </div>
+          <div class="chips smart-filter-group" id="quickfilters-exames">
+            <button class="smart-filter active" type="button" data-flag="todos">Todos</button>
+            <button class="smart-filter" type="button" data-flag="pendentes">Pendentes</button>
+            <button class="smart-filter" type="button" data-flag="preferenciais">Preferenciais</button>
+            <button class="smart-filter" type="button" data-flag="obra">Obra</button>
+            <button class="smart-filter" type="button" data-flag="semAso">Sem ASO</button>
+            <button class="smart-filter" type="button" data-flag="naoLiberado">Não Realizado</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Paciente</th><th>Empresa / Tipo</th><th>Status</th><th>Fluxo</th><th>Progresso</th><th>Regras do fluxo</th><th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-exames"></tbody>
+          </table>
+        </div>
+      </div>`;
+
+    const searchInput = document.getElementById('search-exames');
+    const examFilter = document.getElementById('filter-tipo-exame');
+    const tbody = document.getElementById('tbody-exames');
+    const filterButtons = Array.from(document.querySelectorAll('#quickfilters-exames .smart-filter'));
+    let activeFlag = 'todos';
+    if (examFilter && typeof examsFilters !== 'undefined') examFilter.value = examsFilters.exam || '';
+
+    function applyExamFilters(){
+      const selectedExam = examFilter ? examFilter.value : '';
+      if (typeof examsFilters !== 'undefined') examsFilters = { search: searchInput?.value || '', exam: selectedExam || '' };
+      let filtered = queue;
+      if (typeof filterPatientsAdvanced === 'function') {
+        filtered = filterPatientsAdvanced(queue, { term: searchInput?.value || '', flag: activeFlag, examKey: selectedExam, context: 'exames' });
+      } else {
+        const term = String(searchInput?.value || '').toLowerCase();
+        filtered = queue.filter(p => !term || [p.nome,p.id,p.cpf,p.empresa,p.funcao,p.obra].join(' ').toLowerCase().includes(term));
+      }
+      tbody.innerHTML = filtered.length
+        ? filtered.map(p => typeof patientRow === 'function' ? patientRow('exames', p, selectedExam) : `<tr><td colspan="7">${p.nome || p.cpf}</td></tr>`).join('')
+        : `<tr><td colspan="7"><div class="small">Nenhum paciente liberado para Exames Ocupacionais neste momento. Verifique se a Recepção completou o cadastro nominal e marcou os exames aplicáveis.</div></td></tr>`;
+      try { if (typeof window.syncCallerWorkflowByExam === 'function') window.syncCallerWorkflowByExam('Exames', selectedExam || ''); } catch(e) {}
+    }
+    searchInput?.addEventListener('input', applyExamFilters);
+    examFilter?.addEventListener('change', applyExamFilters);
+    filterButtons.forEach(button => button.addEventListener('click', () => {
+      activeFlag = button.dataset.flag || 'todos';
+      filterButtons.forEach(item => item.classList.toggle('active', item === button));
+      applyExamFilters();
+    }));
+    applyExamFilters();
+  }
+  const previousSaveReception = typeof saveReception === 'function' ? saveReception : null;
+  if (previousSaveReception && !previousSaveReception.__examesEligibilityFixed) {
+    const wrappedSaveReception = function(id){
+      const result = previousSaveReception.apply(this, arguments);
+      ensureExamStageEligibility();
+      try { if (typeof renderExames === 'function' && (typeof currentPage === 'undefined' || currentPage === 'exames')) renderExames(); } catch(e) {}
+      return result;
+    };
+    wrappedSaveReception.__examesEligibilityFixed = true;
+    saveReception = wrappedSaveReception;
+    window.saveReception = wrappedSaveReception;
+  }
+  renderExames = renderExamesFixed;
+  window.renderExames = renderExamesFixed;
+  document.addEventListener('DOMContentLoaded', () => setTimeout(() => {
+    ensureExamStageEligibility();
+    try { if (typeof currentPage !== 'undefined' && currentPage === 'exames') renderExamesFixed(); } catch(e) {}
+  }, 150));
 })();
 </script>
 
