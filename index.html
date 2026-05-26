@@ -4415,7 +4415,7 @@ button[data-totem-key] {
 <option>Sala EEG</option>
 <option>Sala Avaliação Psicossocial 1</option>
 <option>Sala Avaliação Psicossocial 2</option>
-<option value="Sala de Raio X">Sala de Raio X</option>
+<option>Sala de Raio X</option>
 </select>
 </div>
 <button class="btn btn-success" id="caller-next-btn" type="button">Chamar próximo</button>
@@ -4536,6 +4536,15 @@ button[data-totem-key] {
 </div>
 <div class="field"><label>Data de atendimento</label><input name="dataAtendimento" type="date"/></div>
 <div class="field"><label>Telefone</label><input name="telefone"/></div>
+<div class="field"><label>CEP</label><input id="cepCadastroInput" name="cep" maxlength="9" placeholder="Digite o CEP"/></div>
+<div class="field"><label>Endereço</label><input id="enderecoCadastroInput" name="endereco" placeholder="Preenchido automaticamente pelo CEP"/></div>
+<div class="field"><label>Retorno?</label>
+<select id="retornoCadastroSelect" name="retorno">
+<option value="Não">Não</option>
+<option value="Sim">Sim</option>
+</select>
+</div>
+<div class="field hidden" id="dataRetornoCadastroField"><label>Data do retorno</label><input id="dataRetornoCadastroInput" name="dataRetorno" type="date"/></div>
 <div class="field"><label>Atendimento preferencial?</label>
 <select id="preferencialSelect" name="preferencial">
 <option value="Não">Não</option>
@@ -7600,7 +7609,11 @@ function compareQueueOrder(a, b) {
     }
 
     function renderRecepcao() {
-      renderQueuePage('page-recepcao', 'recepcao', () => true);
+      renderQueuePage(
+        'page-recepcao',
+        'recepcao',
+        p => !!(p.cpf && String(p.cpf).replace(/\D/g, '').length >= 11)
+      );
     }
 
     function renderExames() {
@@ -9249,7 +9262,7 @@ function compareQueueOrder(a, b) {
                   <option value="Sim" ${patient.retorno === 'Sim' ? 'selected' : ''}>Sim</option>
                 </select>
               </div>
-              <div class="field"><label>Data do retorno</label><input id="edit-data-retorno" type="date" value="${patient.dataRetorno || ''}"></div>
+              <div class="field ${patient.retorno === 'Sim' ? '' : 'hidden'}" id="edit-data-retorno-field"><label>Data do retorno</label><input id="edit-data-retorno" type="date" value="${patient.dataRetorno || ''}"></div>
               <div class="field"><label>Grupo de serviço</label><input id="edit-grupo-servico" value="${patient.grupoServico || ''}"></div>
               <div class="field"><label>Serviço</label><input id="edit-servico" value="${patient.servico || ''}"></div>
             </div>
@@ -9692,7 +9705,7 @@ function compareQueueOrder(a, b) {
       patient.obra = editObraMarcada ? sanitizeText(document.getElementById('edit-obra')?.value || '') : '';
       patient.cei = editObraMarcada ? sanitizeText(document.getElementById('edit-cei')?.value || '') : '';
       patient.retorno = sanitizeText(document.getElementById('edit-retorno').value) || 'Não';
-      patient.dataRetorno = sanitizeText(document.getElementById('edit-data-retorno').value);
+      patient.dataRetorno = patient.retorno === 'Sim' ? sanitizeText(document.getElementById('edit-data-retorno').value) : '';
       patient.grupoServico = sanitizeText(document.getElementById('edit-grupo-servico').value) || 'EXAMES OCUPACIONAIS';
       patient.servico = sanitizeText(document.getElementById('edit-servico').value) || 'SERVIÇOS MÉDICOS OCUPACIONAIS';
       patient.asoCadastrado = document.getElementById('edit-aso-cadastrado').value === 'true';
@@ -9885,6 +9898,57 @@ function compareQueueOrder(a, b) {
       preview.classList.toggle('active', preferencialSelect.value === 'Sim');
     }
 
+
+    function syncRetornoCadastroVisibility() {
+      const retornoSelect = document.getElementById('retornoCadastroSelect');
+      const dataRetornoField = document.getElementById('dataRetornoCadastroField');
+      const dataRetornoInput = document.getElementById('dataRetornoCadastroInput');
+      if (!retornoSelect || !dataRetornoField) return;
+      const isRetorno = retornoSelect.value === 'Sim';
+      dataRetornoField.classList.toggle('hidden', !isRetorno);
+      if (!isRetorno && dataRetornoInput) dataRetornoInput.value = '';
+    }
+
+    function syncRetornoEditVisibility() {
+      const retornoSelect = document.getElementById('edit-retorno');
+      const dataRetornoField = document.getElementById('edit-data-retorno-field');
+      const dataRetornoInput = document.getElementById('edit-data-retorno');
+      if (!retornoSelect || !dataRetornoField) return;
+      const isRetorno = retornoSelect.value === 'Sim';
+      dataRetornoField.classList.toggle('hidden', !isRetorno);
+      if (!isRetorno && dataRetornoInput) dataRetornoInput.value = '';
+    }
+
+    async function preencherEnderecoPorCep(cepInput, enderecoInput) {
+      if (!cepInput || !enderecoInput) return;
+      const cepDigits = String(cepInput.value || '').replace(/\D/g, '');
+      if (cepDigits.length !== 8) return;
+      cepInput.value = cepDigits.replace(/(\d{5})(\d{3})/, '$1-$2');
+      try {
+        const response = await fetch(`https://viacep.com.br/ws/${cepDigits}/json/`);
+        if (!response.ok) throw new Error('CEP não encontrado');
+        const data = await response.json();
+        if (data.erro) throw new Error('CEP não encontrado');
+        const endereco = [data.logradouro, data.bairro, data.localidade, data.uf].filter(Boolean).join(' - ');
+        if (endereco) enderecoInput.value = endereco;
+      } catch (error) {
+        console.warn('Não foi possível preencher o endereço pelo CEP:', error);
+        showToast('CEP não localizado', 'Confira o CEP digitado ou preencha o endereço manualmente.', '📍');
+      }
+    }
+
+    function setupCepAutoFill(cepSelector, enderecoSelector) {
+      const cepInput = document.querySelector(cepSelector);
+      const enderecoInput = document.querySelector(enderecoSelector);
+      if (!cepInput || !enderecoInput || cepInput.dataset.cepAutofill === 'true') return;
+      cepInput.dataset.cepAutofill = 'true';
+      cepInput.addEventListener('input', () => {
+        const digitsOnly = String(cepInput.value || '').replace(/\D/g, '').slice(0, 8);
+        cepInput.value = digitsOnly.length > 5 ? digitsOnly.replace(/(\d{5})(\d{0,3})/, '$1-$2') : digitsOnly;
+      });
+      cepInput.addEventListener('blur', () => preencherEnderecoPorCep(cepInput, enderecoInput));
+    }
+
     function openNewModal() {
       document.getElementById('newModal').classList.add('open');
     }
@@ -9910,6 +9974,9 @@ function compareQueueOrder(a, b) {
       if (asoSelect) asoSelect.value = 'true';
       const preferencialSelect = document.querySelector('#newAttendanceForm [name="preferencial"]');
       if (preferencialSelect) preferencialSelect.value = 'Não';
+      const retornoSelect = document.getElementById('retornoCadastroSelect');
+      if (retornoSelect) retornoSelect.value = 'Não';
+      syncRetornoCadastroVisibility();
       syncPriorityPreview();
       const obraFlag = document.getElementById('obraFlag');
       if (obraFlag) obraFlag.checked = false;
@@ -9954,6 +10021,13 @@ function compareQueueOrder(a, b) {
         preferencialSelect.addEventListener('change', syncPriorityPreview);
         syncPriorityPreview();
       }
+      const retornoSelect = document.getElementById('retornoCadastroSelect');
+      if (retornoSelect) {
+        retornoSelect.value = 'Não';
+        retornoSelect.addEventListener('change', syncRetornoCadastroVisibility);
+        syncRetornoCadastroVisibility();
+      }
+      setupCepAutoFill('#cepCadastroInput', '#enderecoCadastroInput');
       document.querySelectorAll('#examChecklist input[type="checkbox"]').forEach(input => {
         input.addEventListener('change', syncNewAttendanceExamFields);
       });
@@ -9994,8 +10068,8 @@ function compareQueueOrder(a, b) {
           ordem: maxOrder + 1,
           id: 'AT-' + String(nextIdNum).padStart(4, '0'),
           dataAtendimento: form.get('dataAtendimento') || new Date().toISOString().slice(0,10),
-          retorno: 'Não',
-          dataRetorno: '',
+          retorno: sanitizeText(form.get('retorno')) || 'Não',
+          dataRetorno: form.get('retorno') === 'Sim' ? sanitizeText(form.get('dataRetorno')) : '',
           cnpj: '',
           empresa: sanitizeText(form.get('empresa')),
           contratoNumero: sanitizeText(form.get('contratoNumero')),
@@ -10015,8 +10089,8 @@ function compareQueueOrder(a, b) {
           sexo: '',
           telefone: sanitizeText(form.get('telefone')),
           email: '',
-          endereco: '',
-          cep: '',
+          endereco: sanitizeText(form.get('endereco')),
+          cep: sanitizeText(form.get('cep')),
           tipoAtendimento: sanitizeText(form.get('tipoAtendimento')) || 'Admissional',
           grupoServico: 'EXAMES OCUPACIONAIS',
           servico: 'SERVIÇOS MÉDICOS OCUPACIONAIS',
@@ -10742,6 +10816,13 @@ function compareQueueOrder(a, b) {
   }
 
   function getQueue() {
+    /* Próximos da fila no painel dedicado seguem a mesma sala/exame selecionado no chamador. */
+    try {
+      if (typeof window.__sesiGetCallerFilteredQueue === "function") {
+        const filtered = window.__sesiGetCallerFilteredQueue();
+        if (Array.isArray(filtered)) return filtered;
+      }
+    } catch (e) {}
     return sortQueue(safeParse(queueKey, []));
   }
 
@@ -12879,6 +12960,13 @@ function compareQueueOrder(a, b) {
   function removePatient(id){ save(QUEUE_KEY, readQueue().filter(item => item.id !== id)); renderFilteredCaller(); }
 
   function refreshAfterOriginal(){ setTimeout(renderFilteredCaller, 0); }
+
+  /* API interna para que o painel "Próximos da fila" use exatamente a mesma fila da sala/exame selecionado. */
+  window.__sesiGetCallerSelectedRoom = selectedRoom;
+  window.__sesiGetCallerRoomRule = function(){ return roomRule(selectedRoom()); };
+  window.__sesiGetCallerFilteredQueue = filteredQueue;
+  window.__sesiRenderFilteredCaller = renderFilteredCaller;
+
   const previousRenderCaller = window.renderCaller;
   window.renderCaller = function(){ try { if (typeof previousRenderCaller === "function") previousRenderCaller.apply(this, arguments); } catch(e) {} renderFilteredCaller(); };
   const previousRenderCallerRules = window.renderCallerRules;
@@ -12897,6 +12985,31 @@ function compareQueueOrder(a, b) {
   window.addEventListener("storage", event => { if ([QUEUE_KEY, HISTORY_KEY, LAST_KEY].includes(event.key)) renderFilteredCaller(); });
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => setTimeout(renderFilteredCaller, 120));
   else setTimeout(renderFilteredCaller, 120);
+})();
+</script>
+<script id="chamador-proximos-fila-mesma-ordem-sala-exame">
+/* ===== Regra: "Próximos da fila" obedece a ordem exata da sala/exame selecionado =====
+   Mantém o painel dedicado sincronizado com o filtro operacional do Chamador. */
+(function(){
+  function syncNextList(){
+    try {
+      if (typeof window.__sesiRenderFilteredCaller === "function") window.__sesiRenderFilteredCaller();
+      if (typeof window.renderCaller === "function") window.renderCaller();
+    } catch(e) {}
+  }
+  document.addEventListener("change", function(event){
+    if (event.target && event.target.id === "caller-default-room") setTimeout(syncNextList, 60);
+  }, true);
+  document.addEventListener("click", function(event){
+    if (event.target.closest && event.target.closest("#caller-display-next-btn,#caller-next-btn,[data-filtered-room-call],[data-caller-action='call']")) {
+      setTimeout(syncNextList, 180);
+    }
+  }, true);
+  window.addEventListener("storage", function(event){
+    if (["sesi_chamador_fila_v1","sesi_chamador_historico_v1","sesi_chamador_ultima_chamada_v1"].includes(event.key)) setTimeout(syncNextList, 60);
+  });
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function(){ setTimeout(syncNextList, 180); });
+  else setTimeout(syncNextList, 180);
 })();
 </script>
 
@@ -13785,6 +13898,531 @@ function compareQueueOrder(a, b) {
     try { if (typeof renderRecepcao === "function") renderRecepcao(); } catch(e) {}
     try { if (typeof renderPapaFila === "function" && typeof currentPage !== "undefined" && currentPage === "papa-fila") renderPapaFila(); } catch(e) {}
   });
+})();
+</script>
+
+
+
+<script id="final-fix-cpf-recepcao-raiox-aso-somente-exames">
+/* Atualizações finais solicitadas:
+   1) Garante Sala de Raio X na seleção "Sala padrão para chamada".
+   2) Garante que o CPF digitado no TOTEM gere/atualize a mesma ficha na Recepção.
+   3) Quando "Atendimento Possui ASO?" = Não, o fluxo é somente exames: não passa por Triagem nem Médico. */
+(function(){
+  const PREFIX = 'sesi-fluxo-ocupacional-v7-clean';
+  const UNIT_KEY = `${PREFIX}-selected-unit`;
+  const CHECKIN_KEY = 'sesi_toten_checkins_v1';
+  const QUEUE_KEY = 'sesi_chamador_fila_v1';
+
+  function parseJson(key, fallback){
+    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+    catch(e){ return fallback; }
+  }
+  function saveJson(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+  function digits(value){ return String(value || '').replace(/\D/g, ''); }
+  function activeUnit(){
+    try { return (typeof selectedUnit !== 'undefined' && selectedUnit) ? selectedUnit : (localStorage.getItem(UNIT_KEY) || 'paulista'); }
+    catch(e){ return localStorage.getItem(UNIT_KEY) || 'paulista'; }
+  }
+  function patientsKey(){ return `${PREFIX}-${activeUnit()}`; }
+  function maskCpf(value){
+    const d = digits(value).slice(0, 11);
+    return d.length === 11 ? `${d.slice(0,3)}.${d.slice(3,6)}.${d.slice(6,9)}-${d.slice(9)}` : d;
+  }
+  function today(){ return new Date().toISOString().slice(0, 10); }
+  function timeNow(){ return new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); }
+  function isCpfOnlyName(name){ return /^CPF\s/i.test(String(name || '').trim()); }
+  function readPatients(){
+    try { if (Array.isArray(patients)) return patients.slice(); } catch(e) {}
+    return parseJson(patientsKey(), []);
+  }
+  function writePatients(list){
+    const normalized = Array.isArray(list) ? list : [];
+    saveJson(patientsKey(), normalized);
+    try {
+      if (Array.isArray(patients)) {
+        patients.length = 0;
+        normalized.forEach(p => patients.push(p));
+      }
+    } catch(e) {}
+    try { if (typeof savePatients === 'function') savePatients(); } catch(e) {}
+  }
+  function defaultExams(){
+    try {
+      if (Array.isArray(EXAM_ORDER)) return EXAM_ORDER.map(ex => ({ key: ex.key, nome: ex.nome, status: 'Não se aplica', motivoNaoRealizado: '' }));
+    } catch(e) {}
+    return [];
+  }
+  function makeReceptionRecord(cpfValue, preferential){
+    const list = readPatients();
+    const masked = maskCpf(cpfValue);
+    const maxOrder = list.reduce((m, p) => Math.max(m, Number(p && p.ordem || 0)), 0);
+    const nextIdNum = list.reduce((m, p) => {
+      const found = String(p && p.id || '').match(/AT-(\d+)/);
+      return Math.max(m, found ? Number(found[1]) : 0);
+    }, 0) + 1;
+    return {
+      ordem: maxOrder + 1,
+      id: `AT-${String(nextIdNum).padStart(4, '0')}`,
+      dataAtendimento: today(), retorno: 'Não', dataRetorno: '', cnpj: '', empresa: '', contratoNumero: '',
+      contratoStatus: 'Pendente', contratoStatusFinanceiro: 'Pendente', contratoTipo: 'ASO + Exames Ocupacionais',
+      obra: '', cboObra: '', cei: '', preferencial: preferential === 'Sim' ? 'Sim' : 'Não',
+      nome: `CPF ${masked}`, nomeSocial: '', setor: '', funcao: '', cpf: masked, dataNascimento: '', sexo: '', telefone: '', email: '', endereco: '', cep: '',
+      tipoAtendimento: 'Aguardando cadastro nominal', grupoServico: 'EXAMES OCUPACIONAIS', servico: 'SERVIÇOS MÉDICOS OCUPACIONAIS',
+      rxTipo: '', labTipo: '', rxTipos: [], labTipos: [],
+      obsCadastro: 'CPF informado no TOTEM. A Recepção deve completar esta mesma ficha digital, sem criar outro atendimento.',
+      asoCadastrado: false, etapa: 'Recepção', statusAtendimento: 'Pendente',
+      exames: defaultExams(), triagem: { status: 'Bloqueado', data: '', observacoes: '' }, medico: { nome: '', resultado: '', data: '', pendencia: '', observacoes: '' },
+      papaFila: (typeof normalizePapaFila === 'function') ? normalizePapaFila() : {},
+      attendanceMetrics: (typeof normalizeAttendanceMetrics === 'function') ? normalizeAttendanceMetrics() : {},
+      source: 'TOTEM', origem: 'TOTEM', cadastroNominal: false
+    };
+  }
+  function ensureCpfOnReception(cpfValue, preferential){
+    const d = digits(cpfValue).slice(0, 11);
+    if (d.length !== 11) return null;
+    const masked = maskCpf(d);
+    const list = readPatients();
+    let idx = list.findIndex(p => digits(p && p.cpf) === d);
+    if (idx < 0) {
+      list.push(makeReceptionRecord(d, preferential));
+      idx = list.length - 1;
+    } else {
+      const patient = Object.assign({}, list[idx]);
+      patient.cpf = masked;
+      patient.preferencial = patient.preferencial === 'Sim' || preferential === 'Sim' ? 'Sim' : 'Não';
+      if (!String(patient.nome || '').trim() || isCpfOnlyName(patient.nome) || patient.cadastroNominal === false) {
+        patient.nome = `CPF ${masked}`;
+        patient.etapa = 'Recepção';
+        patient.statusAtendimento = 'Pendente';
+        patient.tipoAtendimento = patient.tipoAtendimento || 'Aguardando cadastro nominal';
+        patient.asoCadastrado = false;
+        patient.source = patient.source || 'TOTEM';
+        patient.origem = patient.origem || 'TOTEM';
+        patient.cadastroNominal = false;
+        patient.obsCadastro = patient.obsCadastro || 'CPF informado no TOTEM. Completar cadastro nominal nesta mesma ficha.';
+      }
+      patient.triagem = patient.triagem || { status: 'Bloqueado', data: '', observacoes: '' };
+      patient.medico = patient.medico || { nome: '', resultado: '', data: '', pendencia: '', observacoes: '' };
+      list[idx] = patient;
+    }
+    writePatients(list);
+    return list[idx];
+  }
+  function syncReceptionQueue(record){
+    if (!record) return;
+    const d = digits(record.cpf);
+    if (d.length !== 11) return;
+    const nominal = String(record.nome || '').trim() && !isCpfOnlyName(record.nome);
+    let queue = parseJson(QUEUE_KEY, []);
+    let found = false;
+    queue = queue.map(item => {
+      if (digits(item && item.cpf) !== d) return item;
+      found = true;
+      return Object.assign({}, item, {
+        cpf: d,
+        patientId: record.id || item.patientId || '',
+        name: nominal ? record.nome : `CPF ${maskCpf(d)}`,
+        nome: nominal ? record.nome : `CPF ${maskCpf(d)}`,
+        displayName: nominal ? record.nome : `CPF ${maskCpf(d)}`,
+        company: record.empresa || record.contratoNumero || item.company || 'Cadastro aguardando recepção',
+        empresa: record.empresa || item.empresa || '',
+        type: nominal ? (record.tipoAtendimento || record.contratoTipo || item.type || 'Recepção') : 'Recepção / CPF do TOTEM',
+        preferential: record.preferencial || item.preferential || 'Não',
+        workflowStage: 'Recepção', suggestedRoom: item.suggestedRoom || 'Recepção', source: item.source || 'TOTEM'
+      });
+    });
+    if (!found) queue.push({
+      id: `recepcao_${d}`, cpf: d, patientId: record.id || '',
+      name: nominal ? record.nome : `CPF ${maskCpf(d)}`, nome: nominal ? record.nome : `CPF ${maskCpf(d)}`, displayName: nominal ? record.nome : `CPF ${maskCpf(d)}`,
+      company: record.empresa || record.contratoNumero || 'Cadastro aguardando recepção', empresa: record.empresa || '',
+      type: nominal ? (record.tipoAtendimento || record.contratoTipo || 'Recepção') : 'Recepção / CPF do TOTEM',
+      preferential: record.preferencial || 'Não', workflowStage: 'Recepção', suggestedRoom: 'Recepção', source: record.source || 'TOTEM',
+      createdAt: Date.now(), time: timeNow()
+    });
+    saveJson(QUEUE_KEY, queue);
+  }
+  function importTotemCheckinsToReception(){
+    parseJson(CHECKIN_KEY, []).forEach(item => {
+      const record = ensureCpfOnReception(item && item.cpf, item && (item.preferential || item.preferencial));
+      syncReceptionQueue(record);
+    });
+    parseJson(QUEUE_KEY, []).forEach(item => {
+      const stage = String(item && (item.workflowStage || item.stage || item.etapa || item.type || '')).toLowerCase();
+      if (item && (item.source === 'TOTEM' || stage.includes('recep'))) {
+        const record = ensureCpfOnReception(item.cpf, item.preferential || item.preferencial);
+        syncReceptionQueue(record);
+      }
+    });
+  }
+  function ensureRaioXOption(){
+    const select = document.getElementById('caller-default-room');
+    if (select && !Array.from(select.options).some(opt => opt.value === 'Sala de Raio X' || opt.textContent.trim() === 'Sala de Raio X')) {
+      select.insertAdjacentHTML('beforeend', '<option value="Sala de Raio X">Sala de Raio X</option>');
+    }
+    try {
+      if (Array.isArray(PAPA_FILA_ROOMS) && !PAPA_FILA_ROOMS.some(room => room && room.label === 'Sala de Raio X')) {
+        PAPA_FILA_ROOMS.push({ key: 'rx-01', label: 'Sala de Raio X', stage: 'Exames', icon: '🩻', description: 'Chamada exclusiva para pacientes com RX/Raio X pendente.' });
+      }
+    } catch(e) {}
+  }
+  function applyOnlyExamsRule(patient){
+    if (!patient) return patient;
+    const onlyExams = patient.asoCadastrado === false || String(patient.asoCadastrado) === 'false';
+    if (!onlyExams) return patient;
+    patient.triagem = patient.triagem || { status: 'Não se aplica', data: '', observacoes: '' };
+    patient.triagem.status = 'Não se aplica';
+    patient.medico = patient.medico || { nome: '', resultado: '', data: '', pendencia: '', observacoes: '' };
+    patient.medico.resultado = '';
+    patient.medico.pendencia = '';
+    const exames = Array.isArray(patient.exames) ? patient.exames : [];
+    const aplicaveis = exames.filter(ex => ex && ex.status !== 'Não se aplica');
+    const abertos = aplicaveis.filter(ex => !['Concluído', 'Exame liberado'].includes(ex.status));
+    if (aplicaveis.length && abertos.length) {
+      patient.etapa = 'Exames';
+      patient.statusAtendimento = 'Em andamento';
+    } else {
+      patient.etapa = 'Concluído';
+      patient.statusAtendimento = 'Concluído';
+    }
+    return patient;
+  }
+  function normalizeOnlyExamsPatients(){
+    const list = readPatients();
+    let changed = false;
+    list.forEach(patient => {
+      const before = JSON.stringify([patient.etapa, patient.statusAtendimento, patient.triagem, patient.medico]);
+      applyOnlyExamsRule(patient);
+      if (JSON.stringify([patient.etapa, patient.statusAtendimento, patient.triagem, patient.medico]) !== before) changed = true;
+    });
+    if (changed) writePatients(list);
+  }
+
+  const previousUpsert = window.upsertTotemCpfReceptionRecord;
+  window.upsertTotemCpfReceptionRecord = function(cpf, preferential){
+    let record = null;
+    try { if (typeof previousUpsert === 'function') record = previousUpsert.apply(this, arguments); } catch(e) {}
+    record = ensureCpfOnReception(cpf, preferential) || record;
+    syncReceptionQueue(record);
+    try { if (typeof renderRecepcao === 'function') renderRecepcao(); } catch(e) {}
+    try { if (typeof window.renderCallerRules === 'function') window.renderCallerRules(); } catch(e) {}
+    try { if (typeof window.renderCaller === 'function') window.renderCaller(); } catch(e) {}
+    return record;
+  };
+
+  try {
+    if (typeof updateFlow === 'function') {
+      const previousUpdateFlow = updateFlow;
+      updateFlow = function(patient){
+        if (patient && (patient.asoCadastrado === false || String(patient.asoCadastrado) === 'false')) return applyOnlyExamsRule(patient);
+        return previousUpdateFlow.apply(this, arguments);
+      };
+    }
+  } catch(e) {}
+
+  try {
+    if (typeof renderRecepcao === 'function') {
+      const previousRenderRecepcao = renderRecepcao;
+      renderRecepcao = function(){
+        importTotemCheckinsToReception();
+        normalizeOnlyExamsPatients();
+        const result = previousRenderRecepcao.apply(this, arguments);
+        setTimeout(() => {
+          document.querySelectorAll('#page-recepcao button').forEach(btn => {
+            if (/Editar cadastro/i.test(btn.textContent || '')) btn.textContent = 'Editar cadastro / completar dados';
+          });
+        }, 0);
+        return result;
+      };
+    }
+  } catch(e) {}
+
+  document.addEventListener('change', event => {
+    if (event.target && event.target.id === 'asoCadastradoSelect') {
+      const info = document.getElementById('aso-only-exams-info');
+      if (event.target.value === 'false' && !info) {
+        event.target.closest('.field')?.insertAdjacentHTML('afterend', '<div id="aso-only-exams-info" class="sticky-note">Regra aplicada: sem ASO, o paciente fará somente os exames selecionados e não será enviado para Triagem nem Médico do Trabalho.</div>');
+      } else if (event.target.value !== 'false' && info) {
+        info.remove();
+      }
+    }
+  }, true);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    ensureRaioXOption();
+    importTotemCheckinsToReception();
+    normalizeOnlyExamsPatients();
+    try { if (typeof renderRecepcao === 'function') renderRecepcao(); } catch(e) {}
+  });
+
+  ensureRaioXOption();
+  importTotemCheckinsToReception();
+  normalizeOnlyExamsPatients();
+})();
+</script>
+
+
+
+<script id="fix-final-salas-e-tipo-exame-chamador">
+/* Correção final:
+   - Repreenche a caixa "Tipo de exame" em Exames Ocupacionais quando ela renderizar vazia.
+   - Repreenche a caixa "Sala padrão para chamada" quando ela renderizar vazia.
+   - Recria a lista/cartões "Salas de atendimento" do Chamador quando a grade ficar em branco.
+   - Mantém "Sala de Raio X" disponível nas listas do Chamador.
+*/
+(function(){
+  const EXAM_OPTIONS_FALLBACK = [
+    { key: "audiometria", nome: "Audiometria" },
+    { key: "acuidade", nome: "Acuidade Visual" },
+    { key: "espirometria", nome: "Espirometria" },
+    { key: "ecg", nome: "ECG" },
+    { key: "eeg", nome: "EEG" },
+    { key: "rx", nome: "RX" },
+    { key: "lab", nome: "Exames Laboratoriais" },
+    { key: "psicossocial", nome: "Avaliação Psicossocial" }
+  ];
+
+  const CALL_ROOM_OPTIONS_FALLBACK = [
+    "Recepção Térreo 1",
+    "Recepção Térreo 2",
+    "Recepção Térreo 3",
+    "Recepção Ocupacional 1",
+    "Recepção Ocupacional 2",
+    "Recepção Ocupacional 01",
+    "Recepção Ocupacional 02",
+    "Sala Triagem 1",
+    "Sala Triagem 2",
+    "Sala Triagem 3",
+    "Sala Triagem 01",
+    "Sala Triagem 02",
+    "Consultório Médico 1",
+    "Consultório Médico 2",
+    "Consultório Médico 3",
+    "Consultório Médico 4",
+    "Consultório Médico 01",
+    "Consultório Médico 02",
+    "Sala Acuidade Visual",
+    "Sala Coleta de Exames laboratoriais 1",
+    "Sala Coleta de Exames laboratoriais 2",
+    "Sala Coleta de Exames laboratoriais 3",
+    "Sala Coleta / Laboratório",
+    "Sala Audiometria 1",
+    "Sala Audiometria 2",
+    "Sala Audiometria",
+    "Sala Espirometria",
+    "Sala ECG",
+    "Sala EEG",
+    "Sala de Raio X",
+    "Sala Avaliação Psicossocial 1",
+    "Sala Avaliação Psicossocial 2",
+    "Sala Avaliação Psicossocial"
+  ];
+
+  const CALL_ROOM_CARDS_FALLBACK = [
+    { nome: "Recepção Ocupacional 01", tipo: "Recepção" },
+    { nome: "Recepção Ocupacional 02", tipo: "Recepção" },
+    { nome: "Sala Audiometria", tipo: "Exames Ocupacionais" },
+    { nome: "Sala Acuidade Visual", tipo: "Exames Ocupacionais" },
+    { nome: "Sala Espirometria", tipo: "Exames Ocupacionais" },
+    { nome: "Sala ECG", tipo: "Exames Ocupacionais" },
+    { nome: "Sala EEG", tipo: "Exames Ocupacionais" },
+    { nome: "Sala de Raio X", tipo: "Exames Ocupacionais" },
+    { nome: "Sala Coleta / Laboratório", tipo: "Exames Ocupacionais" },
+    { nome: "Sala Avaliação Psicossocial", tipo: "Exames Ocupacionais" },
+    { nome: "Sala Triagem 01", tipo: "Triagem" },
+    { nome: "Sala Triagem 02", tipo: "Triagem" },
+    { nome: "Consultório Médico 01", tipo: "Médico do Trabalho" },
+    { nome: "Consultório Médico 02", tipo: "Médico do Trabalho" }
+  ];
+
+  function esc(value){
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#39;");
+  }
+
+  function uniqueByText(list){
+    const seen = new Set();
+    return list.filter(item => {
+      const key = String(item || "").trim().toLowerCase();
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+
+  function getExamOptions(){
+    try {
+      if (Array.isArray(EXAM_ORDER) && EXAM_ORDER.length) {
+        return EXAM_ORDER
+          .filter(ex => ex && ex.key && ex.nome)
+          .map(ex => ({ key: String(ex.key), nome: String(ex.nome) }));
+      }
+    } catch(e) {}
+    return EXAM_OPTIONS_FALLBACK;
+  }
+
+  function ensureExamTypeSelects(){
+    const selectors = Array.from(document.querySelectorAll(
+      "#filter-tipo-exame, select[id^='filter-tipo-exame-']"
+    ));
+    if (!selectors.length) return;
+
+    const options = getExamOptions();
+    selectors.forEach(select => {
+      const current = select.value || "";
+      const hasUsefulOptions = Array.from(select.options || [])
+        .some(option => String(option.value || "").trim() !== "");
+
+      if (!hasUsefulOptions || select.options.length <= 1) {
+        select.innerHTML =
+          '<option value="">Todos os exames</option>' +
+          options.map(ex => `<option value="${esc(ex.key)}">${esc(ex.nome)}</option>`).join("");
+        if (Array.from(select.options).some(option => option.value === current)) {
+          select.value = current;
+        }
+      }
+    });
+  }
+
+  function ensureCallerRoomSelect(){
+    const select = document.getElementById("caller-default-room");
+    if (!select) return;
+
+    const current = select.value || "";
+    const existing = Array.from(select.options || []).map(option => option.value || option.textContent || "");
+    const merged = uniqueByText([...existing, ...CALL_ROOM_OPTIONS_FALLBACK]);
+
+    if (select.options.length === 0 || !existing.some(value => String(value || "").trim()) || !existing.includes("Sala de Raio X")) {
+      select.innerHTML = merged.map(room => `<option value="${esc(room)}">${esc(room)}</option>`).join("");
+      if (merged.includes(current)) select.value = current;
+    }
+  }
+
+  function getLatestRoomCall(roomName){
+    try {
+      const raw = localStorage.getItem("sesi_chamador_historico_v1");
+      const history = JSON.parse(raw || "[]");
+      if (!Array.isArray(history)) return null;
+      return history.find(item => String(item?.room || item?.roomLabel || item?.displayRoomLabel || "").trim() === roomName) || null;
+    } catch(e) {
+      return null;
+    }
+  }
+
+  function ensureCallerRoomsGrid(){
+    const grid = document.getElementById("caller-rooms");
+    if (!grid) return;
+
+    const visibleText = String(grid.textContent || "").trim();
+    const hasRoomTitle = !!grid.querySelector(".room-title, .room-name, [data-room-name]");
+    if (visibleText && hasRoomTitle) return;
+
+    grid.innerHTML = CALL_ROOM_CARDS_FALLBACK.map(room => {
+      const latest = getLatestRoomCall(room.nome);
+      const patientName = latest ? (latest.name || latest.nome || "Paciente chamado") : "Sala disponível";
+      const meta = latest
+        ? `${latest.calledAt || latest.time || ""} • ${latest.type || latest.workflowExamName || latest.displayExamLabel || room.tipo}`
+        : "Aguardando próxima chamada";
+      return `
+        <div class="call-center-room" data-room-name="${esc(room.nome)}">
+          <div class="room-title">${esc(room.nome)}</div>
+          <div class="room-type">${esc(room.tipo)}</div>
+          <div class="room-now">${esc(patientName)}</div>
+          <div class="small">${esc(meta)}</div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function ensurePapaFilaRoomDefinitions(){
+    try {
+      if (Array.isArray(PAPA_FILA_ROOMS)) {
+        const rxRoom = PAPA_FILA_ROOMS.find(room => room && room.key === "rx-01");
+        if (rxRoom) {
+          rxRoom.label = "Sala de Raio X";
+          rxRoom.stage = "Exames";
+          rxRoom.icon = "🩻";
+          rxRoom.description = "Chamada exclusiva para pacientes com RX/Raio X pendente.";
+        }
+        if (!PAPA_FILA_ROOMS.some(room => room && String(room.label || "").trim() === "Sala de Raio X")) {
+          PAPA_FILA_ROOMS.push({
+            key: "rx-01",
+            label: "Sala de Raio X",
+            stage: "Exames",
+            icon: "🩻",
+            description: "Chamada exclusiva para pacientes com RX/Raio X pendente."
+          });
+        }
+      }
+    } catch(e) {}
+  }
+
+  function ensureAll(){
+    ensurePapaFilaRoomDefinitions();
+    ensureExamTypeSelects();
+    ensureCallerRoomSelect();
+    ensureCallerRoomsGrid();
+  }
+
+  function wrapRenderFunction(name){
+    try {
+      const original = window[name] || (typeof globalThis[name] === "function" ? globalThis[name] : null);
+      if (typeof original !== "function" || original.__selectRoomSafeWrapped) return;
+      const wrapped = function(){
+        const result = original.apply(this, arguments);
+        setTimeout(ensureAll, 0);
+        setTimeout(ensureAll, 80);
+        return result;
+      };
+      wrapped.__selectRoomSafeWrapped = true;
+      window[name] = wrapped;
+      try { globalThis[name] = wrapped; } catch(e) {}
+    } catch(e) {}
+  }
+
+  function install(){
+    ["renderExames", "renderTriagem", "renderMedico", "renderCaller", "renderPapaFila"].forEach(wrapRenderFunction);
+    ensureAll();
+    setTimeout(ensureAll, 100);
+    setTimeout(ensureAll, 400);
+    setTimeout(ensureAll, 1000);
+  }
+
+  document.addEventListener("change", function(event){
+    if (event.target && (
+      event.target.id === "caller-default-room" ||
+      event.target.id === "filter-tipo-exame" ||
+      String(event.target.id || "").startsWith("filter-tipo-exame-")
+    )) {
+      setTimeout(ensureAll, 50);
+    }
+  }, true);
+
+  document.addEventListener("click", function(event){
+    if (event.target && event.target.closest && event.target.closest("[data-page='chamador'], [data-page='exames'], .nav-btn")) {
+      setTimeout(install, 120);
+    }
+  }, true);
+
+  try {
+    const observer = new MutationObserver(function(){
+      clearTimeout(window.__sesiFixSelectsRoomsTimer);
+      window.__sesiFixSelectsRoomsTimer = setTimeout(ensureAll, 80);
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+  } catch(e) {}
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", install);
+  } else {
+    install();
+  }
+
+  window.__sesiEnsureChamadorSalasTipoExame = ensureAll;
 })();
 </script>
 
