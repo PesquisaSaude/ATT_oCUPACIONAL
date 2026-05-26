@@ -4351,9 +4351,8 @@ button[data-totem-key] {
 <div class="call-center-card-title">
 <div>
 <h3>Nova entrada na fila</h3>
-<div class="small">Inclua pacientes na fila do chamador ou use os dados simulados do atendimento ocupacional.</div>
+<div class="small">Inclua pacientes na fila do chamador para chamada ocupacional.</div>
 </div>
-<button class="btn btn-ghost" id="caller-seed-btn" type="button">Carregar fila exemplo</button>
 </div>
 <div class="call-center-form">
 <div class="field">
@@ -10315,13 +10314,6 @@ function compareQueueOrder(a, b) {
     "Consultório Médico 02"
   ];
 
-  const seedQueue = [
-    { name: "Maria Aparecida Santos", company: "Empresa Modelo A", type: "ASO + Exames Ocupacionais", preferential: "Sim" },
-    { name: "João Pedro Oliveira", company: "Contrato 2025-001", type: "ASO", preferential: "Não" },
-    { name: "Ana Clara Lima", company: "Empresa Modelo B", type: "Exames Ocupacionais", preferential: "Não" },
-    { name: "Carlos Roberto Silva", company: "Contrato 2025-002", type: "ASO + Exames Ocupacionais", preferential: "Sim" }
-  ];
-
   function safeParse(key, fallback) {
     try {
       const raw = localStorage.getItem(key);
@@ -10461,7 +10453,7 @@ function compareQueueOrder(a, b) {
     if (!el) return;
 
     if (!queue.length) {
-      el.innerHTML = `<div class="call-center-empty">Nenhum paciente aguardando. Adicione uma entrada ou carregue a fila exemplo.</div>`;
+      el.innerHTML = `<div class="call-center-empty">Nenhum paciente aguardando. Adicione uma entrada na fila.</div>`;
       return;
     }
 
@@ -10481,7 +10473,6 @@ function compareQueueOrder(a, b) {
           </div>
           <div class="call-center-actions">
             <button class="btn btn-success" type="button" data-caller-action="call" data-id="${item.id}">Chamar</button>
-            <button class="btn btn-ghost" type="button" data-caller-action="remove" data-id="${item.id}">Remover</button>
           </div>
         </div>
       `;
@@ -10489,10 +10480,6 @@ function compareQueueOrder(a, b) {
 
     el.querySelectorAll("[data-caller-action='call']").forEach(btn => {
       btn.addEventListener("click", () => callPatient(btn.dataset.id));
-    });
-
-    el.querySelectorAll("[data-caller-action='remove']").forEach(btn => {
-      btn.addEventListener("click", () => removePatient(btn.dataset.id));
     });
   }
 
@@ -10631,23 +10618,6 @@ function compareQueueOrder(a, b) {
     notifyCall(call);
   }
 
-  function removePatient(id) {
-    saveQueue(getQueue().filter(item => item.id !== id));
-    renderCaller();
-  }
-
-  function loadSeedQueue() {
-    const queue = getQueue();
-    const stamped = seedQueue.map((item, index) => ({
-      ...item,
-      id: "seed_" + Date.now() + "_" + index,
-      time: nowTime(),
-      createdAt: Date.now() + index
-    }));
-    saveQueue([...queue, ...stamped]);
-    renderCaller();
-  }
-
   function clearHistory() {
     if (!confirm("Deseja limpar o histórico de chamadas?")) return;
     localStorage.removeItem(historyKey);
@@ -10677,7 +10647,6 @@ function compareQueueOrder(a, b) {
   function bindCallerEvents() {
     document.getElementById("caller-add-btn")?.addEventListener("click", addPatient);
     document.getElementById("caller-next-btn")?.addEventListener("click", callNext);
-    document.getElementById("caller-seed-btn")?.addEventListener("click", loadSeedQueue);
     document.getElementById("caller-clear-history-btn")?.addEventListener("click", clearHistory);
     document.getElementById("caller-repeat-btn")?.addEventListener("click", repeatLastCall);
 
