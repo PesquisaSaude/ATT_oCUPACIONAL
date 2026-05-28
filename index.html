@@ -14833,5 +14833,1126 @@ function compareQueueOrder(a, b) {
 })();
 </script>
 
+
+
+<script id="fix-definitivo-botao-chamar-fila-chamador">
+/* Correção definitiva: o botão "Chamar" da fila usa um handler isolado, sem conflito com os módulos anteriores. */
+(function(){
+  const QUEUE_KEY = "sesi_chamador_fila_v1";
+  const HISTORY_KEY = "sesi_chamador_historico_v1";
+  const LAST_KEY = "sesi_chamador_ultima_chamada_v1";
+  let rendering = false;
+
+  function parse(key, fallback){
+    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+    catch(e){ return fallback; }
+  }
+  function save(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+  function esc(value){
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+  function digits(value){ return String(value || "").replace(/\D/g, "").slice(0, 11); }
+  function maskCpf(value){
+    const d = digits(value);
+    return d.length === 11 ? `${d.slice(0,3)}.${d.slice(3,6)}.${d.slice(6,9)}-${d.slice(9)}` : d;
+  }
+  function normalize(value){
+    return String(value || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim();
+  }
+  function now(){ return new Date().toLocaleTimeString("pt-BR", { hour:"2-digit", minute:"2-digit" }); }
+  function sortQueue(queue){
+    return [...queue].sort((a,b) => ((b.preferential === "Sim") - (a.preferential === "Sim")) || ((Number(a.createdAt)||0) - (Number(b.createdAt)||0)));
+  }
+  function ticket(index){ return "A" + String(index + 1).padStart(3, "0"); }
+  function typeBadge(type){ return String(type || "").includes("Exames") ? "call-badge-exams" : "call-badge-aso"; }
+  function selectedRoom(){ return document.getElementById("caller-default-room")?.value || "Recepção Térreo 1"; }
+  function callName(item){ return String(item?.displayName || item?.name || item?.nome || (item?.cpf ? `CPF ${maskCpf(item.cpf)}` : "Paciente")).trim(); }
+  function normalizeItem(item, index){
+    const cpf = digits(item?.cpf);
+    const createdAt = Number(item?.createdAt || Date.now() + index);
+    const name = callName(item);
+    return {
+      ...item,
+      id: item?.id || `call_fix_${Date.now()}_${index}`,
+      cpf,
+      name,
+      displayName: name,
+      company: item?.company || item?.empresa || "Paciente sem cadastro",
+      type: item?.type || item?.workflowStage || item?.stage || "Atendimento",
+      preferential: item?.preferential === "Sim" ? "Sim" : "Não",
+      createdAt,
+      time: item?.time || now()
+    };
+  }
+  function readQueue(){ return sortQueue((parse(QUEUE_KEY, []) || []).map(normalizeItem)); }
+  function filteredQueue(){
+    try {
+      if (typeof window.__sesiGetCallerFilteredQueue === "function") {
+        const filtered = window.__sesiGetCallerFilteredQueue();
+        if (Array.isArray(filtered)) return filtered.map(normalizeItem);
+      }
+    } catch(e) {}
+    return readQueue();
+  }
+  function ensureNextButtonFixed(){
+    const btn = document.getElementById("caller-next-btn");
+    if (!btn || btn.dataset.fixedChamarNext === "true") return;
+    const clone = btn.cloneNode(true);
+    clone.id = "caller-next-btn-fixed";
+    clone.dataset.fixedChamarNext = "true";
+    clone.textContent = btn.textContent || "Chamar próximo";
+    btn.replaceWith(clone);
+  }
+  function renderFixedCaller(){
+    if (rendering) return;
+    rendering = true;
+    try {
+      ensureNextButtonFixed();
+      const el = document.getElementById("caller-queue-list");
+      if (!el) return;
+      const queue = filteredQueue();
+      const history = parse(HISTORY_KEY, []);
+      const waitingEl = document.getElementById("caller-kpi-waiting");
+      const prefEl = document.getElementById("caller-kpi-preferential");
+      const calledEl = document.getElementById("caller-kpi-called");
+      if (waitingEl) waitingEl.textContent = queue.length;
+      if (prefEl) prefEl.textContent = queue.filter(item => item.preferential === "Sim").length;
+      if (calledEl) calledEl.textContent = history.length;
+
+      if (!queue.length) {
+        const room = selectedRoom();
+        el.innerHTML = `<div class="call-center-empty">Nenhum paciente disponível para ${esc(room)} obedecendo o filtro atual.</div>`;
+        return;
+      }
+
+      el.innerHTML = queue.map((item, index) => `
+        <div class="call-center-queue-item ${item.preferential === "Sim" ? "is-preferential" : ""}" data-id="${esc(item.id)}">
+          <div class="call-center-ticket">${ticket(index)}</div>
+          <div class="call-center-queue-main">
+            <div class="call-center-queue-name">${esc(callName(item))}</div>
+            <div class="call-center-queue-meta">
+              ${item.preferential === "Sim" ? '<span class="call-badge call-badge-preferential">⭐ Preferencial</span>' : ""}
+              ${item.source === "TOTEM" ? '<span class="call-badge call-badge-toten">🖥️ TOTEM</span>' : ""}
+              <span class="call-badge ${typeBadge(item.type)}">${esc(item.type || "Atendimento")}</span>
+              ${item.workflowStage ? `<span class="call-badge call-badge-room">Fluxo: ${esc(item.workflowStage)}</span>` : ""}
+              ${item.workflowExamName ? `<span class="call-badge call-badge-room">${esc(item.workflowExamName)}</span>` : ""}
+              <span>${esc(item.company || "Sem empresa")}</span>
+              ${item.cpf ? `<span>CPF: ${esc(maskCpf(item.cpf))}</span>` : ""}
+              <span>Entrada: ${esc(item.time || "--:--")}</span>
+            </div>
+          </div>
+          <div class="call-center-actions">
+            <button class="btn btn-success" type="button" data-sesi-fixed-call="${esc(item.id)}">Chamar</button>
+            <button class="btn btn-ghost" type="button" data-sesi-fixed-remove="${esc(item.id)}">Remover</button>
+          </div>
+        </div>`).join("");
+    } finally {
+      rendering = false;
+    }
+  }
+  function updateCallerTv(call){
+    const screen = document.getElementById("caller-tv-screen");
+    const patient = document.getElementById("caller-tv-patient");
+    const room = document.getElementById("caller-tv-room");
+    const meta = document.getElementById("caller-tv-meta");
+    if (!patient || !room || !meta) return;
+    if (screen) { screen.classList.add("is-calling"); setTimeout(() => screen.classList.remove("is-calling"), 4500); }
+    patient.classList.remove("call-tv-empty");
+    patient.textContent = callName(call);
+    room.textContent = call.room || selectedRoom();
+    meta.innerHTML = `${call.preferential === "Sim" ? '<span class="call-badge call-badge-preferential">⭐ Atendimento Preferencial</span>' : ""}<span class="call-badge ${typeBadge(call.type)}">${esc(call.type || "Atendimento")}</span>${call.cpf ? `<span class="call-badge">CPF ${esc(maskCpf(call.cpf))}</span>` : ""}<span class="call-badge call-badge-room">Chamado às ${esc(call.calledAt || "")}</span>`;
+  }
+  function speak(call){
+    const say = function(){
+      try {
+        if (!("speechSynthesis" in window)) return;
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(`Paciente ${callName(call)}, dirigir-se à ${call.room}.`);
+        utterance.lang = "pt-BR";
+        utterance.rate = 0.92;
+        utterance.volume = 1;
+        const voices = window.speechSynthesis.getVoices?.() || [];
+        const ptVoice = voices.find(v => String(v.lang || "").toLowerCase().includes("pt"));
+        if (ptVoice) utterance.voice = ptVoice;
+        window.speechSynthesis.speak(utterance);
+      } catch(e) {}
+    };
+    try {
+      const result = typeof window.playSesiChamadorSound === "function" ? window.playSesiChamadorSound() : null;
+      Promise.resolve(result).catch(() => {}).finally(say);
+    } catch(e) { say(); }
+  }
+  function notify(call){
+    try {
+      const fn = window.showToast || window.toast;
+      if (typeof fn === "function") fn("Paciente chamado", `${callName(call)} • ${call.room}`, "📣");
+    } catch(e) {}
+  }
+  function callFixed(id){
+    const all = readQueue();
+    const visible = filteredQueue();
+    const selected = id ? (visible.find(item => String(item.id) === String(id)) || all.find(item => String(item.id) === String(id))) : visible[0];
+    if (!selected) {
+      alert("Não há pacientes disponíveis para chamar no filtro atual.");
+      renderFixedCaller();
+      return;
+    }
+    const room = selectedRoom();
+    const call = normalizeItem({ ...selected, room, calledAt: now(), calledTimestamp: Date.now() }, 0);
+    save(QUEUE_KEY, all.filter(item => String(item.id) !== String(selected.id)));
+    save(HISTORY_KEY, [call, ...parse(HISTORY_KEY, [])].slice(0, 80));
+    save(LAST_KEY, call);
+    updateCallerTv(call);
+    renderFixedCaller();
+    try { if (typeof window.renderCallerRules === "function") setTimeout(renderFixedCaller, 0); } catch(e) {}
+    speak(call);
+    notify(call);
+  }
+  function removeFixed(id){
+    save(QUEUE_KEY, readQueue().filter(item => String(item.id) !== String(id)));
+    renderFixedCaller();
+  }
+
+  const previousRenderCaller = window.renderCaller;
+  window.renderCaller = function(){
+    try { if (typeof previousRenderCaller === "function") previousRenderCaller.apply(this, arguments); } catch(e) {}
+    renderFixedCaller();
+  };
+  const previousRenderCallerRules = window.renderCallerRules;
+  window.renderCallerRules = function(){
+    try { if (typeof previousRenderCallerRules === "function") previousRenderCallerRules.apply(this, arguments); } catch(e) {}
+    renderFixedCaller();
+  };
+  const previousFilteredRender = window.__sesiRenderFilteredCaller;
+  window.__sesiRenderFilteredCaller = function(){
+    try { if (typeof previousFilteredRender === "function") previousFilteredRender.apply(this, arguments); } catch(e) {}
+    renderFixedCaller();
+  };
+
+  window.addEventListener("click", function(event){
+    const callBtn = event.target.closest?.("[data-sesi-fixed-call]");
+    const removeBtn = event.target.closest?.("[data-sesi-fixed-remove]");
+    const nextBtn = event.target.closest?.("#caller-next-btn-fixed, [data-fixed-chamar-next='true'], #caller-display-next-btn");
+    if (callBtn) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      callFixed(callBtn.dataset.sesiFixedCall);
+      return;
+    }
+    if (removeBtn) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      removeFixed(removeBtn.dataset.sesiFixedRemove);
+      return;
+    }
+    if (nextBtn) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      callFixed();
+    }
+  }, true);
+
+  document.addEventListener("change", function(event){ if (event.target?.id === "caller-default-room") setTimeout(renderFixedCaller, 0); }, true);
+  document.addEventListener("input", function(event){ if (event.target?.id === "caller-queue-search") setTimeout(renderFixedCaller, 0); }, true);
+  document.addEventListener("click", function(event){ if (event.target?.id === "caller-queue-search-clear") setTimeout(renderFixedCaller, 0); }, true);
+  window.addEventListener("storage", function(event){ if ([QUEUE_KEY, HISTORY_KEY, LAST_KEY].includes(event.key)) renderFixedCaller(); });
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function(){ setTimeout(renderFixedCaller, 120); });
+  else setTimeout(renderFixedCaller, 120);
+})();
+</script>
+
+
+
+<script id="fix-final-botao-chamar-linha-paciente-2026-05-28">
+/* Correção final do botão "Chamar" ao lado do nome do paciente.
+   Este módulo renderiza a fila com um atributo próprio e usa um handler isolado,
+   evitando que handlers antigos de [data-filtered-room-call] capturem o clique antes. */
+(function(){
+  const QUEUE_KEY = "sesi_chamador_fila_v1";
+  const HISTORY_KEY = "sesi_chamador_historico_v1";
+  const LAST_KEY = "sesi_chamador_ultima_chamada_v1";
+  let renderingUltimate = false;
+  let scheduled = false;
+
+  function parse(key, fallback){
+    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+    catch(e){ return fallback; }
+  }
+  function save(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+  function esc(value){
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+  function digits(value){ return String(value || "").replace(/\D/g, "").slice(0, 11); }
+  function maskCpf(value){
+    const d = digits(value);
+    return d.length === 11 ? `${d.slice(0,3)}.${d.slice(3,6)}.${d.slice(6,9)}-${d.slice(9)}` : d;
+  }
+  function now(){ return new Date().toLocaleTimeString("pt-BR", { hour:"2-digit", minute:"2-digit" }); }
+  function selectedRoom(){ return document.getElementById("caller-default-room")?.value || "Recepção Térreo 1"; }
+  function normalize(value){ return String(value || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim(); }
+  function sortQueue(queue){
+    return [...queue].sort((a,b) => ((b.preferential === "Sim") - (a.preferential === "Sim")) || ((Number(a.createdAt)||0) - (Number(b.createdAt)||0)));
+  }
+  function callName(item){
+    const cpf = digits(item?.cpf);
+    return String(item?.displayName || item?.name || item?.nome || item?.patientName || item?.nomePaciente || item?.nomeCompleto || (cpf ? `CPF ${maskCpf(cpf)}` : "Paciente")).trim();
+  }
+  function normalizeItem(item, index){
+    const cpf = digits(item?.cpf);
+    const createdAt = Number(item?.createdAt || Date.now() + index);
+    const name = callName(item);
+    return {
+      ...item,
+      id: item?.id || `call_ultimate_${Date.now()}_${index}`,
+      cpf,
+      name,
+      displayName: name,
+      company: item?.company || item?.empresa || "Paciente sem cadastro",
+      type: item?.type || item?.workflowStage || item?.stage || "Atendimento",
+      preferential: item?.preferential === "Sim" ? "Sim" : "Não",
+      createdAt,
+      time: item?.time || now()
+    };
+  }
+  function readQueue(){ return sortQueue((parse(QUEUE_KEY, []) || []).map(normalizeItem)); }
+  function filteredQueue(){
+    try {
+      if (typeof window.__sesiGetCallerFilteredQueue === "function") {
+        const result = window.__sesiGetCallerFilteredQueue();
+        if (Array.isArray(result)) return sortQueue(result.map(normalizeItem));
+      }
+    } catch(e) {}
+    return readQueue();
+  }
+  function typeBadge(type){ return String(type || "").includes("Exames") ? "call-badge-exams" : "call-badge-aso"; }
+  function ticket(index){ return "A" + String(index + 1).padStart(3, "0"); }
+
+  function renderUltimateQueue(){
+    if (renderingUltimate) return;
+    const el = document.getElementById("caller-queue-list");
+    if (!el) return;
+    renderingUltimate = true;
+    try {
+      const queue = filteredQueue();
+      const history = parse(HISTORY_KEY, []);
+      const waitingEl = document.getElementById("caller-kpi-waiting");
+      const prefEl = document.getElementById("caller-kpi-preferential");
+      const calledEl = document.getElementById("caller-kpi-called");
+      if (waitingEl) waitingEl.textContent = queue.length;
+      if (prefEl) prefEl.textContent = queue.filter(item => item.preferential === "Sim").length;
+      if (calledEl) calledEl.textContent = history.length;
+
+      if (!queue.length) {
+        el.innerHTML = `<div class="call-center-empty">Nenhum paciente disponível para ${esc(selectedRoom())} obedecendo o filtro atual.</div>`;
+        return;
+      }
+
+      el.innerHTML = queue.map((item, index) => `
+        <div class="call-center-queue-item ${item.preferential === "Sim" ? "is-preferential" : ""}" data-id="${esc(item.id)}">
+          <div class="call-center-ticket">${ticket(index)}</div>
+          <div class="call-center-queue-main">
+            <div class="call-center-queue-name">${esc(callName(item))}</div>
+            <div class="call-center-queue-meta">
+              ${item.preferential === "Sim" ? '<span class="call-badge call-badge-preferential">⭐ Preferencial</span>' : ""}
+              ${item.source === "TOTEM" ? '<span class="call-badge call-badge-toten">🖥️ TOTEM</span>' : ""}
+              <span class="call-badge ${typeBadge(item.type)}">${esc(item.type || "Atendimento")}</span>
+              ${item.workflowStage ? `<span class="call-badge call-badge-room">Fluxo: ${esc(item.workflowStage)}</span>` : ""}
+              ${item.workflowExamName ? `<span class="call-badge call-badge-room">${esc(item.workflowExamName)}</span>` : ""}
+              <span>${esc(item.company || "Sem empresa")}</span>
+              ${item.cpf ? `<span>CPF: ${esc(maskCpf(item.cpf))}</span>` : ""}
+              <span>Entrada: ${esc(item.time || "--:--")}</span>
+            </div>
+          </div>
+          <div class="call-center-actions">
+            <button class="btn btn-success" type="button" data-sesi-call-row-final="${esc(item.id)}" onclick="return false;">Chamar</button>
+            <button class="btn btn-ghost" type="button" data-sesi-remove-row-final="${esc(item.id)}" onclick="return false;">Remover</button>
+          </div>
+        </div>`).join("");
+    } finally {
+      renderingUltimate = false;
+    }
+  }
+
+  function scheduleRender(){
+    if (scheduled) return;
+    scheduled = true;
+    setTimeout(function(){ scheduled = false; renderUltimateQueue(); }, 0);
+  }
+
+  function updateTv(call){
+    const screen = document.getElementById("caller-tv-screen");
+    const patient = document.getElementById("caller-tv-patient");
+    const room = document.getElementById("caller-tv-room");
+    const meta = document.getElementById("caller-tv-meta");
+    if (!patient || !room || !meta) return;
+    if (screen) { screen.classList.add("is-calling"); setTimeout(() => screen.classList.remove("is-calling"), 4500); }
+    patient.classList.remove("call-tv-empty");
+    patient.textContent = callName(call);
+    room.textContent = call.room || selectedRoom();
+    meta.innerHTML = `${call.preferential === "Sim" ? '<span class="call-badge call-badge-preferential">⭐ Atendimento Preferencial</span>' : ""}<span class="call-badge ${typeBadge(call.type)}">${esc(call.type || "Atendimento")}</span>${call.cpf ? `<span class="call-badge">CPF ${esc(maskCpf(call.cpf))}</span>` : ""}<span class="call-badge call-badge-room">Chamado às ${esc(call.calledAt || "")}</span>`;
+  }
+  function speak(call){
+    const run = function(){
+      try {
+        if (!("speechSynthesis" in window)) return;
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(`Paciente ${callName(call)}, dirigir-se à ${call.room}.`);
+        utterance.lang = "pt-BR";
+        utterance.rate = 0.92;
+        const voices = window.speechSynthesis.getVoices?.() || [];
+        const ptVoice = voices.find(v => String(v.lang || "").toLowerCase().includes("pt"));
+        if (ptVoice) utterance.voice = ptVoice;
+        window.speechSynthesis.speak(utterance);
+      } catch(e) {}
+    };
+    try {
+      const sound = typeof window.playSesiChamadorSound === "function" ? window.playSesiChamadorSound() : null;
+      Promise.resolve(sound).catch(() => {}).finally(run);
+    } catch(e) { run(); }
+  }
+  function notify(call){
+    try {
+      const fn = window.showToast || window.toast;
+      if (typeof fn === "function") fn("Paciente chamado", `${callName(call)} • ${call.room}`, "📣");
+    } catch(e) {}
+  }
+
+  function callRow(id){
+    const all = readQueue();
+    const visible = filteredQueue();
+    const selected = id ? (visible.find(item => String(item.id) === String(id)) || all.find(item => String(item.id) === String(id))) : visible[0];
+    if (!selected) {
+      alert("Paciente não encontrado na fila atual. Atualize a fila e tente novamente.");
+      scheduleRender();
+      return;
+    }
+    const call = normalizeItem({ ...selected, room: selectedRoom(), calledAt: now(), calledTimestamp: Date.now() }, 0);
+    save(QUEUE_KEY, all.filter(item => String(item.id) !== String(selected.id)));
+    save(HISTORY_KEY, [call, ...parse(HISTORY_KEY, [])].slice(0, 80));
+    save(LAST_KEY, call);
+    updateTv(call);
+    scheduleRender();
+    speak(call);
+    notify(call);
+  }
+  function removeRow(id){
+    save(QUEUE_KEY, readQueue().filter(item => String(item.id) !== String(id)));
+    scheduleRender();
+  }
+
+  /* Handler no início da captura: os botões finais usam atributos próprios, então os scripts antigos não interceptam. */
+  window.addEventListener("click", function(event){
+    const callBtn = event.target?.closest?.("[data-sesi-call-row-final]");
+    const removeBtn = event.target?.closest?.("[data-sesi-remove-row-final]");
+    if (callBtn) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      callRow(callBtn.getAttribute("data-sesi-call-row-final"));
+      return false;
+    }
+    if (removeBtn) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      removeRow(removeBtn.getAttribute("data-sesi-remove-row-final"));
+      return false;
+    }
+  }, true);
+
+  ["renderCaller", "renderCallerRules", "__sesiRenderFilteredCaller"].forEach(function(name){
+    const original = window[name];
+    if (typeof original === "function" && !original.__sesiRowCallFinalWrapped) {
+      const wrapped = function(){
+        const result = original.apply(this, arguments);
+        scheduleRender();
+        return result;
+      };
+      wrapped.__sesiRowCallFinalWrapped = true;
+      window[name] = wrapped;
+    }
+  });
+
+  document.addEventListener("change", function(event){ if (event.target?.id === "caller-default-room") scheduleRender(); }, true);
+  document.addEventListener("input", function(event){ if (event.target?.id === "caller-queue-search") scheduleRender(); }, true);
+  document.addEventListener("click", function(event){ if (event.target?.id === "caller-queue-search-clear") scheduleRender(); }, true);
+  window.addEventListener("storage", function(event){ if ([QUEUE_KEY, HISTORY_KEY, LAST_KEY].includes(event.key)) scheduleRender(); });
+
+  function observeList(){
+    const list = document.getElementById("caller-queue-list");
+    if (!list || list.__sesiRowCallFinalObserver) return;
+    const observer = new MutationObserver(function(){
+      if (!renderingUltimate && !list.querySelector("[data-sesi-call-row-final]")) scheduleRender();
+    });
+    observer.observe(list, { childList: true, subtree: false });
+    list.__sesiRowCallFinalObserver = observer;
+  }
+  function start(){ observeList(); renderUltimateQueue(); }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function(){ setTimeout(start, 180); });
+  else setTimeout(start, 180);
+})();
+</script>
+
+
+
+<script id="fix-definitivo-botao-chamar-cadastro-paciente-v2">
+/* Correção definitiva do botão "Chamar" atrelado ao cadastro do paciente.
+   Motivo: alguns módulos anteriores renderizam botões diferentes na fila e podem
+   sobrescrever ou interceptar o clique. Este patch fica por último, cobre todos
+   os atributos já usados e também vincula o clique diretamente aos botões visíveis
+   dentro de #caller-queue-list. */
+(function(){
+  const QUEUE_KEY = "sesi_chamador_fila_v1";
+  const HISTORY_KEY = "sesi_chamador_historico_v1";
+  const LAST_KEY = "sesi_chamador_ultima_chamada_v1";
+  let lastClickToken = "";
+  let lastClickAt = 0;
+
+  function parse(key, fallback){
+    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+    catch(e){ return fallback; }
+  }
+  function save(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+  function digits(value){ return String(value || "").replace(/\D/g, "").slice(0, 11); }
+  function maskCpf(value){
+    const d = digits(value);
+    return d.length === 11 ? `${d.slice(0,3)}.${d.slice(3,6)}.${d.slice(6,9)}-${d.slice(9)}` : d;
+  }
+  function esc(value){
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+  function normalize(value){
+    return String(value || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim();
+  }
+  function now(){ return new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }); }
+  function selectedRoom(){ return document.getElementById("caller-default-room")?.value || "Recepção Térreo 1"; }
+  function callName(item){
+    const cpf = digits(item?.cpf);
+    return String(item?.displayName || item?.name || item?.nome || item?.patientName || item?.nomePaciente || item?.nomeCompleto || (cpf ? `CPF ${maskCpf(cpf)}` : "Paciente")).trim();
+  }
+  function normalizeItem(item, index){
+    const cpf = digits(item?.cpf);
+    const name = callName(item);
+    return {
+      ...item,
+      id: String(item?.id || item?.cpf || `call_row_${Date.now()}_${index}`),
+      cpf,
+      name,
+      displayName: name,
+      company: item?.company || item?.empresa || "Paciente sem cadastro",
+      type: item?.type || item?.workflowStage || item?.stage || "Atendimento",
+      preferential: item?.preferential === "Sim" ? "Sim" : "Não",
+      createdAt: Number(item?.createdAt || Date.now() + index),
+      time: item?.time || now()
+    };
+  }
+  function sortQueue(queue){
+    return [...queue].sort((a,b) => ((b.preferential === "Sim") - (a.preferential === "Sim")) || ((Number(a.createdAt)||0) - (Number(b.createdAt)||0)));
+  }
+  function readQueue(){ return sortQueue((parse(QUEUE_KEY, []) || []).map(normalizeItem)); }
+  function visibleQueue(){
+    try {
+      if (typeof window.__sesiGetCallerFilteredQueue === "function") {
+        const filtered = window.__sesiGetCallerFilteredQueue();
+        if (Array.isArray(filtered)) return sortQueue(filtered.map(normalizeItem));
+      }
+    } catch(e) {}
+    return readQueue();
+  }
+  function itemIdFromButton(btn){
+    return btn?.getAttribute("data-sesi-call-row-final") ||
+      btn?.getAttribute("data-sesi-fixed-call") ||
+      btn?.getAttribute("data-filtered-room-call") ||
+      btn?.getAttribute("data-caller-action-id") ||
+      btn?.getAttribute("data-priority-call") ||
+      btn?.dataset?.id ||
+      btn?.closest?.("[data-id]")?.getAttribute("data-id") ||
+      "";
+  }
+  function isRowCallButton(target){
+    const btn = target?.closest?.("button, [role='button']");
+    if (!btn) return null;
+    const list = document.getElementById("caller-queue-list");
+    if (list && !list.contains(btn)) return null;
+    if (btn.matches("[data-sesi-call-row-final], [data-sesi-fixed-call], [data-filtered-room-call], [data-priority-call]")) return btn;
+    if (btn.getAttribute("data-caller-action") === "call") return btn;
+    if (normalize(btn.textContent) === "chamar") return btn;
+    return null;
+  }
+  function typeBadge(type){ return String(type || "").includes("Exames") ? "call-badge-exams" : "call-badge-aso"; }
+  function updateTv(call){
+    try {
+      const screen = document.getElementById("caller-tv-screen");
+      const patient = document.getElementById("caller-tv-patient");
+      const room = document.getElementById("caller-tv-room");
+      const meta = document.getElementById("caller-tv-meta");
+      if (screen) { screen.classList.add("is-calling"); setTimeout(() => screen.classList.remove("is-calling"), 4500); }
+      if (patient) { patient.classList.remove("call-tv-empty"); patient.textContent = callName(call); }
+      if (room) room.textContent = call.room || selectedRoom();
+      if (meta) meta.innerHTML = `${call.preferential === "Sim" ? '<span class="call-badge call-badge-preferential">⭐ Atendimento Preferencial</span>' : ""}<span class="call-badge ${typeBadge(call.type)}">${esc(call.type || "Atendimento")}</span>${call.cpf ? `<span class="call-badge">CPF ${esc(maskCpf(call.cpf))}</span>` : ""}<span class="call-badge call-badge-room">Chamado às ${esc(call.calledAt || "")}</span>`;
+    } catch(e) {}
+  }
+  function speak(call){
+    const run = function(){
+      try {
+        if (!("speechSynthesis" in window)) return;
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(`Paciente ${callName(call)}, dirigir-se à ${call.room}.`);
+        utterance.lang = "pt-BR";
+        utterance.rate = 0.92;
+        const voices = window.speechSynthesis.getVoices?.() || [];
+        const voice = voices.find(v => String(v.lang || "").toLowerCase().includes("pt"));
+        if (voice) utterance.voice = voice;
+        window.speechSynthesis.speak(utterance);
+      } catch(e) {}
+    };
+    try {
+      const sound = typeof window.playSesiChamadorSound === "function" ? window.playSesiChamadorSound() : null;
+      Promise.resolve(sound).catch(() => {}).finally(run);
+    } catch(e) { run(); }
+  }
+  function notify(call){
+    try {
+      const fn = window.showToast || window.toast;
+      if (typeof fn === "function") fn("Paciente chamado", `${callName(call)} • ${call.room}`, "📣");
+    } catch(e) {}
+  }
+  function refreshAfterCall(id){
+    const row = document.querySelector(`#caller-queue-list [data-id="${CSS.escape(String(id))}"]`);
+    if (row) row.remove();
+    ["renderCaller", "renderCallerRules", "__sesiRenderFilteredCaller"].forEach(function(name){
+      try { if (typeof window[name] === "function") setTimeout(() => window[name](), 0); } catch(e) {}
+    });
+    setTimeout(bindButtons, 80);
+    setTimeout(bindButtons, 300);
+  }
+  function callPatientFromRow(id){
+    const all = readQueue();
+    const visible = visibleQueue();
+    const selected = id
+      ? (visible.find(item => String(item.id) === String(id)) || all.find(item => String(item.id) === String(id)))
+      : visible[0];
+    if (!selected) {
+      alert("Paciente não encontrado na fila atual. Atualize a fila e tente novamente.");
+      return false;
+    }
+    const call = normalizeItem({ ...selected, room: selectedRoom(), calledAt: now(), calledTimestamp: Date.now() }, 0);
+    save(QUEUE_KEY, all.filter(item => String(item.id) !== String(selected.id)));
+    save(HISTORY_KEY, [call, ...parse(HISTORY_KEY, [])].slice(0, 100));
+    save(LAST_KEY, call);
+    updateTv(call);
+    speak(call);
+    notify(call);
+    refreshAfterCall(selected.id);
+    return false;
+  }
+
+  window.__sesiChamarPacienteCadastro = function(id){ return callPatientFromRow(id); };
+
+  function handleEvent(event){
+    const btn = isRowCallButton(event.target);
+    if (!btn) return;
+    const id = itemIdFromButton(btn);
+    const token = `${id}|${event.type}`;
+    const t = Date.now();
+    if (token === lastClickToken && (t - lastClickAt) < 700) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      return false;
+    }
+    lastClickToken = token;
+    lastClickAt = t;
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+    callPatientFromRow(id);
+    return false;
+  }
+
+  function bindButtons(){
+    const list = document.getElementById("caller-queue-list");
+    if (!list) return;
+    list.querySelectorAll("button, [role='button']").forEach(function(btn){
+      if (!isRowCallButton(btn)) return;
+      const id = itemIdFromButton(btn);
+      if (!id) return;
+      btn.setAttribute("data-sesi-call-row-final", id);
+      btn.removeAttribute("onclick");
+      btn.onclick = function(ev){
+        if (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          if (typeof ev.stopImmediatePropagation === "function") ev.stopImmediatePropagation();
+        }
+        return callPatientFromRow(id);
+      };
+    });
+  }
+
+  window.addEventListener("click", handleEvent, true);
+  document.addEventListener("click", handleEvent, true);
+  document.addEventListener("mousedown", function(event){
+    const btn = isRowCallButton(event.target);
+    if (btn) bindButtons();
+  }, true);
+  document.addEventListener("DOMContentLoaded", function(){ setTimeout(bindButtons, 80); setTimeout(bindButtons, 400); });
+  document.addEventListener("change", function(event){ if (event.target?.id === "caller-default-room") setTimeout(bindButtons, 120); }, true);
+  document.addEventListener("input", function(event){ if (event.target?.id === "caller-queue-search") setTimeout(bindButtons, 120); }, true);
+
+  const observer = new MutationObserver(function(){ bindButtons(); });
+  function startObserver(){
+    const list = document.getElementById("caller-queue-list");
+    if (list && !list.__sesiCadastroCallObserver) {
+      observer.observe(list, { childList: true, subtree: true });
+      list.__sesiCadastroCallObserver = true;
+    }
+    bindButtons();
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", startObserver);
+  else startObserver();
+  setInterval(bindButtons, 1200);
+})();
+</script>
+
+
+
+<style id="fix-chamador-fila-sem-tremor-2026-05-28">
+/* Corrige o tremor da linha e estabiliza o clique no botão Chamar da fila. */
+#caller-queue-list .call-center-queue-item,
+#caller-queue-list .call-center-queue-item:hover,
+#caller-queue-list .queue-item,
+#caller-queue-list .queue-item:hover {
+  transform: none !important;
+  transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease !important;
+  will-change: auto !important;
+}
+#caller-queue-list .call-center-actions,
+#caller-queue-list .call-center-actions * {
+  pointer-events: auto !important;
+}
+#caller-queue-list button,
+#caller-queue-list button:hover,
+#caller-queue-list .btn,
+#caller-queue-list .btn:hover {
+  transform: none !important;
+  position: relative !important;
+  z-index: 20 !important;
+}
+#caller-queue-list button[data-sesi-stable-call="true"] {
+  cursor: pointer !important;
+  user-select: none !important;
+}
+#caller-queue-list .call-center-queue-item.is-calling-now {
+  opacity: .72;
+  pointer-events: none;
+}
+</style>
+
+<script id="fix-chamador-botao-chamar-pointerdown-estavel-2026-05-28">
+/*
+  Correção do botão "Chamar" ao lado do paciente:
+  - remove o efeito de deslocamento no hover que fazia a linha tremer;
+  - usa pointerdown em captura para chamar antes de scripts antigos de click;
+  - aplica delegação no #caller-queue-list, funcionando mesmo após filtros, busca e troca de sala.
+*/
+(function(){
+  const QUEUE_KEY = "sesi_chamador_fila_v1";
+  const HISTORY_KEY = "sesi_chamador_historico_v1";
+  const LAST_KEY = "sesi_chamador_ultima_chamada_v1";
+  let lastToken = "";
+  let lastAt = 0;
+
+  function parse(key, fallback){
+    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+    catch(e){ return fallback; }
+  }
+  function save(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+  function digits(value){ return String(value || "").replace(/\D/g, "").slice(0, 11); }
+  function maskCpf(value){
+    const d = digits(value);
+    return d.length === 11 ? `${d.slice(0,3)}.${d.slice(3,6)}.${d.slice(6,9)}-${d.slice(9)}` : d;
+  }
+  function esc(value){
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+  function normalizeText(value){
+    return String(value || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim();
+  }
+  function now(){ return new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }); }
+  function selectedRoom(){ return document.getElementById("caller-default-room")?.value || "Recepção Térreo 1"; }
+  function callName(item){
+    const cpf = digits(item?.cpf);
+    return String(item?.displayName || item?.name || item?.nome || item?.patientName || item?.nomePaciente || item?.nomeCompleto || (cpf ? `CPF ${maskCpf(cpf)}` : "Paciente")).trim();
+  }
+  function normalizeItem(item, index){
+    const cpf = digits(item?.cpf);
+    const name = callName(item);
+    return {
+      ...item,
+      id: String(item?.id || item?.cpf || `stable_call_${Date.now()}_${index}`),
+      cpf,
+      name,
+      displayName: name,
+      company: item?.company || item?.empresa || "Paciente sem cadastro",
+      type: item?.type || item?.workflowStage || item?.stage || "Atendimento",
+      preferential: item?.preferential === "Sim" ? "Sim" : "Não",
+      createdAt: Number(item?.createdAt || Date.now() + index),
+      time: item?.time || now()
+    };
+  }
+  function sortQueue(queue){
+    return [...queue].sort((a,b) => ((b.preferential === "Sim") - (a.preferential === "Sim")) || ((Number(a.createdAt)||0) - (Number(b.createdAt)||0)));
+  }
+  function readQueue(){ return sortQueue((parse(QUEUE_KEY, []) || []).map(normalizeItem)); }
+  function visibleQueue(){
+    try {
+      if (typeof window.__sesiGetCallerFilteredQueue === "function") {
+        const result = window.__sesiGetCallerFilteredQueue();
+        if (Array.isArray(result)) return sortQueue(result.map(normalizeItem));
+      }
+    } catch(e) {}
+    return readQueue();
+  }
+  function typeBadge(type){ return String(type || "").includes("Exames") ? "call-badge-exams" : "call-badge-aso"; }
+  function itemIdFromButton(btn){
+    return btn?.getAttribute("data-sesi-stable-call-id") ||
+      btn?.getAttribute("data-sesi-call-row-final") ||
+      btn?.getAttribute("data-sesi-fixed-call") ||
+      btn?.getAttribute("data-filtered-room-call") ||
+      btn?.getAttribute("data-priority-call") ||
+      btn?.dataset?.id ||
+      btn?.closest?.("[data-id]")?.getAttribute("data-id") || "";
+  }
+  function findCallButton(target){
+    const btn = target?.closest?.("button, [role='button']");
+    if (!btn) return null;
+    const list = document.getElementById("caller-queue-list");
+    if (!list || !list.contains(btn)) return null;
+    const text = normalizeText(btn.textContent);
+    const isCall = text === "chamar" || btn.matches("[data-sesi-stable-call-id], [data-sesi-call-row-final], [data-sesi-fixed-call], [data-filtered-room-call], [data-priority-call], [data-caller-action='call']");
+    if (!isCall) return null;
+    if (text.includes("proximo") || text.includes("próximo") || normalizeText(btn.id).includes("next")) return null;
+    return btn;
+  }
+  function updateTv(call){
+    try {
+      const screen = document.getElementById("caller-tv-screen");
+      const patient = document.getElementById("caller-tv-patient");
+      const room = document.getElementById("caller-tv-room");
+      const meta = document.getElementById("caller-tv-meta");
+      if (screen) { screen.classList.add("is-calling"); setTimeout(() => screen.classList.remove("is-calling"), 4500); }
+      if (patient) { patient.classList.remove("call-tv-empty"); patient.textContent = callName(call); }
+      if (room) room.textContent = call.room || selectedRoom();
+      if (meta) meta.innerHTML = `${call.preferential === "Sim" ? '<span class="call-badge call-badge-preferential">⭐ Atendimento Preferencial</span>' : ""}<span class="call-badge ${typeBadge(call.type)}">${esc(call.type || "Atendimento")}</span>${call.cpf ? `<span class="call-badge">CPF ${esc(maskCpf(call.cpf))}</span>` : ""}<span class="call-badge call-badge-room">Chamado às ${esc(call.calledAt || "")}</span>`;
+    } catch(e) {}
+  }
+  function speak(call){
+    const run = function(){
+      try {
+        if (!("speechSynthesis" in window)) return;
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(`Paciente ${callName(call)}, dirigir-se à ${call.room}.`);
+        utterance.lang = "pt-BR";
+        utterance.rate = 0.92;
+        const voices = window.speechSynthesis.getVoices?.() || [];
+        const voice = voices.find(v => String(v.lang || "").toLowerCase().includes("pt"));
+        if (voice) utterance.voice = voice;
+        window.speechSynthesis.speak(utterance);
+      } catch(e) {}
+    };
+    try {
+      const sound = typeof window.playSesiChamadorSound === "function" ? window.playSesiChamadorSound() : null;
+      Promise.resolve(sound).catch(() => {}).finally(run);
+    } catch(e) { run(); }
+  }
+  function notify(call){
+    try {
+      const fn = window.showToast || window.toast;
+      if (typeof fn === "function") fn("Paciente chamado", `${callName(call)} • ${call.room}`, "📣");
+    } catch(e) {}
+  }
+  function refreshQueue(id){
+    const row = document.querySelector(`#caller-queue-list [data-id="${CSS.escape(String(id))}"]`);
+    if (row) row.remove();
+    const refreshers = ["renderCallerRules", "__sesiRenderFilteredCaller", "renderCaller"];
+    refreshers.forEach(name => {
+      try { if (typeof window[name] === "function") setTimeout(() => window[name](), 0); } catch(e) {}
+    });
+    setTimeout(stabilizeButtons, 80);
+    setTimeout(stabilizeButtons, 250);
+  }
+  function callById(id){
+    const all = readQueue();
+    const visible = visibleQueue();
+    const selected = id ? (visible.find(item => String(item.id) === String(id)) || all.find(item => String(item.id) === String(id))) : visible[0];
+    if (!selected) {
+      alert("Paciente não encontrado na fila atual. Atualize a fila e tente novamente.");
+      return false;
+    }
+    const call = normalizeItem({ ...selected, room: selectedRoom(), calledAt: now(), calledTimestamp: Date.now() }, 0);
+    save(QUEUE_KEY, all.filter(item => String(item.id) !== String(selected.id)));
+    save(HISTORY_KEY, [call, ...parse(HISTORY_KEY, [])].slice(0, 100));
+    save(LAST_KEY, call);
+    updateTv(call);
+    speak(call);
+    notify(call);
+    refreshQueue(selected.id);
+    return false;
+  }
+  function runFromEvent(event){
+    const btn = findCallButton(event.target);
+    if (!btn) return;
+    const id = itemIdFromButton(btn);
+    const token = `${id}|${event.type}`;
+    const t = Date.now();
+    event.preventDefault();
+    event.stopPropagation();
+    if (typeof event.stopImmediatePropagation === "function") event.stopImmediatePropagation();
+    if (lastToken === token || (lastToken === `${id}|pointerdown` && event.type === "click" && (t - lastAt) < 900)) return false;
+    lastToken = token;
+    lastAt = t;
+    btn.disabled = true;
+    btn.textContent = "Chamando...";
+    btn.closest(".call-center-queue-item")?.classList.add("is-calling-now");
+    callById(id);
+    return false;
+  }
+  function stabilizeButtons(){
+    const list = document.getElementById("caller-queue-list");
+    if (!list) return;
+    list.querySelectorAll(".call-center-queue-item").forEach(row => {
+      row.style.transform = "none";
+      row.style.willChange = "auto";
+    });
+    list.querySelectorAll("button, [role='button']").forEach(btn => {
+      if (!findCallButton(btn)) return;
+      const id = itemIdFromButton(btn);
+      if (!id) return;
+      btn.setAttribute("data-sesi-stable-call", "true");
+      btn.setAttribute("data-sesi-stable-call-id", id);
+      btn.removeAttribute("onclick");
+      btn.style.transform = "none";
+      btn.style.pointerEvents = "auto";
+      btn.style.position = "relative";
+      btn.style.zIndex = "20";
+    });
+  }
+
+  window.__sesiChamarPacienteCadastro = callById;
+  window.addEventListener("pointerdown", runFromEvent, true);
+  document.addEventListener("pointerdown", runFromEvent, true);
+  window.addEventListener("click", runFromEvent, true);
+  document.addEventListener("click", runFromEvent, true);
+  document.addEventListener("mouseover", function(event){ if (findCallButton(event.target)) stabilizeButtons(); }, true);
+  document.addEventListener("DOMContentLoaded", function(){ setTimeout(stabilizeButtons, 80); setTimeout(stabilizeButtons, 400); });
+  document.addEventListener("change", function(event){ if (event.target?.id === "caller-default-room") setTimeout(stabilizeButtons, 120); }, true);
+  document.addEventListener("input", function(event){ if (event.target?.id === "caller-queue-search") setTimeout(stabilizeButtons, 120); }, true);
+  const observer = new MutationObserver(function(){ setTimeout(stabilizeButtons, 0); });
+  function start(){
+    const list = document.getElementById("caller-queue-list");
+    if (list && !list.__sesiStableCallObserver) {
+      observer.observe(list, { childList: true, subtree: true });
+      list.__sesiStableCallObserver = true;
+    }
+    stabilizeButtons();
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
+  else start();
+})();
+</script>
+
+
+
+<script id="fix-chamador-nome-social-tv-2026-05-28">
+/* Regra: quando o Nome Social estiver preenchido no cadastro, a TV/voz visual do Chamador exibe o Nome Social. */
+(function(){
+  const PATIENT_PREFIX = "sesi-fluxo-ocupacional-v7-clean";
+  const UNIT_KEY = `${PATIENT_PREFIX}-selected-unit`;
+  const CALL_KEYS = new Set([
+    "sesi_chamador_ultima_chamada_v1",
+    "sesi_chamador_historico_v1"
+  ]);
+
+  function clean(value){ return String(value || "").replace(/\s+/g, " ").trim(); }
+  function digits(value){ return String(value || "").replace(/\D/g, "").slice(0, 11); }
+  function norm(value){ return clean(value).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
+  function isCpfOnlyName(value){ return /^cpf\s*[\d.\- ]{11,}$/i.test(clean(value)); }
+  function readJson(key, fallback){
+    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+    catch(e){ return fallback; }
+  }
+  function selectedUnit(){
+    try { return clean(localStorage.getItem(UNIT_KEY)) || "paulista"; }
+    catch(e){ return "paulista"; }
+  }
+  function patientKeys(){
+    const preferred = `${PATIENT_PREFIX}-${selectedUnit()}`;
+    const keys = [preferred];
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key || !key.startsWith(`${PATIENT_PREFIX}-`)) continue;
+        if (key === UNIT_KEY || key.includes("papa-fila") || key.includes("selected-unit")) continue;
+        if (!keys.includes(key)) keys.push(key);
+      }
+    } catch(e) {}
+    return keys;
+  }
+  function allPatients(){
+    const items = [];
+    patientKeys().forEach(key => {
+      const data = readJson(key, []);
+      if (Array.isArray(data)) items.push(...data);
+    });
+    return items;
+  }
+  function findPatient(call){
+    const cpf = digits(call?.cpf || call?.documento || call?.cpfPaciente);
+    const name = norm(call?.nomeCivil || call?.nome || call?.name || call?.displayName || call?.patientName || call?.nomePaciente || call?.nomeCompleto);
+    const patients = allPatients();
+    if (cpf) {
+      const byCpf = patients.find(p => digits(p?.cpf) === cpf);
+      if (byCpf) return byCpf;
+    }
+    if (name && !isCpfOnlyName(name)) {
+      return patients.find(p => [p?.nome, p?.name, p?.nomeCompleto].some(v => norm(v) === name)) || null;
+    }
+    return null;
+  }
+  function socialNameFor(call){
+    const direct = clean(call?.nomeSocial || call?.socialName || call?.nome_social || call?.nameSocial);
+    if (direct) return direct;
+    const patient = findPatient(call);
+    return clean(patient?.nomeSocial || patient?.socialName || patient?.nome_social || patient?.nameSocial);
+  }
+  function currentCallFallback(){
+    return readJson("sesi_chamador_ultima_chamada_v1", null);
+  }
+  function publicName(call){
+    const social = socialNameFor(call);
+    if (social) return social;
+    return clean(call?.displayName || call?.name || call?.nome || call?.patientName || call?.nomePaciente || call?.nomeCompleto || "Paciente não identificado");
+  }
+  function enrichCall(call){
+    if (!call || typeof call !== "object") return call;
+    const social = socialNameFor(call);
+    if (!social) return call;
+    const original = clean(call.nomeCivil || call.nomeCompleto || call.nome || call.name || call.displayName);
+    return {
+      ...call,
+      nomeCivil: original || call.nomeCivil || "",
+      nomeSocial: social,
+      name: social,
+      nome: social,
+      displayName: social,
+      tvName: social
+    };
+  }
+  function enrichPayload(key, value){
+    if (!CALL_KEYS.has(key)) return value;
+    try {
+      const parsed = typeof value === "string" ? JSON.parse(value) : value;
+      const enriched = Array.isArray(parsed) ? parsed.map(enrichCall) : enrichCall(parsed);
+      return JSON.stringify(enriched);
+    } catch(e) {
+      return value;
+    }
+  }
+  function applyTvSocialName(){
+    const call = enrichCall(currentCallFallback());
+    if (!call) return;
+    const name = publicName(call);
+    if (!name) return;
+    ["caller-tv-patient", "caller-display-patient"].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (clean(el.textContent) && clean(el.textContent) !== name) {
+        el.textContent = name;
+        el.classList?.remove("call-tv-empty", "call-display-empty");
+      }
+    });
+  }
+  function normalizeExistingStorage(){
+    CALL_KEYS.forEach(key => {
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return;
+        const normalized = enrichPayload(key, raw);
+        if (normalized && normalized !== raw) localStorage.setItem(key, normalized);
+      } catch(e) {}
+    });
+  }
+
+  if (!window.__sesiNomeSocialTvPatchAtivo) {
+    window.__sesiNomeSocialTvPatchAtivo = true;
+    const originalSetItem = localStorage.setItem.bind(localStorage);
+    localStorage.setItem = function(key, value){
+      return originalSetItem(key, enrichPayload(String(key || ""), value));
+    };
+  }
+
+  window.__sesiNomeChamadaPaciente = publicName;
+  window.__sesiAplicarNomeSocialTv = applyTvSocialName;
+
+  const observer = new MutationObserver(function(){ setTimeout(applyTvSocialName, 0); });
+  function start(){
+    normalizeExistingStorage();
+    applyTvSocialName();
+    ["caller-tv-patient", "caller-display-patient", "caller-tv-screen", "caller-display-main"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && !el.__sesiNomeSocialObserver) {
+        observer.observe(el, { childList: true, subtree: true, characterData: true });
+        el.__sesiNomeSocialObserver = true;
+      }
+    });
+  }
+  document.addEventListener("DOMContentLoaded", start);
+  document.addEventListener("click", function(event){
+    if (event.target?.closest?.("#caller-next-btn,#caller-display-next-btn,[data-sesi-stable-call-id],[data-sesi-call-row-final],[data-sesi-fixed-call],[data-filtered-room-call],[data-priority-call],[data-caller-action='call']")) {
+      setTimeout(applyTvSocialName, 30);
+      setTimeout(applyTvSocialName, 250);
+      setTimeout(applyTvSocialName, 700);
+    }
+  }, true);
+  document.addEventListener("pointerdown", function(event){
+    if (event.target?.closest?.("[data-sesi-stable-call-id],[data-sesi-call-row-final],[data-sesi-fixed-call],[data-filtered-room-call],[data-priority-call],[data-caller-action='call']")) {
+      setTimeout(applyTvSocialName, 30);
+      setTimeout(applyTvSocialName, 250);
+    }
+  }, true);
+  window.addEventListener("storage", function(event){
+    if (CALL_KEYS.has(event.key)) setTimeout(applyTvSocialName, 0);
+  });
+  setInterval(applyTvSocialName, 1200);
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
+  else start();
+})();
+</script>
+
 </body>
 </html>
