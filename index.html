@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
@@ -12740,7 +12741,7 @@ function compareQueueOrder(a, b) {
     if (r.includes("espirometria")) return { stage:"Exames", exam:"Espirometria", examKey:"espirometria", label:"Espirometria" };
     if (r.includes("ecg")) return { stage:"Exames", exam:"ECG", examKey:"ecg", label:"ECG" };
     if (r.includes("eeg")) return { stage:"Exames", exam:"EEG", examKey:"eeg", label:"EEG" };
-    if (r.includes("rx") || r.includes("raio")) return { stage:"Exames", exam:"RX", examKey:"rx", label:"RX" };
+    if (r.includes("rx") || r.includes("raio")) return { stage:"Exames", exam:"Raio X", examKey:"rx", label:"Raio X" };
     if (r.includes("coleta") || r.includes("laborat")) return { stage:"Exames", exam:"Exames Laboratoriais", examKey:"lab", label:"Coleta / Laboratoriais" };
     if (r.includes("psicossocial")) return { stage:"Exames", exam:"Avaliação Psicossocial", examKey:"psicossocial", label:"Avaliação Psicossocial" };
     if (r.includes("exames")) return { stage:"Exames", label:"Exames Ocupacionais" };
@@ -12754,7 +12755,7 @@ function compareQueueOrder(a, b) {
     const text = String(value || "").toLowerCase();
     if (text.includes("triagem")) return "Triagem";
     if (text.includes("médico") || text.includes("medico")) return "Médico";
-    if (text.includes("exame") || text.includes("audiometria") || text.includes("coleta") || text.includes("laborator")) return "Exames";
+    if (text.includes("exame") || text.includes("audiometria") || text.includes("coleta") || text.includes("laborator") || text.includes("raio") || /\brx\b/.test(text)) return "Exames";
     return "Recepção";
   }
   function itemStage(item){
@@ -12768,19 +12769,20 @@ function compareQueueOrder(a, b) {
     const exames = Array.isArray(item?.exames) ? item.exames : [];
     const key = String(rule.examKey || '').toLowerCase();
     const wanted = String(rule.exam || '').toLowerCase();
+    const wantedIsRx = key === 'rx' || wanted === 'rx' || wanted.includes('raio');
     const pendingStatuses = ['pendente', 'em andamento', 'exame liberado', 'aguardando', ''];
     if (exames.length) {
       return exames.some(ex => {
         const exKey = String(ex?.key || '').toLowerCase();
         const exName = String(ex?.nome || ex?.name || '').toLowerCase();
         const status = String(ex?.status || '').toLowerCase();
-        const matches = (key && exKey === key) || exName.includes(wanted) || (wanted === 'exames laboratoriais' && (exKey === 'lab' || exName.includes('laborat'))) || (wanted === 'rx' && exKey === 'rx');
+        const matches = (key && exKey === key) || exName.includes(wanted) || (wantedIsRx && (exKey === 'rx' || /\brx\b/.test(exName) || exName.includes('raio'))) || (wanted === 'exames laboratoriais' && (exKey === 'lab' || exName.includes('laborat')));
         return matches && pendingStatuses.some(s => status === s || (!status && s === ''));
       });
     }
     const blob = itemExamBlob(item);
     if (wanted === 'exames laboratoriais') return blob.includes('laborator') || blob.includes('coleta') || blob.includes('hemograma') || blob.includes('glicemia') || blob.includes('urina');
-    if (wanted === 'rx') return blob.includes('rx') || blob.includes('raio');
+    if (wantedIsRx) return /\brx\b/.test(blob) || blob.includes('raio');
     return blob.includes(wanted);
   }
   function isCpfOnlyRegistration(item){
@@ -13364,14 +13366,16 @@ function compareQueueOrder(a, b) {
     'Sala ECG',
     'Sala EEG',
     'Sala Avaliação Psicossocial 1',
-    'Sala Avaliação Psicossocial 2'
+    'Sala Avaliação Psicossocial 2',
+    'Sala de Raio X'
   ];
   function ensureCallerRoomOptions(){
     const select = document.getElementById('caller-default-room');
     if (!select) return;
     const current = select.value;
-    select.innerHTML = FULL_CALL_ROOMS.map(room => `<option value="${room.replaceAll('&','&amp;').replaceAll('"','&quot;')}">${room}</option>`).join('');
-    if (FULL_CALL_ROOMS.includes(current)) select.value = current;
+    const rooms = Array.from(new Set([...FULL_CALL_ROOMS, 'Sala de Raio X']));
+    select.innerHTML = rooms.map(room => `<option value="${room.replaceAll('&','&amp;').replaceAll('"','&quot;')}">${room}</option>`).join('');
+    if (rooms.includes(current)) select.value = current;
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ensureCallerRoomOptions);
   else setTimeout(ensureCallerRoomOptions, 50);
@@ -14574,7 +14578,7 @@ function compareQueueOrder(a, b) {
     try { if (typeof renderExames === 'function') renderExames(); } catch(e) {}
   }
   document.addEventListener('change', function(event){
-    if (event.target && (event.target.id === 'caller-default-room' || event.target.id === 'filter-tipo-exame' || String(event.target.id || '').startsWith('filter-tipo-exame-'))) {
+    if (event.target && (event.target.id === 'filter-tipo-exame' || String(event.target.id || '').startsWith('filter-tipo-exame-'))) {
       setTimeout(run, 0);
     }
   }, true);
@@ -14697,5 +14701,137 @@ function compareQueueOrder(a, b) {
   else setTimeout(applyNameSearchFilter, 160);
 })();
 </script>
+
+
+<script id="fix-chamador-sala-raio-x-selecao-final-2026-05-28">
+/* Correção final: permite selecionar "Sala de Raio X" no Chamador e mantém a fila filtrada por pacientes de Raio X. */
+(function(){
+  const QUEUE_KEY = 'sesi_chamador_fila_v1';
+  const digits = value => String(value || '').replace(/\D/g, '').slice(0, 11);
+  const normalize = value => String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim();
+  const isRaioXRoom = value => /sala\s+de\s+raio\s*x|raio\s*x|\brx\b/i.test(String(value || ''));
+  const isPending = status => {
+    const s = normalize(status);
+    return !s || ['pendente','em andamento','exame liberado','aguardando'].includes(s);
+  };
+  function ensureRaioXOption(){
+    const select = document.getElementById('caller-default-room');
+    if (!select) return null;
+    let option = Array.from(select.options).find(opt => normalize(opt.textContent) === 'sala de raio x' || normalize(opt.value) === 'sala de raio x');
+    if (!option) {
+      option = new Option('Sala de Raio X', 'Sala de Raio X');
+      select.appendChild(option);
+    }
+    option.textContent = 'Sala de Raio X';
+    option.value = 'Sala de Raio X';
+    return select;
+  }
+  function itemStage(item){
+    const text = normalize([item && (item.workflowStage || item.stage || item.etapa), item && (item.suggestedRoom || item.room), item && item.type].filter(Boolean).join(' '));
+    if (text.includes('triagem')) return 'Triagem';
+    if (text.includes('medico') || text.includes('consultorio')) return 'Médico';
+    if (text.includes('exame') || text.includes('audiometria') || text.includes('coleta') || text.includes('laborator') || text.includes('raio') || /\brx\b/.test(text)) return 'Exames';
+    return 'Recepção';
+  }
+  function hasRaioXExam(item){
+    const exames = Array.isArray(item && item.exames) ? item.exames : [];
+    if (exames.length) {
+      return exames.some(ex => {
+        const key = normalize(ex && ex.key);
+        const name = normalize(ex && (ex.nome || ex.name));
+        return (key === 'rx' || name.includes('raio') || /\brx\b/.test(name)) && isPending(ex && ex.status);
+      });
+    }
+    const blob = normalize([item && item.workflowExamName, item && item.examType, item && item.displayExamLabel, item && item.type, item && item.suggestedRoom, item && item.room].join(' '));
+    return blob.includes('raio') || /\brx\b/.test(blob);
+  }
+  function selectedRoom(){ return document.getElementById('caller-default-room')?.value || ''; }
+  function readQueue(){ try { const list = JSON.parse(localStorage.getItem(QUEUE_KEY) || '[]'); return Array.isArray(list) ? list : []; } catch(e) { return []; } }
+  function findVisibleId(id){
+    if (!isRaioXRoom(selectedRoom())) return true;
+    const item = readQueue().find(row => String(row && row.id) === String(id));
+    return item && itemStage(item) === 'Exames' && hasRaioXExam(item);
+  }
+  function refreshRaioXSelection(){
+    const select = ensureRaioXOption();
+    if (!select) return;
+    if (isRaioXRoom(select.value)) select.value = 'Sala de Raio X';
+    try { if (typeof window.__sesiRenderFilteredCaller === 'function') window.__sesiRenderFilteredCaller(); }
+    catch(e) {}
+  }
+  document.addEventListener('change', function(event){
+    if (event.target && event.target.id === 'caller-default-room') setTimeout(refreshRaioXSelection, 0);
+  }, true);
+  document.addEventListener('click', function(event){
+    const btn = event.target?.closest?.('[data-filtered-room-call], #caller-next-btn');
+    if (!btn || !isRaioXRoom(selectedRoom())) return;
+    const id = btn.dataset?.filteredRoomCall;
+    if (id && !findVisibleId(id)) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      alert('Este paciente não possui Raio X pendente para chamada nesta sala.');
+    }
+  }, true);
+  const wrap = name => {
+    const original = window[name];
+    if (typeof original === 'function' && !original.__raioXCallerSelectFinal) {
+      const wrapped = function(){
+        const result = original.apply(this, arguments);
+        setTimeout(refreshRaioXSelection, 0);
+        return result;
+      };
+      wrapped.__raioXCallerSelectFinal = true;
+      window[name] = wrapped;
+    }
+  };
+  ['renderCaller','renderCallerRules','__sesiRenderFilteredCaller'].forEach(wrap);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(refreshRaioXSelection, 160));
+  else setTimeout(refreshRaioXSelection, 160);
+})();
+</script>
+
+
+<script id="fix-definitivo-select-sala-raio-x-chamador">
+/* Correção definitiva: a rotina que recria a lista de salas no clique agora mantém a opção Sala de Raio X disponível e selecionável. */
+(function(){
+  const ROOM = 'Sala de Raio X';
+  const normalize = value => String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim();
+  function getSelect(){ return document.getElementById('caller-default-room'); }
+  function ensureOption(){
+    const select = getSelect();
+    if (!select) return null;
+    const current = select.value;
+    let option = Array.from(select.options || []).find(opt => normalize(opt.value) === 'sala de raio x' || normalize(opt.textContent) === 'sala de raio x');
+    if (!option) {
+      option = new Option(ROOM, ROOM);
+      select.appendChild(option);
+    }
+    option.value = ROOM;
+    option.textContent = ROOM;
+    if (normalize(current) === 'sala de raio x' || normalize(current).includes('raio x') || /\brx\b/i.test(current)) select.value = ROOM;
+    return select;
+  }
+  function refresh(){
+    ensureOption();
+    try { if (typeof window.__sesiRenderFilteredCaller === 'function') window.__sesiRenderFilteredCaller(); } catch(e) {}
+  }
+  document.addEventListener('mousedown', function(event){
+    if (event.target && event.target.id === 'caller-default-room') setTimeout(ensureOption, 0);
+  }, true);
+  document.addEventListener('click', function(event){
+    if (event.target && event.target.id === 'caller-default-room') setTimeout(ensureOption, 0);
+  }, true);
+  document.addEventListener('change', function(event){
+    if (event.target && event.target.id === 'caller-default-room') {
+      if (normalize(event.target.value) === 'sala de raio x' || normalize(event.target.value).includes('raio x')) event.target.value = ROOM;
+      setTimeout(refresh, 0);
+    }
+  }, true);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(ensureOption, 80));
+  else setTimeout(ensureOption, 80);
+})();
+</script>
+
 </body>
 </html>
