@@ -4709,7 +4709,7 @@ button[data-totem-key] {
       { key: 'espirometria', nome: 'Espirometria' },
       { key: 'ecg', nome: 'ECG' },
       { key: 'eeg', nome: 'EEG' },
-      { key: 'rx', nome: 'RX' },
+      { key: 'rx', nome: 'Raio X' },
       { key: 'lab', nome: 'Exames Laboratoriais' },
       { key: 'psicossocial', nome: 'Avaliação Psicossocial' },
     ];
@@ -4748,7 +4748,7 @@ button[data-totem-key] {
       { key: 'espirometria-01', label: 'Sala Espirometria', stage: 'Exames', icon: '🌬️', description: 'Chamada exclusiva para pacientes com Espirometria pendente.' },
       { key: 'ecg-01', label: 'Sala ECG', stage: 'Exames', icon: '🫀', description: 'Chamada exclusiva para pacientes com ECG pendente.' },
       { key: 'eeg-01', label: 'Sala EEG', stage: 'Exames', icon: '🧠', description: 'Chamada exclusiva para pacientes com EEG pendente.' },
-      { key: 'rx-01', label: 'Sala de Raio X', stage: 'Exames', icon: '🩻', description: 'Chamada exclusiva para pacientes com RX/Raio X pendente.' },
+      { key: 'rx-01', label: 'Sala de Raio X', stage: 'Exames', icon: '🩻', description: 'Chamada exclusiva para pacientes com Raio X pendente.' },
       { key: 'coleta-01', label: 'Sala Coleta / Laboratório', stage: 'Exames', icon: '🧪', description: 'Chamada para exames laboratoriais e coleta.' },
       { key: 'psicossocial-01', label: 'Sala Avaliação Psicossocial', stage: 'Exames', icon: '💬', description: 'Chamada exclusiva para Avaliação Psicossocial.' },
       { key: 'triagem-01', label: 'Sala Triagem 01', stage: 'Triagem', icon: '🚦', description: 'Chamada para avaliação inicial e aferições.' },
@@ -4764,7 +4764,7 @@ button[data-totem-key] {
       { value: 'Espirometria', stage: 'Exames', icon: '🌬️' },
       { value: 'ECG', stage: 'Exames', icon: '🫀' },
       { value: 'EEG', stage: 'Exames', icon: '🧠' },
-      { value: 'RX', stage: 'Exames', icon: '🩻' },
+      { value: 'Raio X', stage: 'Exames', icon: '🩻' },
       { value: 'Exames Laboratoriais', stage: 'Exames', icon: '🧪' },
       { value: 'Avaliação Psicossocial', stage: 'Exames', icon: '💬' },
       { value: 'Triagem', stage: 'Triagem', icon: '🚦' },
@@ -4785,7 +4785,7 @@ button[data-totem-key] {
       if (label.includes('espirometria')) return 'Espirometria';
       if (label.includes('ecg')) return 'ECG';
       if (label.includes('eeg')) return 'EEG';
-      if (label.includes('rx') || label.includes('raio x')) return 'RX';
+      if (label.includes('rx') || label.includes('raio x')) return 'Raio X';
       if (label.includes('coleta') || label.includes('laborat')) return 'Exames Laboratoriais';
       if (label.includes('psicossocial')) return 'Avaliação Psicossocial';
       return 'Audiometria';
@@ -5699,9 +5699,16 @@ function compareQueueOrder(a, b) {
       if (normalizedQueue === 'Triagem') return patient.etapa === 'Triagem';
       if (normalizedQueue === 'Atendimento médico') return patient.etapa === 'Médico';
       if (patient.etapa !== 'Exames') return false;
-      const exam = (patient.exames || []).find(item => item.nome === normalizedQueue);
+      const queueKey = /^(rx|raio\s*x)$/i.test(normalizedQueue) ? 'rx' : '';
+      const exam = (patient.exames || []).find(item => {
+        const examName = sanitizeText(item?.nome);
+        const examKey = sanitizeText(item?.key).toLowerCase();
+        if (queueKey && examKey === queueKey) return true;
+        if (queueKey && /^(rx|raio\s*x)$/i.test(examName)) return true;
+        return examName === normalizedQueue;
+      });
       if (!exam) return false;
-      return !['Concluído', 'Não se aplica'].includes(exam.status);
+      return !['Concluído', 'Não se aplica', 'Exame liberado'].includes(exam.status);
     }
 
     function getEligibleQueueByType(queueType) {
@@ -7985,7 +7992,7 @@ function compareQueueOrder(a, b) {
                   <th>Espirometria</th>
                   <th>ECG</th>
                   <th>EEG</th>
-                  <th>RX</th>
+                  <th>Raio X</th>
                   <th>Exames Laboratoriais</th>
                   <th>Avaliação Psicossocial</th>
                   <th>Triagem</th>
@@ -9648,7 +9655,9 @@ function compareQueueOrder(a, b) {
         patientModalCard.addEventListener('change', event => event.stopPropagation());
       }
       document.getElementById('edit-obra-flag')?.addEventListener('change', () => syncEditObraFields(true));
+      document.getElementById('edit-retorno')?.addEventListener('change', syncRetornoEditVisibility);
       syncEditObraFields(false);
+      syncRetornoEditVisibility();
       const editChecklist = document.querySelectorAll('#editExamChecklist input[type="checkbox"]');
       editChecklist.forEach(input => {
         input.addEventListener('change', syncEditReceptionExamFields);
@@ -9897,24 +9906,25 @@ function compareQueueOrder(a, b) {
       preview.classList.toggle('active', preferencialSelect.value === 'Sim');
     }
 
-
     function syncRetornoCadastroVisibility() {
-      const retornoSelect = document.getElementById('retornoCadastroSelect');
-      const dataRetornoField = document.getElementById('dataRetornoCadastroField');
-      const dataRetornoInput = document.getElementById('dataRetornoCadastroInput');
+      const retornoSelect = document.getElementById('retornoCadastroSelect') || document.querySelector('#newAttendanceForm [name="retorno"]');
+      const dataRetornoField = document.getElementById('dataRetornoCadastroField') || document.querySelector('#newAttendanceForm [name="dataRetorno"]')?.closest('.field');
+      const dataRetornoInput = document.getElementById('dataRetornoCadastroInput') || document.querySelector('#newAttendanceForm [name="dataRetorno"]');
       if (!retornoSelect || !dataRetornoField) return;
-      const isRetorno = retornoSelect.value === 'Sim';
+      const isRetorno = String(retornoSelect.value || '').trim().toLowerCase() === 'sim';
       dataRetornoField.classList.toggle('hidden', !isRetorno);
+      dataRetornoField.style.display = isRetorno ? '' : 'none';
       if (!isRetorno && dataRetornoInput) dataRetornoInput.value = '';
     }
 
     function syncRetornoEditVisibility() {
       const retornoSelect = document.getElementById('edit-retorno');
-      const dataRetornoField = document.getElementById('edit-data-retorno-field');
+      const dataRetornoField = document.getElementById('edit-data-retorno-field') || document.getElementById('edit-data-retorno')?.closest('.field');
       const dataRetornoInput = document.getElementById('edit-data-retorno');
       if (!retornoSelect || !dataRetornoField) return;
-      const isRetorno = retornoSelect.value === 'Sim';
+      const isRetorno = String(retornoSelect.value || '').trim().toLowerCase() === 'sim';
       dataRetornoField.classList.toggle('hidden', !isRetorno);
+      dataRetornoField.style.display = isRetorno ? '' : 'none';
       if (!isRetorno && dataRetornoInput) dataRetornoInput.value = '';
     }
 
@@ -11619,7 +11629,7 @@ function compareQueueOrder(a, b) {
     save(historyKey,[called,...parse(historyKey,[])].slice(0,80));
     save(lastCallKey,called);
     renderAll();
-    try{if("speechSynthesis" in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(`Paciente ${called.displayName}, dirigir-se à ${room}.`);u.lang="pt-BR";u.rate=.92;speechSynthesis.speak(u)}}catch(e){}
+    try{if("speechSynthesis" in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(`Paciente ${called.displayName}, dirigir-se à ${room}.`);u.lang="pt-BR";u.rate=.92;u.volume=1;speechSynthesis.speak(u)}}catch(e){}
   }
   function remove(id){save(queueKey,parse(queueKey,[]).filter(x=>x.id!==id));renderAll()}
   function register(cpf,pref){
@@ -12353,6 +12363,7 @@ function compareQueueOrder(a, b) {
     if (stage === "Médico") return "Sala Médico";
     const name = examName(examKey);
     if (/audiometria/i.test(name)) return "Sala Audiometria";
+    if (/raio\s*x|\brx\b/i.test(name)) return "Sala de Raio X";
     if (/laborator/i.test(name)) return "Sala Coleta";
     return "Sala Exames";
   }
@@ -12878,6 +12889,7 @@ function compareQueueOrder(a, b) {
       const utterance = new SpeechSynthesisUtterance(`Paciente ${call.displayName || call.name}, dirigir-se à ${call.room}.`);
       utterance.lang = "pt-BR";
       utterance.rate = 0.92;
+      utterance.volume = 1;
       speechSynthesis.speak(utterance);
     } catch(e) {}
   }
@@ -13676,7 +13688,7 @@ function compareQueueOrder(a, b) {
       { key:"espirometria", nome:"Espirometria", status:"Não se aplica" },
       { key:"ecg", nome:"ECG", status:"Não se aplica" },
       { key:"eeg", nome:"EEG", status:"Não se aplica" },
-      { key:"rx", nome:"RX", status:"Não se aplica" },
+      { key:"rx", nome:"Raio X", status:"Não se aplica" },
       { key:"lab", nome:"Exames Laboratoriais", status:"Não se aplica" },
       { key:"psicossocial", nome:"Avaliação Psicossocial", status:"Não se aplica" }
     ];
@@ -14031,7 +14043,7 @@ function compareQueueOrder(a, b) {
     }
     try {
       if (Array.isArray(PAPA_FILA_ROOMS) && !PAPA_FILA_ROOMS.some(room => room && room.label === 'Sala de Raio X')) {
-        PAPA_FILA_ROOMS.push({ key: 'rx-01', label: 'Sala de Raio X', stage: 'Exames', icon: '🩻', description: 'Chamada exclusiva para pacientes com RX/Raio X pendente.' });
+        PAPA_FILA_ROOMS.push({ key: 'rx-01', label: 'Sala de Raio X', stage: 'Exames', icon: '🩻', description: 'Chamada exclusiva para pacientes com Raio X pendente.' });
       }
     } catch(e) {}
   }
@@ -14146,7 +14158,7 @@ function compareQueueOrder(a, b) {
     { key: "espirometria", nome: "Espirometria" },
     { key: "ecg", nome: "ECG" },
     { key: "eeg", nome: "EEG" },
-    { key: "rx", nome: "RX" },
+    { key: "rx", nome: "Raio X" },
     { key: "lab", nome: "Exames Laboratoriais" },
     { key: "psicossocial", nome: "Avaliação Psicossocial" }
   ];
@@ -14323,7 +14335,7 @@ function compareQueueOrder(a, b) {
             label: "Sala de Raio X",
             stage: "Exames",
             icon: "🩻",
-            description: "Chamada exclusiva para pacientes com RX/Raio X pendente."
+            description: "Chamada exclusiva para pacientes com Raio X pendente."
           });
         }
       }
@@ -14395,5 +14407,134 @@ function compareQueueOrder(a, b) {
 })();
 </script>
 
+
+<script>
+/* Correção Recepção: campo Data do retorno dinâmico no cadastro e edição */
+(function() {
+  function toggleRetornoArea(selectEl) {
+    if (!selectEl) return;
+    const isSim = String(selectEl.value || '').trim().toLowerCase() === 'sim';
+    const form = selectEl.closest('form') || document;
+    let field = null;
+    let input = null;
+
+    if (selectEl.id === 'retornoCadastroSelect' || selectEl.name === 'retorno') {
+      field = document.getElementById('dataRetornoCadastroField') || form.querySelector('[name="dataRetorno"]')?.closest('.field');
+      input = document.getElementById('dataRetornoCadastroInput') || form.querySelector('[name="dataRetorno"]');
+    }
+
+    if (selectEl.id === 'edit-retorno') {
+      field = document.getElementById('edit-data-retorno-field') || document.getElementById('edit-data-retorno')?.closest('.field');
+      input = document.getElementById('edit-data-retorno');
+    }
+
+    if (!field) return;
+    field.classList.toggle('hidden', !isSim);
+    field.style.display = isSim ? '' : 'none';
+    if (!isSim && input) input.value = '';
+  }
+
+  function refreshRetornoFields() {
+    document.querySelectorAll('#retornoCadastroSelect, #newAttendanceForm [name="retorno"], #edit-retorno')
+      .forEach(toggleRetornoArea);
+  }
+
+  document.addEventListener('change', function(event) {
+    const select = event.target.closest('#retornoCadastroSelect, #newAttendanceForm [name="retorno"], #edit-retorno');
+    if (select) toggleRetornoArea(select);
+  }, true);
+
+  document.addEventListener('click', function() {
+    setTimeout(refreshRetornoFields, 0);
+  }, true);
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', refreshRetornoFields);
+  } else {
+    refreshRetornoFields();
+  }
+
+  const observer = new MutationObserver(() => refreshRetornoFields());
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+})();
+</script>
+
+
+
+<script id="fix-raiox-fila-tipo-exame-2026-05-28">
+/* Correção: Tipo de Exame RX -> Raio X e fila da Sala de Raio X filtrando por exame marcado. */
+(function(){
+  function txt(value){ return String(value || '').replace(/\s+/g, ' ').trim(); }
+  function isRx(value){ return /^(rx|raio\s*x)$/i.test(txt(value)); }
+  function normalizeExamLabel(exam){
+    if (!exam) return exam;
+    if (exam.key === 'rx' || isRx(exam.nome)) exam.nome = 'Raio X';
+    return exam;
+  }
+  function normalizeRuntimeData(){
+    try { if (Array.isArray(EXAM_ORDER)) EXAM_ORDER.forEach(normalizeExamLabel); } catch(e) {}
+    try {
+      if (Array.isArray(PAPA_FILA_QUEUE_OPTIONS)) {
+        PAPA_FILA_QUEUE_OPTIONS.forEach(option => { if (isRx(option.value)) option.value = 'Raio X'; });
+      }
+    } catch(e) {}
+    try {
+      if (Array.isArray(PAPA_FILA_ROOMS)) {
+        const room = PAPA_FILA_ROOMS.find(item => item && item.key === 'rx-01');
+        if (room) {
+          room.label = 'Sala de Raio X';
+          room.description = 'Chamada exclusiva para pacientes com Raio X pendente.';
+        }
+      }
+    } catch(e) {}
+    try {
+      if (typeof papaFilaRoomSettings !== 'undefined' && papaFilaRoomSettings && papaFilaRoomSettings['rx-01']) {
+        papaFilaRoomSettings['rx-01'].queueType = 'Raio X';
+        if (isRx(papaFilaRoomSettings['rx-01'].displayExamLabel)) papaFilaRoomSettings['rx-01'].displayExamLabel = 'Raio X';
+        if (!papaFilaRoomSettings['rx-01'].displayRoomLabel || /sala\s*rx/i.test(papaFilaRoomSettings['rx-01'].displayRoomLabel)) papaFilaRoomSettings['rx-01'].displayRoomLabel = 'Sala de Raio X';
+        if (typeof savePapaFilaRoomSettings === 'function') savePapaFilaRoomSettings();
+      }
+    } catch(e) {}
+    try {
+      if (Array.isArray(patients)) {
+        patients.forEach(patient => (patient.exames || []).forEach(normalizeExamLabel));
+        if (typeof savePatients === 'function') savePatients();
+      }
+    } catch(e) {}
+  }
+  function refreshSelectLabels(){
+    document.querySelectorAll('option').forEach(option => {
+      if (isRx(option.textContent)) option.textContent = 'Raio X';
+      if (isRx(option.value)) option.value = 'Raio X';
+    });
+  }
+  function patchCallNextPatient(){
+    const original = window.callNextPatient;
+    if (typeof original !== 'function' || original.__raioXFilterPatched) return;
+    const patched = function(roomKey){
+      try { normalizeRuntimeData(); } catch(e) {}
+      return original.apply(this, arguments);
+    };
+    patched.__raioXFilterPatched = true;
+    window.callNextPatient = patched;
+  }
+  function run(){
+    normalizeRuntimeData();
+    refreshSelectLabels();
+    patchCallNextPatient();
+    try { if (typeof renderPapaFila === 'function') renderPapaFila(); } catch(e) {}
+    try { if (typeof renderExames === 'function') renderExames(); } catch(e) {}
+  }
+  document.addEventListener('change', function(event){
+    if (event.target && (event.target.id === 'caller-default-room' || event.target.id === 'filter-tipo-exame' || String(event.target.id || '').startsWith('filter-tipo-exame-'))) {
+      setTimeout(run, 0);
+    }
+  }, true);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+  else run();
+  setTimeout(run, 150);
+  setTimeout(run, 800);
+})();
+</script>
 </body>
 </html>
