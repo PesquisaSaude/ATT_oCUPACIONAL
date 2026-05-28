@@ -4419,6 +4419,13 @@ button[data-totem-key] {
 <button class="btn btn-success" id="caller-next-btn" type="button">Chamar próximo</button>
 </div>
 </div>
+<div class="filters" id="caller-queue-search-area" style="margin: 2px 0 14px;">
+  <div class="search" style="flex: 1 1 320px;">
+    <span>🔎</span>
+    <input id="caller-queue-search" placeholder="Buscar paciente pelo nome na fila de atendimento" type="search" autocomplete="off"/>
+  </div>
+  <button class="btn btn-ghost" id="caller-queue-search-clear" type="button">Limpar busca</button>
+</div>
 <div class="call-center-queue" id="caller-queue-list"></div>
 </div>
 <div class="card">
@@ -12737,6 +12744,9 @@ function compareQueueOrder(a, b) {
     if (r.includes("coleta") || r.includes("laborat")) return { stage:"Exames", exam:"Exames Laboratoriais", examKey:"lab", label:"Coleta / Laboratoriais" };
     if (r.includes("psicossocial")) return { stage:"Exames", exam:"Avaliação Psicossocial", examKey:"psicossocial", label:"Avaliação Psicossocial" };
     if (r.includes("exames")) return { stage:"Exames", label:"Exames Ocupacionais" };
+    if (r.includes("recepção térreo 1") || r.includes("recepcao terreo 1") || r.includes("recepção térreo 2") || r.includes("recepcao terreo 2") || r.includes("recepção térreo 3") || r.includes("recepcao terreo 3")) {
+      return { stage:"Recepção", label:"Recepção Térreo - cadastros somente com CPF", onlyCpfPendingRegistration:true };
+    }
     return { stage:"Recepção", label:"Recepção" };
   }
 
@@ -12773,9 +12783,19 @@ function compareQueueOrder(a, b) {
     if (wanted === 'rx') return blob.includes('rx') || blob.includes('raio');
     return blob.includes(wanted);
   }
+  function isCpfOnlyRegistration(item){
+    const cpf = digits(item && item.cpf);
+    if (!cpf) return false;
+    const name = String(item?.displayName || item?.name || item?.nome || '').replace(/\s+/g, ' ').trim();
+    const hasOnlyCpfAsName = !name || /^CPF\s/i.test(name) || digits(name) === cpf;
+    const nominalFlag = item?.cadastroNominal === true || item?.cadastroNominal === 'true';
+    const knownNamedPatient = Boolean(item?.patientName || item?.nomePaciente || item?.nomeCompleto);
+    return hasOnlyCpfAsName && !nominalFlag && !knownNamedPatient;
+  }
   function isAvailableForRoom(item, rule){
     const stage = itemStage(item);
     if (stage !== rule.stage) return false;
+    if (rule.onlyCpfPendingRegistration && !isCpfOnlyRegistration(item)) return false;
     return patientHasPendingExam(item, rule);
   }
   function normalizeItem(item, index){
@@ -12801,9 +12821,21 @@ function compareQueueOrder(a, b) {
     save(QUEUE_KEY, queue);
     return sortQueue(queue);
   }
+  function callerQueueSearchTerm(){
+    return String(document.getElementById("caller-queue-search")?.value || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+  }
+  function normalizeForSearch(value){
+    return String(value || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+  function matchesCallerNameSearch(item, term){
+    if (!term) return true;
+    const nameText = normalizeForSearch([item.displayName, item.name, item.nome, item.patientName, item.nomePaciente, item.nomeCompleto].filter(Boolean).join(" "));
+    return nameText.includes(term);
+  }
   function filteredQueue(){
     const rule = roomRule(selectedRoom());
-    return readQueue().filter(item => isAvailableForRoom(item, rule));
+    const term = callerQueueSearchTerm();
+    return readQueue().filter(item => isAvailableForRoom(item, rule) && matchesCallerNameSearch(item, term));
   }
 
   function renderFilteredCaller(){
@@ -12812,7 +12844,9 @@ function compareQueueOrder(a, b) {
     const room = selectedRoom();
     const rule = roomRule(room);
     const all = readQueue();
-    const queue = all.filter(item => isAvailableForRoom(item, rule));
+    const term = callerQueueSearchTerm();
+    const availableForRoom = all.filter(item => isAvailableForRoom(item, rule));
+    const queue = availableForRoom.filter(item => matchesCallerNameSearch(item, term));
     const history = parse(HISTORY_KEY, []);
     const waitingEl = document.getElementById("caller-kpi-waiting");
     const prefEl = document.getElementById("caller-kpi-preferential");
@@ -12822,8 +12856,11 @@ function compareQueueOrder(a, b) {
     if (calledEl) calledEl.textContent = history.length;
 
     if (!queue.length) {
-      const blocked = all.length ? `<div class="small" style="margin-top:8px">Existem ${all.length} paciente(s) em outras etapas, mas nenhum liberado para <strong>${esc(rule.label)}</strong>.</div>` : "";
-      el.innerHTML = `<div class="call-center-empty">Nenhum paciente disponível para ${esc(room)} obedecendo o fluxo de atendimento.${blocked}</div>`;
+      const blocked = all.length ? `<div class="small" style="margin-top:8px">Existem ${all.length} paciente(s) em outras etapas ou já com cadastro nominal, mas nenhum liberado para <strong>${esc(rule.label)}</strong>.</div>` : "";
+      const guidance = rule.onlyCpfPendingRegistration ? `<div class="small" style="margin-top:8px">Recepção Térreo 1, 2 e 3 exibem somente fichas sem nome, identificadas apenas pelo CPF, para que a atendente complete o cadastro.</div>` : "";
+      const searchMessage = term ? `<div class="small" style="margin-top:8px">Nenhum paciente encontrado pelo nome pesquisado: <strong>${esc(document.getElementById("caller-queue-search")?.value || "")}</strong>.</div>` : "";
+      const baseMessage = term && availableForRoom.length ? `Nenhum paciente encontrado na busca da fila de ${esc(room)}.` : `Nenhum paciente disponível para ${esc(room)} obedecendo o fluxo de atendimento.`;
+      el.innerHTML = `<div class="call-center-empty">${baseMessage}${searchMessage}${term ? "" : blocked}${guidance}</div>`;
       renderTv(parse(LAST_KEY, null));
       return;
     }
@@ -12962,6 +12999,18 @@ function compareQueueOrder(a, b) {
   }, true);
 
   document.addEventListener("change", function(event){ if (event.target?.id === "caller-default-room") refreshAfterOriginal(); }, true);
+  document.addEventListener("input", function(event){
+    if (event.target?.id === "caller-queue-search") renderFilteredCaller();
+  }, true);
+  document.addEventListener("click", function(event){
+    if (event.target?.id === "caller-queue-search-clear") {
+      const input = document.getElementById("caller-queue-search");
+      if (input) input.value = "";
+      renderFilteredCaller();
+      input?.focus();
+    }
+  }, true);
+  document.documentElement.dataset.searchBindingApplied = "true";
   window.addEventListener("storage", event => { if ([QUEUE_KEY, HISTORY_KEY, LAST_KEY].includes(event.key)) renderFilteredCaller(); });
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => setTimeout(renderFilteredCaller, 120));
   else setTimeout(renderFilteredCaller, 120);
@@ -14533,6 +14582,119 @@ function compareQueueOrder(a, b) {
   else run();
   setTimeout(run, 150);
   setTimeout(run, 800);
+})();
+</script>
+
+
+<script id="fix-recepcao-terreo-cpf-only-2026-05-28">
+/* Correção: Recepção Térreo 1, 2 e 3 no Chamador mostra somente cadastros sem nome, identificados apenas por CPF. */
+(function(){
+  const QUEUE_KEY = 'sesi_chamador_fila_v1';
+  const digits = value => String(value || '').replace(/\D/g, '').slice(0, 11);
+  const isGroundReceptionRoom = value => /recep(?:ç|c)[aã]o\s+t[eé]rreo\s+[123]/i.test(String(value || ''));
+  function isCpfOnlyRegistration(item){
+    const cpf = digits(item && item.cpf);
+    if (!cpf) return false;
+    const name = String(item?.displayName || item?.name || item?.nome || '').replace(/\s+/g, ' ').trim();
+    const hasOnlyCpfAsName = !name || /^CPF\s/i.test(name) || digits(name) === cpf;
+    const nominalFlag = item?.cadastroNominal === true || item?.cadastroNominal === 'true';
+    const named = Boolean(item?.patientName || item?.nomePaciente || item?.nomeCompleto);
+    return hasOnlyCpfAsName && !nominalFlag && !named;
+  }
+  function selectedRoom(){ return document.getElementById('caller-default-room')?.value || ''; }
+  function markVisibleCards(){
+    if (!isGroundReceptionRoom(selectedRoom())) return;
+    document.querySelectorAll('#caller-queue-list .call-center-queue-item').forEach(card => {
+      const id = card.getAttribute('data-id');
+      let queue = [];
+      try { queue = JSON.parse(localStorage.getItem(QUEUE_KEY) || '[]'); } catch(e) {}
+      const item = Array.isArray(queue) ? queue.find(row => String(row && row.id) === String(id)) : null;
+      if (item && !isCpfOnlyRegistration(item)) card.remove();
+    });
+    const list = document.getElementById('caller-queue-list');
+    if (list && !list.querySelector('.call-center-queue-item') && !list.querySelector('.call-center-empty')) {
+      list.innerHTML = '<div class="call-center-empty">Nenhum CPF aguardando cadastro nominal para a Recepção Térreo selecionada.</div>';
+    }
+  }
+  document.addEventListener('change', event => {
+    if (event.target?.id === 'caller-default-room') setTimeout(markVisibleCards, 80);
+  }, true);
+  document.addEventListener('click', event => {
+    if (event.target?.closest?.('[data-page="chamador"], #caller-next-btn, [data-filtered-room-call]')) setTimeout(markVisibleCards, 100);
+  }, true);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(markVisibleCards, 250));
+  else setTimeout(markVisibleCards, 250);
+})();
+</script>
+
+
+<script id="chamador-busca-paciente-nome-fila-final">
+/* ===== Busca por nome na Fila de atendimento do Chamador =====
+   Mantém o campo de busca ativo mesmo após atualizações de sala, fila e renderizações complementares. */
+(function(){
+  function normalizeText(value){
+    return String(value || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+  }
+  function ensureSearchArea(){
+    const list = document.getElementById('caller-queue-list');
+    if (!list || document.getElementById('caller-queue-search')) return;
+    const area = document.createElement('div');
+    area.className = 'filters';
+    area.id = 'caller-queue-search-area';
+    area.style.margin = '2px 0 14px';
+    area.innerHTML = '<div class="search" style="flex:1 1 320px"><span>🔎</span><input id="caller-queue-search" placeholder="Buscar paciente pelo nome na fila de atendimento" type="search" autocomplete="off"></div><button class="btn btn-ghost" id="caller-queue-search-clear" type="button">Limpar busca</button>';
+    list.parentNode.insertBefore(area, list);
+  }
+  function applyNameSearchFilter(){
+    ensureSearchArea();
+    const input = document.getElementById('caller-queue-search');
+    const list = document.getElementById('caller-queue-list');
+    if (!input || !list) return;
+    const term = normalizeText(input.value);
+    const cards = Array.from(list.querySelectorAll('.call-center-queue-item'));
+    let visible = 0;
+    cards.forEach(card => {
+      const name = normalizeText(card.querySelector('.call-center-queue-name')?.textContent || '');
+      const match = !term || name.includes(term);
+      card.style.display = match ? '' : 'none';
+      if (match) visible += 1;
+    });
+    const previous = list.querySelector('[data-search-empty="true"]');
+    if (previous) previous.remove();
+    if (term && cards.length && !visible) {
+      const empty = document.createElement('div');
+      empty.className = 'call-center-empty';
+      empty.dataset.searchEmpty = 'true';
+      empty.innerHTML = 'Nenhum paciente encontrado pelo nome pesquisado.';
+      list.appendChild(empty);
+    }
+  }
+  document.addEventListener('input', function(event){
+    if (event.target?.id === 'caller-queue-search') applyNameSearchFilter();
+  }, true);
+  document.addEventListener('click', function(event){
+    if (event.target?.id === 'caller-queue-search-clear') {
+      const input = document.getElementById('caller-queue-search');
+      if (input) input.value = '';
+      applyNameSearchFilter();
+      input?.focus();
+    }
+  }, true);
+  const wrap = name => {
+    const original = window[name];
+    if (typeof original === 'function' && !original.__nameSearchWrapped) {
+      const wrapped = function(){
+        const result = original.apply(this, arguments);
+        setTimeout(applyNameSearchFilter, 0);
+        return result;
+      };
+      wrapped.__nameSearchWrapped = true;
+      window[name] = wrapped;
+    }
+  };
+  ['renderCaller','renderCallerRules','__sesiRenderFilteredCaller'].forEach(wrap);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(applyNameSearchFilter, 160));
+  else setTimeout(applyNameSearchFilter, 160);
 })();
 </script>
 </body>
