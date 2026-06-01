@@ -3326,13 +3326,13 @@
 }
 
 
-/* ===== TOTEN DE ATENDIMENTO TOUCH ===== */
-.toten-shell {
+/* ===== TOTEM DE ATENDIMENTO TOUCH ===== */
+.totem-shell {
   display: grid;
   gap: 18px;
 }
 
-.toten-hero {
+.totem-hero {
   position: relative;
   overflow: hidden;
   border-radius: 30px;
@@ -3344,7 +3344,7 @@
   box-shadow: var(--shadow);
 }
 
-.toten-hero-grid {
+.totem-hero-grid {
   position: relative;
   z-index: 1;
   display: grid;
@@ -3353,26 +3353,26 @@
   align-items: center;
 }
 
-.toten-title {
+.totem-title {
   margin: 0 0 8px;
   font-size: 30px;
   line-height: 1.1;
 }
 
-.toten-subtitle {
+.totem-subtitle {
   margin: 0;
   color: #dbeafe;
   line-height: 1.5;
 }
 
-.toten-layout {
+.totem-layout {
   display: grid;
   grid-template-columns: minmax(420px, .8fr) minmax(0, 1.2fr);
   gap: 18px;
   align-items: start;
 }
 
-.toten-screen {
+.totem-screen {
   min-height: 640px;
   border-radius: 34px;
   padding: 26px;
@@ -3386,13 +3386,13 @@
   align-content: start;
 }
 
-.toten-screen-head {
+.totem-screen-head {
   display: flex;
   align-items: center;
   gap: 14px;
 }
 
-.toten-screen-icon {
+.totem-screen-icon {
   width: 68px;
   height: 68px;
   border-radius: 22px;
@@ -3403,18 +3403,18 @@
   border: 1px solid rgba(56,189,248,.22);
 }
 
-.toten-screen-head h3 {
+.totem-screen-head h3 {
   margin: 0;
   font-size: 24px;
 }
 
-.toten-screen-head p {
+.totem-screen-head p {
   margin: 4px 0 0;
   color: var(--muted);
   font-size: 14px;
 }
 
-.toten-cpf-display {
+.totem-cpf-display {
   min-height: 72px;
   padding: 18px 20px;
   border-radius: 22px;
@@ -3428,25 +3428,25 @@
   place-items: center;
 }
 
-.toten-cpf-display.invalid {
+.totem-cpf-display.invalid {
   border-color: rgba(239,68,68,.34);
   background: rgba(239,68,68,.10);
   color: #fecaca;
 }
 
-.toten-cpf-display.valid {
+.totem-cpf-display.valid {
   border-color: rgba(34,197,94,.30);
   background: rgba(34,197,94,.10);
   color: #bbf7d0;
 }
 
-.toten-keypad {
+.totem-keypad {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 14px;
 }
 
-.toten-key {
+.totem-key {
   min-height: 78px;
   border: 1px solid rgba(255,255,255,.08);
   border-radius: 22px;
@@ -3458,33 +3458,33 @@
   transition: .18s ease;
 }
 
-.toten-key:hover,
-.toten-key:focus {
+.totem-key:hover,
+.totem-key:focus {
   transform: translateY(-1px);
   background: rgba(0,91,170,.16);
   border-color: rgba(125,211,252,.22);
   outline: none;
 }
 
-.toten-key.action {
+.totem-key.action {
   font-size: 17px;
   background: rgba(255,255,255,.035);
   color: #dbeafe;
 }
 
-.toten-key.confirm {
+.totem-key.confirm {
   grid-column: span 3;
   background: linear-gradient(135deg, #005baa, #0086d1);
   box-shadow: 0 12px 28px rgba(0,91,170,.24);
 }
 
-.toten-key.confirm:disabled {
+.totem-key.confirm:disabled {
   opacity: .55;
   cursor: not-allowed;
   transform: none;
 }
 
-.toten-result {
+.totem-result {
   padding: 18px;
   border-radius: 22px;
   background: rgba(255,255,255,.04);
@@ -3493,7 +3493,7 @@
   gap: 10px;
 }
 
-.toten-result .label {
+.totem-result .label {
   color: var(--muted);
   font-size: 12px;
   text-transform: uppercase;
@@ -3501,52 +3501,52 @@
   font-weight: 800;
 }
 
-.toten-result .value {
+.totem-result .value {
   font-size: 22px;
   font-weight: 900;
   line-height: 1.2;
 }
 
-.toten-result.success {
+.totem-result.success {
   border-color: rgba(34,197,94,.24);
   background: rgba(34,197,94,.08);
 }
 
-.toten-result.warning {
+.totem-result.warning {
   border-color: rgba(250,204,21,.24);
   background: rgba(250,204,21,.08);
 }
 
-.toten-practice-grid {
+.totem-practice-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0,1fr));
   gap: 14px;
 }
 
-.toten-practice-card {
+.totem-practice-card {
   padding: 16px;
   border-radius: 20px;
   background: rgba(255,255,255,.035);
   border: 1px solid rgba(255,255,255,.07);
 }
 
-.toten-practice-card .title {
+.totem-practice-card .title {
   font-weight: 900;
   margin-bottom: 6px;
 }
 
-.toten-practice-card .desc {
+.totem-practice-card .desc {
   color: var(--muted);
   font-size: 13px;
   line-height: 1.45;
 }
 
-.toten-checkin-list {
+.totem-checkin-list {
   display: grid;
   gap: 10px;
 }
 
-.toten-checkin-item {
+.totem-checkin-item {
   display: grid;
   grid-template-columns: auto minmax(0,1fr) auto;
   gap: 12px;
@@ -3557,7 +3557,7 @@
   border: 1px solid rgba(255,255,255,.07);
 }
 
-.toten-checkin-badge {
+.totem-checkin-badge {
   width: 46px;
   height: 46px;
   border-radius: 15px;
@@ -3568,42 +3568,42 @@
   font-weight: 900;
 }
 
-.toten-checkin-name {
+.totem-checkin-name {
   font-weight: 900;
   margin-bottom: 4px;
 }
 
-.toten-checkin-meta {
+.totem-checkin-meta {
   color: var(--muted);
   font-size: 12px;
   line-height: 1.4;
 }
 
 @media (max-width: 1180px) {
-  .toten-hero-grid,
-  .toten-layout {
+  .totem-hero-grid,
+  .totem-layout {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 720px) {
-  .toten-practice-grid {
+  .totem-practice-grid {
     grid-template-columns: 1fr;
   }
 
-  .toten-screen {
+  .totem-screen {
     min-height: auto;
     padding: 18px;
   }
 
-  .toten-key {
+  .totem-key {
     min-height: 66px;
   }
 }
 
 
-/* ===== MELHORIA UX TOTEN FULLSCREEN ===== */
-.toten-open-btn {
+/* ===== MELHORIA UX TOTEM FULLSCREEN ===== */
+.totem-open-btn {
   width: 100%;
   min-height: 190px;
   border-radius: 30px;
@@ -3623,12 +3623,12 @@
   overflow: hidden;
 }
 
-.toten-open-btn:hover {
+.totem-open-btn:hover {
   transform: translateY(-2px);
   border-color: rgba(250,204,21,.34);
 }
 
-.toten-open-btn::after {
+.totem-open-btn::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -3637,7 +3637,7 @@
   animation: callTvSweep 5s linear infinite;
 }
 
-.toten-open-icon {
+.totem-open-icon {
   width: 70px;
   height: 70px;
   border-radius: 24px;
@@ -3648,7 +3648,7 @@
   border: 1px solid rgba(255,255,255,.14);
 }
 
-.toten-fullscreen-modal {
+.totem-fullscreen-modal {
   position: fixed;
   inset: 0;
   z-index: 160;
@@ -3658,17 +3658,17 @@
     linear-gradient(145deg, #03101f, #06192f 50%, #082642);
 }
 
-.toten-fullscreen-modal.open {
+.totem-fullscreen-modal.open {
   display: block;
 }
 
-.toten-fullscreen-stage {
+.totem-fullscreen-stage {
   min-height: 100vh;
   display: grid;
   grid-template-rows: auto 1fr auto;
 }
 
-.toten-fullscreen-top {
+.totem-fullscreen-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -3679,13 +3679,13 @@
   backdrop-filter: blur(16px);
 }
 
-.toten-fullscreen-body {
+.totem-fullscreen-body {
   display: grid;
   place-items: center;
   padding: 26px;
 }
 
-.toten-fullscreen-panel {
+.totem-fullscreen-panel {
   width: min(860px, 100%);
   border-radius: 36px;
   padding: clamp(24px, 4vw, 42px);
@@ -3696,13 +3696,13 @@
   gap: 24px;
 }
 
-.toten-question-grid {
+.totem-question-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0,1fr));
   gap: 16px;
 }
 
-.toten-question-btn {
+.totem-question-btn {
   min-height: 130px;
   border-radius: 26px;
   border: 1px solid rgba(255,255,255,.10);
@@ -3716,116 +3716,116 @@
   transition: .2s ease;
 }
 
-.toten-question-btn:hover {
+.totem-question-btn:hover {
   transform: translateY(-2px);
   background: rgba(0,91,170,.12);
   border-color: rgba(125,211,252,.24);
 }
 
-.toten-question-btn.preferential:hover {
+.totem-question-btn.preferential:hover {
   border-color: rgba(250,204,21,.34);
   background: rgba(250,204,21,.10);
 }
 
-.toten-question-title {
+.totem-question-title {
   font-size: 24px;
   font-weight: 900;
 }
 
-.toten-question-desc {
+.totem-question-desc {
   color: var(--muted);
   line-height: 1.45;
 }
 
 @media (max-width: 760px) {
-  .toten-question-grid {
+  .totem-question-grid {
     grid-template-columns: 1fr;
   }
 }
 
 
 /* ===== CORREÇÃO UX TOTEM FINAL ===== */
-.toten-fullscreen-modal.open{display:block!important}
-.toten-fullscreen-modal{overflow:hidden!important;background:radial-gradient(circle at top right,rgba(0,91,170,.20),transparent 30%),linear-gradient(135deg,#020b17,#04162b 52%,#06223f)!important}
-.toten-fullscreen-stage{height:100vh!important;min-height:100vh!important;display:grid!important;grid-template-rows:auto 1fr auto!important;overflow:hidden!important}
-.toten-fullscreen-top{min-height:70px!important;padding:14px 24px!important}
-.toten-fullscreen-body{display:block!important;padding:20px 24px!important;overflow:auto!important}
-.toten-fullscreen-panel{width:min(1180px,100%)!important;max-width:min(1180px,calc(100vw - 48px))!important;margin:0 auto!important;padding:24px!important;border-radius:30px!important;background:rgba(5,17,34,.92)!important;border:1px solid rgba(96,165,250,.18)!important;box-shadow:0 28px 72px rgba(0,0,0,.36)!important;display:grid!important;grid-template-columns:minmax(0,1.05fr) minmax(320px,.72fr)!important;grid-template-areas:"cpf cpf" "head help" "keypad help" "continue status"!important;gap:18px 24px!important;align-items:start!important;overflow:visible!important}
-#toten-fullscreen-cpf{grid-area:cpf!important;width:100%!important;max-width:100%!important;min-height:150px!important;margin:0!important;padding:22px 28px 48px!important;border-radius:24px!important;background:linear-gradient(180deg,#fff,#eef6ff)!important;color:#020817!important;border:2px solid rgba(96,165,250,.55)!important;box-shadow:0 0 0 5px rgba(37,99,235,.12),0 18px 44px rgba(0,0,0,.28),inset 0 -1px 0 rgba(15,23,42,.10)!important;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace!important;font-size:clamp(46px,6.8vw,86px)!important;line-height:1!important;letter-spacing:-.04em!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;font-weight:950!important;text-shadow:none!important;position:relative!important}
-#toten-fullscreen-cpf::after{content:"Digite os números do seu CPF";position:absolute;left:16px;right:16px;bottom:18px;font-family:Inter,system-ui,sans-serif;font-size:clamp(16px,1.5vw,24px);font-weight:850;letter-spacing:0;color:#0758c9;text-align:center}
-#toten-fullscreen-cpf.valid{border-color:rgba(34,197,94,.75)!important;box-shadow:0 0 0 5px rgba(34,197,94,.14),0 18px 44px rgba(0,0,0,.28)!important}
-#toten-fullscreen-cpf.invalid{border-color:rgba(239,68,68,.75)!important;box-shadow:0 0 0 5px rgba(239,68,68,.14),0 18px 44px rgba(0,0,0,.28)!important}
-.toten-screen-head{grid-area:head!important;min-height:auto!important;margin:0!important;padding:14px 0 0!important;display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;gap:16px!important;align-items:center!important;text-align:left!important;justify-content:start!important}
-.toten-screen-head .toten-screen-icon{width:70px!important;height:70px!important;border-radius:22px!important}
-.toten-screen-head h3{margin:0 0 6px!important;font-size:clamp(28px,3vw,42px)!important;line-height:1.05!important}
-.toten-screen-head p{margin:0!important;font-size:clamp(15px,1.35vw,19px)!important;color:#dbeafe!important}
-.toten-fullscreen-panel>.small{display:none!important}
-#toten-fullscreen-keypad{grid-area:keypad!important;width:100%!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important;margin:0!important}
-#toten-fullscreen-keypad .toten-key{min-width:0!important;min-height:clamp(72px,8vh,104px)!important;border-radius:22px!important;border:1px solid rgba(96,165,250,.18)!important;background:linear-gradient(180deg,rgba(20,39,66,.96),rgba(10,28,52,.96))!important;color:#fff!important;font-size:clamp(34px,4.2vw,58px)!important;font-weight:950!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 12px 26px rgba(0,0,0,.18)!important}
-#toten-fullscreen-keypad .toten-key.action{font-size:clamp(15px,1.45vw,21px)!important;font-weight:900!important}
-#toten-fullscreen-keypad [data-fullscreen-action="clear"]{background:linear-gradient(135deg,#dc2626,#b91c1c)!important;border-color:rgba(248,113,113,.35)!important}
-#toten-fullscreen-keypad [data-fullscreen-action="backspace"]{background:linear-gradient(135deg,#0068d8,#004eb5)!important;border-color:rgba(96,165,250,.35)!important}
-#toten-next-step-btn{grid-area:continue!important;width:100%!important;min-height:90px!important;margin:0!important;border-radius:22px!important;background:linear-gradient(135deg,#0b74ff,#0056d6)!important;border:1px solid rgba(96,165,250,.35)!important;box-shadow:0 18px 38px rgba(0,91,170,.30)!important;color:white!important;font-size:clamp(25px,3vw,38px)!important;font-weight:950!important}
-#toten-next-step-btn::after{content:" ›"}
-#toten-fullscreen-result{grid-area:status!important;align-self:stretch!important;min-height:90px!important;margin:0!important;padding:18px 22px!important;border-radius:22px!important;background:linear-gradient(145deg,rgba(12,36,66,.86),rgba(5,22,44,.78))!important;border:1px solid rgba(96,165,250,.18)!important;display:grid!important;align-content:center!important}
-#toten-fullscreen-result .label{color:#bfdbfe!important;font-size:12px!important;letter-spacing:.12em!important}
-#toten-fullscreen-result .value{color:#fff!important;font-size:clamp(22px,2vw,30px)!important;font-weight:950!important}
-#toten-fullscreen-result .small{color:#cfe5ff!important;font-size:14px!important}
-.toten-fullscreen-panel::after{grid-area:help;content:"Como funciona?\A\A1  Digite seu CPF no teclado ao lado.\A\A2  Confira os números informados.\A\A3  Pressione “Continuar” para confirmar.\A\A🔒 Seus dados estão seguros.\AUtilizamos seus dados apenas para identificar seu atendimento.";white-space:pre-line;align-self:stretch;padding:24px 28px;border-radius:24px;background:linear-gradient(145deg,rgba(12,36,66,.78),rgba(5,22,44,.74));border:1px solid rgba(96,165,250,.18);color:#f8fbff;font-size:clamp(16px,1.45vw,21px);line-height:1.5;font-weight:650}
-#toten-preferential-step{display:none;position:fixed!important;inset:0!important;z-index:500!important;width:auto!important;height:auto!important;margin:0!important;padding:22px!important;background:rgba(2,8,18,.72)!important;backdrop-filter:blur(12px)!important;border:0!important;box-shadow:none!important;align-items:center!important;justify-content:center!important}
-#toten-preferential-step.open{display:flex!important}
-#toten-preferential-step>.toten-screen-head{position:absolute;top:calc(50% - 250px);left:50%;transform:translateX(-50%);width:min(980px,calc(100vw - 44px));min-height:auto!important;padding:28px 28px 8px!important;background:rgba(4,18,35,.98);border-radius:28px 28px 0 0;border:1px solid rgba(96,165,250,.20);border-bottom:0;justify-content:center!important;text-align:center!important}
-#toten-preferential-step>.toten-question-grid{width:min(980px,calc(100vw - 44px))!important;padding:170px 28px 28px!important;border-radius:28px!important;background:rgba(4,18,35,.98);border:1px solid rgba(96,165,250,.20);box-shadow:0 32px 90px rgba(0,0,0,.46);display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:18px!important}
-.toten-question-btn{min-height:190px!important;border-radius:26px!important;padding:28px!important}
-.toten-question-title{font-size:clamp(30px,3vw,44px)!important}
-.toten-question-desc{font-size:clamp(16px,1.35vw,21px)!important}
-@media(max-width:980px),(max-height:760px){.toten-fullscreen-stage{overflow:auto!important}.toten-fullscreen-body{overflow:visible!important}.toten-fullscreen-panel{max-height:none!important;grid-template-columns:1fr!important;grid-template-areas:"cpf" "head" "keypad" "continue" "status"!important}.toten-fullscreen-panel::after{display:none!important}#toten-fullscreen-cpf{min-height:128px!important;font-size:clamp(38px,9vw,62px)!important;padding-left:14px!important;padding-right:14px!important}#toten-fullscreen-keypad .toten-key{min-height:70px!important}#toten-preferential-step>.toten-screen-head{top:calc(50% - 300px)}#toten-preferential-step>.toten-question-grid{grid-template-columns:1fr!important}}
+.totem-fullscreen-modal.open{display:block!important}
+.totem-fullscreen-modal{overflow:hidden!important;background:radial-gradient(circle at top right,rgba(0,91,170,.20),transparent 30%),linear-gradient(135deg,#020b17,#04162b 52%,#06223f)!important}
+.totem-fullscreen-stage{height:100vh!important;min-height:100vh!important;display:grid!important;grid-template-rows:auto 1fr auto!important;overflow:hidden!important}
+.totem-fullscreen-top{min-height:70px!important;padding:14px 24px!important}
+.totem-fullscreen-body{display:block!important;padding:20px 24px!important;overflow:auto!important}
+.totem-fullscreen-panel{width:min(1180px,100%)!important;max-width:min(1180px,calc(100vw - 48px))!important;margin:0 auto!important;padding:24px!important;border-radius:30px!important;background:rgba(5,17,34,.92)!important;border:1px solid rgba(96,165,250,.18)!important;box-shadow:0 28px 72px rgba(0,0,0,.36)!important;display:grid!important;grid-template-columns:minmax(0,1.05fr) minmax(320px,.72fr)!important;grid-template-areas:"cpf cpf" "head help" "keypad help" "continue status"!important;gap:18px 24px!important;align-items:start!important;overflow:visible!important}
+#totem-fullscreen-cpf{grid-area:cpf!important;width:100%!important;max-width:100%!important;min-height:150px!important;margin:0!important;padding:22px 28px 48px!important;border-radius:24px!important;background:linear-gradient(180deg,#fff,#eef6ff)!important;color:#020817!important;border:2px solid rgba(96,165,250,.55)!important;box-shadow:0 0 0 5px rgba(37,99,235,.12),0 18px 44px rgba(0,0,0,.28),inset 0 -1px 0 rgba(15,23,42,.10)!important;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace!important;font-size:clamp(46px,6.8vw,86px)!important;line-height:1!important;letter-spacing:-.04em!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;font-weight:950!important;text-shadow:none!important;position:relative!important}
+#totem-fullscreen-cpf::after{content:"Digite os números do seu CPF";position:absolute;left:16px;right:16px;bottom:18px;font-family:Inter,system-ui,sans-serif;font-size:clamp(16px,1.5vw,24px);font-weight:850;letter-spacing:0;color:#0758c9;text-align:center}
+#totem-fullscreen-cpf.valid{border-color:rgba(34,197,94,.75)!important;box-shadow:0 0 0 5px rgba(34,197,94,.14),0 18px 44px rgba(0,0,0,.28)!important}
+#totem-fullscreen-cpf.invalid{border-color:rgba(239,68,68,.75)!important;box-shadow:0 0 0 5px rgba(239,68,68,.14),0 18px 44px rgba(0,0,0,.28)!important}
+.totem-screen-head{grid-area:head!important;min-height:auto!important;margin:0!important;padding:14px 0 0!important;display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;gap:16px!important;align-items:center!important;text-align:left!important;justify-content:start!important}
+.totem-screen-head .totem-screen-icon{width:70px!important;height:70px!important;border-radius:22px!important}
+.totem-screen-head h3{margin:0 0 6px!important;font-size:clamp(28px,3vw,42px)!important;line-height:1.05!important}
+.totem-screen-head p{margin:0!important;font-size:clamp(15px,1.35vw,19px)!important;color:#dbeafe!important}
+.totem-fullscreen-panel>.small{display:none!important}
+#totem-fullscreen-keypad{grid-area:keypad!important;width:100%!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important;margin:0!important}
+#totem-fullscreen-keypad .totem-key{min-width:0!important;min-height:clamp(72px,8vh,104px)!important;border-radius:22px!important;border:1px solid rgba(96,165,250,.18)!important;background:linear-gradient(180deg,rgba(20,39,66,.96),rgba(10,28,52,.96))!important;color:#fff!important;font-size:clamp(34px,4.2vw,58px)!important;font-weight:950!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 12px 26px rgba(0,0,0,.18)!important}
+#totem-fullscreen-keypad .totem-key.action{font-size:clamp(15px,1.45vw,21px)!important;font-weight:900!important}
+#totem-fullscreen-keypad [data-fullscreen-action="clear"]{background:linear-gradient(135deg,#dc2626,#b91c1c)!important;border-color:rgba(248,113,113,.35)!important}
+#totem-fullscreen-keypad [data-fullscreen-action="backspace"]{background:linear-gradient(135deg,#0068d8,#004eb5)!important;border-color:rgba(96,165,250,.35)!important}
+#totem-next-step-btn{grid-area:continue!important;width:100%!important;min-height:90px!important;margin:0!important;border-radius:22px!important;background:linear-gradient(135deg,#0b74ff,#0056d6)!important;border:1px solid rgba(96,165,250,.35)!important;box-shadow:0 18px 38px rgba(0,91,170,.30)!important;color:white!important;font-size:clamp(25px,3vw,38px)!important;font-weight:950!important}
+#totem-next-step-btn::after{content:" ›"}
+#totem-fullscreen-result{grid-area:status!important;align-self:stretch!important;min-height:90px!important;margin:0!important;padding:18px 22px!important;border-radius:22px!important;background:linear-gradient(145deg,rgba(12,36,66,.86),rgba(5,22,44,.78))!important;border:1px solid rgba(96,165,250,.18)!important;display:grid!important;align-content:center!important}
+#totem-fullscreen-result .label{color:#bfdbfe!important;font-size:12px!important;letter-spacing:.12em!important}
+#totem-fullscreen-result .value{color:#fff!important;font-size:clamp(22px,2vw,30px)!important;font-weight:950!important}
+#totem-fullscreen-result .small{color:#cfe5ff!important;font-size:14px!important}
+.totem-fullscreen-panel::after{grid-area:help;content:"Como funciona?\A\A1  Digite seu CPF no teclado ao lado.\A\A2  Confira os números informados.\A\A3  Pressione “Continuar” para confirmar.\A\A🔒 Seus dados estão seguros.\AUtilizamos seus dados apenas para identificar seu atendimento.";white-space:pre-line;align-self:stretch;padding:24px 28px;border-radius:24px;background:linear-gradient(145deg,rgba(12,36,66,.78),rgba(5,22,44,.74));border:1px solid rgba(96,165,250,.18);color:#f8fbff;font-size:clamp(16px,1.45vw,21px);line-height:1.5;font-weight:650}
+#totem-preferential-step{display:none;position:fixed!important;inset:0!important;z-index:500!important;width:auto!important;height:auto!important;margin:0!important;padding:22px!important;background:rgba(2,8,18,.72)!important;backdrop-filter:blur(12px)!important;border:0!important;box-shadow:none!important;align-items:center!important;justify-content:center!important}
+#totem-preferential-step.open{display:flex!important}
+#totem-preferential-step>.totem-screen-head{position:absolute;top:calc(50% - 250px);left:50%;transform:translateX(-50%);width:min(980px,calc(100vw - 44px));min-height:auto!important;padding:28px 28px 8px!important;background:rgba(4,18,35,.98);border-radius:28px 28px 0 0;border:1px solid rgba(96,165,250,.20);border-bottom:0;justify-content:center!important;text-align:center!important}
+#totem-preferential-step>.totem-question-grid{width:min(980px,calc(100vw - 44px))!important;padding:170px 28px 28px!important;border-radius:28px!important;background:rgba(4,18,35,.98);border:1px solid rgba(96,165,250,.20);box-shadow:0 32px 90px rgba(0,0,0,.46);display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:18px!important}
+.totem-question-btn{min-height:190px!important;border-radius:26px!important;padding:28px!important}
+.totem-question-title{font-size:clamp(30px,3vw,44px)!important}
+.totem-question-desc{font-size:clamp(16px,1.35vw,21px)!important}
+@media(max-width:980px),(max-height:760px){.totem-fullscreen-stage{overflow:auto!important}.totem-fullscreen-body{overflow:visible!important}.totem-fullscreen-panel{max-height:none!important;grid-template-columns:1fr!important;grid-template-areas:"cpf" "head" "keypad" "continue" "status"!important}.totem-fullscreen-panel::after{display:none!important}#totem-fullscreen-cpf{min-height:128px!important;font-size:clamp(38px,9vw,62px)!important;padding-left:14px!important;padding-right:14px!important}#totem-fullscreen-keypad .totem-key{min-height:70px!important}#totem-preferential-step>.totem-screen-head{top:calc(50% - 300px)}#totem-preferential-step>.totem-question-grid{grid-template-columns:1fr!important}}
 
 </style>
-<style id="toten-final-fix-style">
-.toten-fullscreen-modal{position:fixed;inset:0;z-index:9999;display:none;background:linear-gradient(135deg,#020b17,#04162b 55%,#06223f);color:#f8fbff}
-.toten-fullscreen-modal.open{display:block!important}
-.toten-fullscreen-stage{height:100vh;display:grid;grid-template-rows:auto 1fr auto;overflow:hidden}
-.toten-fullscreen-top{padding:14px 24px;display:flex;justify-content:space-between;align-items:center;background:rgba(2,13,27,.82);border-bottom:1px solid rgba(96,165,250,.18)}
-.toten-fullscreen-body{padding:20px 24px;overflow:auto}
-.toten-fullscreen-panel{width:min(1180px,100%);margin:0 auto;padding:24px;border-radius:30px;background:rgba(5,17,34,.92);border:1px solid rgba(96,165,250,.18);box-shadow:0 28px 72px rgba(0,0,0,.36);display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.72fr);grid-template-areas:"cpf cpf" "head help" "keypad help" "continue status";gap:18px 24px;position:relative}
-#toten-fullscreen-cpf{grid-area:cpf;width:100%;min-height:150px;padding:22px 28px 48px;border-radius:24px;background:linear-gradient(180deg,#fff,#eef6ff);color:#020817;border:2px solid rgba(96,165,250,.55);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:clamp(46px,6.8vw,86px);letter-spacing:-.04em;white-space:nowrap;display:flex;align-items:center;justify-content:center;font-weight:950;position:relative;box-shadow:0 0 0 5px rgba(37,99,235,.12),0 18px 44px rgba(0,0,0,.28)}
-#toten-fullscreen-cpf::after{content:"Digite os números do seu CPF";position:absolute;left:16px;right:16px;bottom:18px;font-family:Inter,system-ui,sans-serif;font-size:clamp(16px,1.5vw,24px);font-weight:850;color:#0758c9;text-align:center;letter-spacing:0}
-#toten-fullscreen-cpf.valid{border-color:rgba(34,197,94,.75)}
-#toten-fullscreen-cpf.invalid{border-color:rgba(239,68,68,.75)}
-.toten-screen-head{grid-area:head;display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center;text-align:left}
-.toten-screen-icon{width:70px;height:70px;border-radius:22px;display:grid;place-items:center;background:linear-gradient(135deg,#0069d9,#0052b8);font-size:32px}
-.toten-screen-head h3{margin:0 0 6px;font-size:clamp(28px,3vw,42px);line-height:1.05}
-.toten-screen-head p{margin:0;font-size:clamp(15px,1.35vw,19px);color:#dbeafe}
-#toten-fullscreen-keypad{grid-area:keypad;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-#toten-fullscreen-keypad .toten-key{min-height:clamp(72px,8vh,104px);border-radius:22px;border:1px solid rgba(96,165,250,.18);background:linear-gradient(180deg,rgba(20,39,66,.96),rgba(10,28,52,.96));color:#fff;font-size:clamp(34px,4.2vw,58px);font-weight:950;cursor:pointer}
-#toten-fullscreen-keypad .toten-key.action{font-size:clamp(15px,1.45vw,21px)}
-#toten-fullscreen-keypad [data-fullscreen-action="clear"]{background:linear-gradient(135deg,#dc2626,#b91c1c)}
-#toten-fullscreen-keypad [data-fullscreen-action="backspace"]{background:linear-gradient(135deg,#0068d8,#004eb5)}
-#toten-next-step-btn{grid-area:continue;min-height:90px;border-radius:22px;background:linear-gradient(135deg,#0b74ff,#0056d6);color:white;font-size:clamp(25px,3vw,38px);font-weight:950;border:1px solid rgba(96,165,250,.35);cursor:pointer}
-#toten-next-step-btn:disabled{opacity:.55;cursor:not-allowed}
-#toten-next-step-btn::after{content:" ›"}
-#toten-fullscreen-result{grid-area:status;min-height:90px;padding:18px 22px;border-radius:22px;background:linear-gradient(145deg,rgba(12,36,66,.86),rgba(5,22,44,.78));border:1px solid rgba(96,165,250,.18);display:grid;align-content:center}
-#toten-fullscreen-result .label{color:#bfdbfe;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
-#toten-fullscreen-result .value{font-size:clamp(22px,2vw,30px);font-weight:950}
-#toten-fullscreen-result .small{color:#cfe5ff;font-size:14px}
-.toten-fullscreen-panel::after{grid-area:help;content:"Como funciona?\A\A1  Digite seu CPF no teclado ao lado.\A\A2  Confira os números informados.\A\A3  Pressione “Continuar” para confirmar.\A\A🔒 Seus dados estão seguros.\AUtilizamos seus dados apenas para identificar seu atendimento.";white-space:pre-line;padding:24px 28px;border-radius:24px;background:linear-gradient(145deg,rgba(12,36,66,.78),rgba(5,22,44,.74));border:1px solid rgba(96,165,250,.18);font-size:clamp(16px,1.45vw,21px);line-height:1.5}
-.toten-preferential-popup{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;background:rgba(2,8,18,.74);backdrop-filter:blur(12px);padding:22px}
-.toten-preferential-popup.open{display:flex!important}
-.toten-preferential-card{width:min(980px,calc(100vw - 44px));padding:28px;border-radius:28px;background:rgba(4,18,35,.98);border:1px solid rgba(96,165,250,.22);box-shadow:0 32px 90px rgba(0,0,0,.46)}
-.toten-preferential-card .toten-screen-head{margin-bottom:22px;justify-content:center;text-align:center}
-.toten-question-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
-.toten-question-btn{min-height:190px;border-radius:26px;padding:28px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#fff;text-align:left;cursor:pointer}
-.toten-question-btn.preferential{background:rgba(250,204,21,.10)}
-.toten-question-title{font-size:clamp(30px,3vw,44px);font-weight:950}
-.toten-question-desc{font-size:clamp(16px,1.35vw,21px);color:#cbd5e1;margin-top:10px}
+<style id="totem-final-fix-style">
+.totem-fullscreen-modal{position:fixed;inset:0;z-index:9999;display:none;background:linear-gradient(135deg,#020b17,#04162b 55%,#06223f);color:#f8fbff}
+.totem-fullscreen-modal.open{display:block!important}
+.totem-fullscreen-stage{height:100vh;display:grid;grid-template-rows:auto 1fr auto;overflow:hidden}
+.totem-fullscreen-top{padding:14px 24px;display:flex;justify-content:space-between;align-items:center;background:rgba(2,13,27,.82);border-bottom:1px solid rgba(96,165,250,.18)}
+.totem-fullscreen-body{padding:20px 24px;overflow:auto}
+.totem-fullscreen-panel{width:min(1180px,100%);margin:0 auto;padding:24px;border-radius:30px;background:rgba(5,17,34,.92);border:1px solid rgba(96,165,250,.18);box-shadow:0 28px 72px rgba(0,0,0,.36);display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.72fr);grid-template-areas:"cpf cpf" "head help" "keypad help" "continue status";gap:18px 24px;position:relative}
+#totem-fullscreen-cpf{grid-area:cpf;width:100%;min-height:150px;padding:22px 28px 48px;border-radius:24px;background:linear-gradient(180deg,#fff,#eef6ff);color:#020817;border:2px solid rgba(96,165,250,.55);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:clamp(46px,6.8vw,86px);letter-spacing:-.04em;white-space:nowrap;display:flex;align-items:center;justify-content:center;font-weight:950;position:relative;box-shadow:0 0 0 5px rgba(37,99,235,.12),0 18px 44px rgba(0,0,0,.28)}
+#totem-fullscreen-cpf::after{content:"Digite os números do seu CPF";position:absolute;left:16px;right:16px;bottom:18px;font-family:Inter,system-ui,sans-serif;font-size:clamp(16px,1.5vw,24px);font-weight:850;color:#0758c9;text-align:center;letter-spacing:0}
+#totem-fullscreen-cpf.valid{border-color:rgba(34,197,94,.75)}
+#totem-fullscreen-cpf.invalid{border-color:rgba(239,68,68,.75)}
+.totem-screen-head{grid-area:head;display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center;text-align:left}
+.totem-screen-icon{width:70px;height:70px;border-radius:22px;display:grid;place-items:center;background:linear-gradient(135deg,#0069d9,#0052b8);font-size:32px}
+.totem-screen-head h3{margin:0 0 6px;font-size:clamp(28px,3vw,42px);line-height:1.05}
+.totem-screen-head p{margin:0;font-size:clamp(15px,1.35vw,19px);color:#dbeafe}
+#totem-fullscreen-keypad{grid-area:keypad;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+#totem-fullscreen-keypad .totem-key{min-height:clamp(72px,8vh,104px);border-radius:22px;border:1px solid rgba(96,165,250,.18);background:linear-gradient(180deg,rgba(20,39,66,.96),rgba(10,28,52,.96));color:#fff;font-size:clamp(34px,4.2vw,58px);font-weight:950;cursor:pointer}
+#totem-fullscreen-keypad .totem-key.action{font-size:clamp(15px,1.45vw,21px)}
+#totem-fullscreen-keypad [data-fullscreen-action="clear"]{background:linear-gradient(135deg,#dc2626,#b91c1c)}
+#totem-fullscreen-keypad [data-fullscreen-action="backspace"]{background:linear-gradient(135deg,#0068d8,#004eb5)}
+#totem-next-step-btn{grid-area:continue;min-height:90px;border-radius:22px;background:linear-gradient(135deg,#0b74ff,#0056d6);color:white;font-size:clamp(25px,3vw,38px);font-weight:950;border:1px solid rgba(96,165,250,.35);cursor:pointer}
+#totem-next-step-btn:disabled{opacity:.55;cursor:not-allowed}
+#totem-next-step-btn::after{content:" ›"}
+#totem-fullscreen-result{grid-area:status;min-height:90px;padding:18px 22px;border-radius:22px;background:linear-gradient(145deg,rgba(12,36,66,.86),rgba(5,22,44,.78));border:1px solid rgba(96,165,250,.18);display:grid;align-content:center}
+#totem-fullscreen-result .label{color:#bfdbfe;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+#totem-fullscreen-result .value{font-size:clamp(22px,2vw,30px);font-weight:950}
+#totem-fullscreen-result .small{color:#cfe5ff;font-size:14px}
+.totem-fullscreen-panel::after{grid-area:help;content:"Como funciona?\A\A1  Digite seu CPF no teclado ao lado.\A\A2  Confira os números informados.\A\A3  Pressione “Continuar” para confirmar.\A\A🔒 Seus dados estão seguros.\AUtilizamos seus dados apenas para identificar seu atendimento.";white-space:pre-line;padding:24px 28px;border-radius:24px;background:linear-gradient(145deg,rgba(12,36,66,.78),rgba(5,22,44,.74));border:1px solid rgba(96,165,250,.18);font-size:clamp(16px,1.45vw,21px);line-height:1.5}
+.totem-preferential-popup{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;background:rgba(2,8,18,.74);backdrop-filter:blur(12px);padding:22px}
+.totem-preferential-popup.open{display:flex!important}
+.totem-preferential-card{width:min(980px,calc(100vw - 44px));padding:28px;border-radius:28px;background:rgba(4,18,35,.98);border:1px solid rgba(96,165,250,.22);box-shadow:0 32px 90px rgba(0,0,0,.46)}
+.totem-preferential-card .totem-screen-head{margin-bottom:22px;justify-content:center;text-align:center}
+.totem-question-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.totem-question-btn{min-height:190px;border-radius:26px;padding:28px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#fff;text-align:left;cursor:pointer}
+.totem-question-btn.preferential{background:rgba(250,204,21,.10)}
+.totem-question-title{font-size:clamp(30px,3vw,44px);font-weight:950}
+.totem-question-desc{font-size:clamp(16px,1.35vw,21px);color:#cbd5e1;margin-top:10px}
 .call-display-footer{padding:10px 20px;text-align:center;background:rgba(2,13,27,.82);color:#cbd5e1}
-@media(max-width:980px){.toten-fullscreen-panel{grid-template-columns:1fr;grid-template-areas:"cpf" "head" "keypad" "continue" "status"}.toten-fullscreen-panel::after{display:none}.toten-question-grid{grid-template-columns:1fr}#toten-fullscreen-cpf{font-size:clamp(38px,9vw,62px);padding-left:14px;padding-right:14px}}
+@media(max-width:980px){.totem-fullscreen-panel{grid-template-columns:1fr;grid-template-areas:"cpf" "head" "keypad" "continue" "status"}.totem-fullscreen-panel::after{display:none}.totem-question-grid{grid-template-columns:1fr}#totem-fullscreen-cpf{font-size:clamp(38px,9vw,62px);padding-left:14px;padding-right:14px}}
 </style>
-<style id="toten-caller-priority-rules-style">
-.call-center-queue-item.is-preferential,.queue-item.is-preferential,.toten-priority-row{border-left:6px solid #facc15!important;background:linear-gradient(90deg,rgba(250,204,21,.16),rgba(255,255,255,.035))!important;box-shadow:inset 0 0 0 1px rgba(250,204,21,.10),0 12px 28px rgba(0,0,0,.14)!important}
-.call-badge-preferential,.toten-badge-priority{color:#fff7cc!important;background:rgba(250,204,21,.18)!important;border-color:rgba(250,204,21,.36)!important;font-weight:950!important;text-transform:uppercase}
-.call-badge-toten{color:#dbeafe!important;background:rgba(59,130,246,.16)!important;border-color:rgba(96,165,250,.28)!important;font-weight:800!important}
+<style id="totem-caller-priority-rules-style">
+.call-center-queue-item.is-preferential,.queue-item.is-preferential,.totem-priority-row{border-left:6px solid #facc15!important;background:linear-gradient(90deg,rgba(250,204,21,.16),rgba(255,255,255,.035))!important;box-shadow:inset 0 0 0 1px rgba(250,204,21,.10),0 12px 28px rgba(0,0,0,.14)!important}
+.call-badge-preferential,.totem-badge-priority{color:#fff7cc!important;background:rgba(250,204,21,.18)!important;border-color:rgba(250,204,21,.36)!important;font-weight:950!important;text-transform:uppercase}
+.call-badge-totem{color:#dbeafe!important;background:rgba(59,130,246,.16)!important;border-color:rgba(96,165,250,.28)!important;font-weight:800!important}
 </style>
 <style id="exames-nao-realizado-filter-style">
 /* Botão/filtro Não Realizado - Exames Ocupacionais */
@@ -3959,13 +3959,13 @@ button[data-totem-key] {
 }
 </style>
 
-<style id="toten-cpf-ux-refresh-style">
+<style id="totem-cpf-ux-refresh-style">
 /* UX refresh — campo de CPF do TOTEM de Atendimento */
-.toten-fullscreen-panel {
+.totem-fullscreen-panel {
   grid-template-columns: minmax(0, .98fr) minmax(360px, .78fr) !important;
   gap: 20px 26px !important;
 }
-#toten-fullscreen-cpf {
+#totem-fullscreen-cpf {
   isolation: isolate !important;
   min-height: 178px !important;
   padding: 56px 34px 58px !important;
@@ -3984,7 +3984,7 @@ button[data-totem-key] {
     0 24px 56px rgba(0,0,0,.30),
     inset 0 1px 0 rgba(255,255,255,.95) !important;
 }
-#toten-fullscreen-cpf::before {
+#totem-fullscreen-cpf::before {
   content: "CPF do paciente";
   position: absolute;
   top: 20px;
@@ -4002,7 +4002,7 @@ button[data-totem-key] {
   font-weight: 900;
   letter-spacing: .02em;
 }
-#toten-fullscreen-cpf::after {
+#totem-fullscreen-cpf::after {
   content: attr(data-helper) !important;
   left: 28px !important;
   right: 28px !important;
@@ -4013,61 +4013,61 @@ button[data-totem-key] {
   font-size: clamp(14px, 1.25vw, 20px) !important;
   font-weight: 850 !important;
 }
-#toten-fullscreen-cpf.is-empty {
+#totem-fullscreen-cpf.is-empty {
   color: #8aa1bd !important;
   letter-spacing: .05em !important;
 }
-#toten-fullscreen-cpf.valid {
+#totem-fullscreen-cpf.valid {
   border-color: rgba(34,197,94,.72) !important;
   box-shadow: 0 0 0 6px rgba(34,197,94,.14), 0 24px 56px rgba(0,0,0,.30) !important;
 }
-#toten-fullscreen-cpf.invalid {
+#totem-fullscreen-cpf.invalid {
   border-color: rgba(239,68,68,.70) !important;
   box-shadow: 0 0 0 6px rgba(239,68,68,.14), 0 24px 56px rgba(0,0,0,.30) !important;
 }
-#toten-fullscreen-keypad {
+#totem-fullscreen-keypad {
   gap: 12px !important;
 }
-#toten-fullscreen-keypad .toten-key {
+#totem-fullscreen-keypad .totem-key {
   min-height: clamp(76px, 8.4vh, 112px) !important;
   border-radius: 24px !important;
   background: linear-gradient(180deg, rgba(28,52,88,.98), rgba(9,29,57,.98)) !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 14px 28px rgba(0,0,0,.20) !important;
 }
-#toten-fullscreen-keypad .toten-key:hover,
-#toten-fullscreen-keypad .toten-key:focus {
+#totem-fullscreen-keypad .totem-key:hover,
+#totem-fullscreen-keypad .totem-key:focus {
   transform: translateY(-2px) !important;
   border-color: rgba(125,211,252,.36) !important;
   background: linear-gradient(180deg, rgba(36,70,118,.98), rgba(11,43,82,.98)) !important;
 }
-#toten-fullscreen-keypad [data-fullscreen-action="clear"],
-#toten-fullscreen-keypad [data-fullscreen-action="backspace"] {
+#totem-fullscreen-keypad [data-fullscreen-action="clear"],
+#totem-fullscreen-keypad [data-fullscreen-action="backspace"] {
   font-size: clamp(16px, 1.35vw, 22px) !important;
 }
-#toten-next-step-btn {
+#totem-next-step-btn {
   min-height: 96px !important;
   border-radius: 26px !important;
 }
-#toten-fullscreen-result {
+#totem-fullscreen-result {
   border-radius: 26px !important;
 }
 @media(max-width:980px){
-  #toten-fullscreen-cpf {
+  #totem-fullscreen-cpf {
     min-height: 156px !important;
     padding: 54px 18px 58px !important;
     font-size: clamp(34px, 8.5vw, 58px) !important;
   }
-  #toten-fullscreen-cpf::before { left: 18px; top: 18px; }
-  #toten-fullscreen-cpf::after { left: 18px !important; right: 18px !important; }
+  #totem-fullscreen-cpf::before { left: 18px; top: 18px; }
+  #totem-fullscreen-cpf::after { left: 18px !important; right: 18px !important; }
 }
 </style>
 
 
-<style id="toten-action-button-color-correction">
+<style id="totem-action-button-color-correction">
 /* Correção final: cores específicas dos botões de ação do TOTEM.
    Usa seletores por atributo + !important para vencer estilos anteriores. */
-.toten-keypad [data-toten-action="clear"],
-#toten-fullscreen-keypad [data-fullscreen-action="clear"] {
+.totem-keypad [data-totem-action="clear"],
+#totem-fullscreen-keypad [data-fullscreen-action="clear"] {
   background: linear-gradient(135deg, #facc15, #d9a400) !important;
   border-color: rgba(250, 204, 21, .55) !important;
   color: #1f2937 !important;
@@ -4075,27 +4075,27 @@ button[data-totem-key] {
   box-shadow: 0 12px 28px rgba(250, 204, 21, .22), inset 0 1px 0 rgba(255,255,255,.24) !important;
 }
 
-.toten-keypad [data-toten-action="clear"]:hover,
-.toten-keypad [data-toten-action="clear"]:focus,
-#toten-fullscreen-keypad [data-fullscreen-action="clear"]:hover,
-#toten-fullscreen-keypad [data-fullscreen-action="clear"]:focus {
+.totem-keypad [data-totem-action="clear"]:hover,
+.totem-keypad [data-totem-action="clear"]:focus,
+#totem-fullscreen-keypad [data-fullscreen-action="clear"]:hover,
+#totem-fullscreen-keypad [data-fullscreen-action="clear"]:focus {
   background: linear-gradient(135deg, #fde047, #facc15) !important;
   border-color: rgba(253, 224, 71, .72) !important;
   color: #111827 !important;
 }
 
-.toten-keypad [data-toten-action="backspace"],
-#toten-fullscreen-keypad [data-fullscreen-action="backspace"] {
+.totem-keypad [data-totem-action="backspace"],
+#totem-fullscreen-keypad [data-fullscreen-action="backspace"] {
   background: linear-gradient(135deg, #ef4444, #b91c1c) !important;
   border-color: rgba(248, 113, 113, .56) !important;
   color: #ffffff !important;
   box-shadow: 0 12px 28px rgba(239, 68, 68, .24), inset 0 1px 0 rgba(255,255,255,.14) !important;
 }
 
-.toten-keypad [data-toten-action="backspace"]:hover,
-.toten-keypad [data-toten-action="backspace"]:focus,
-#toten-fullscreen-keypad [data-fullscreen-action="backspace"]:hover,
-#toten-fullscreen-keypad [data-fullscreen-action="backspace"]:focus {
+.totem-keypad [data-totem-action="backspace"]:hover,
+.totem-keypad [data-totem-action="backspace"]:focus,
+#totem-fullscreen-keypad [data-fullscreen-action="backspace"]:hover,
+#totem-fullscreen-keypad [data-fullscreen-action="backspace"]:focus {
   background: linear-gradient(135deg, #f87171, #dc2626) !important;
   border-color: rgba(252, 165, 165, .72) !important;
   color: #ffffff !important;
@@ -4120,7 +4120,7 @@ button[data-totem-key] {
 <button class="nav-btn active" data-page="dashboard" type="button"><span class="left"><span>📊</span><span>Dashboard</span></span><span>›</span></button>
 <button class="nav-btn" data-page="recepcao" type="button"><span class="left"><span>🧾</span><span>Recepção</span></span><span>›</span></button>
 <button data-page="chamador" type="button"><span class="left">📣 <span>Chamador</span></span><span>›</span></button>
-<button data-page="toten" type="button"><span class="left">🖥️ <span>TOTEN de Atendimento</span></span><span>›</span></button>
+<button data-page="totem" type="button"><span class="left">🖥️ <span>TOTEM de Atendimento</span></span><span>›</span></button>
 <button class="nav-btn" data-page="exames" type="button"><span class="left"><span>🔬</span><span>Exames Ocupacionais</span></span><span>›</span></button>
 <button class="nav-btn" data-page="triagem" type="button"><span class="left"><span>🚦</span><span>Triagem</span></span><span>›</span></button>
 <button class="nav-btn" data-page="medico" type="button"><span class="left"><span>👨‍⚕️</span><span>Médico do Trabalho</span></span><span>›</span></button>
@@ -4182,13 +4182,13 @@ button[data-totem-key] {
 <section class="content hidden" id="page-relatorios"></section>
 </main>
 </div>
-<section class="content hidden page-fade" id="page-toten">
-<div class="toten-shell">
-<div class="toten-hero">
-<div class="toten-hero-grid">
+<section class="content hidden page-fade" id="page-totem">
+<div class="totem-shell">
+<div class="totem-hero">
+<div class="totem-hero-grid">
 <div>
-<h3 class="toten-title">TOTEN de Atendimento</h3>
-<p class="toten-subtitle">
+<h3 class="totem-title">TOTEM de Atendimento</h3>
+<p class="totem-subtitle">
             Tela touch para check-in por CPF na recepção. O sistema valida o CPF, identifica pacientes cadastrados e envia automaticamente para a fila do Chamador.
           </p>
 <div class="dashboard-hero-chips">
@@ -4204,10 +4204,10 @@ button[data-totem-key] {
 </div>
 </div>
 <div class="card" style="margin-bottom:18px;">
-<button class="toten-open-btn" id="open-toten-fullscreen-btn" type="button">
-<div class="toten-open-icon">🖥️</div>
+<button class="totem-open-btn" id="open-totem-fullscreen-btn" type="button">
+<div class="totem-open-icon">🖥️</div>
 <div>
-<div class="call-screen-open-title">Abrir Tela do TOTEN</div>
+<div class="call-screen-open-title">Abrir Tela do TOTEM</div>
 <div class="call-screen-open-subtitle">
         Abre uma tela touch dedicada para autoatendimento do paciente na recepção com CPF, validação automática e integração ao Chamador.
       </div>
@@ -4219,32 +4219,32 @@ button[data-totem-key] {
 </div>
 </button>
 </div>
-<div class="toten-layout">
-<div class="toten-screen">
-<div class="toten-screen-head">
-<div class="toten-screen-icon">🖥️</div>
+<div class="totem-layout">
+<div class="totem-screen">
+<div class="totem-screen-head">
+<div class="totem-screen-icon">🖥️</div>
 <div>
 <h3>Informe seu CPF</h3>
 <p>Digite somente números. Seus dados serão usados para localizar seu atendimento.</p>
 </div>
 </div>
-<div class="toten-cpf-display" id="toten-cpf-display">___.___.___-__</div>
-<div aria-label="Teclado numérico do totem" class="toten-keypad">
-<button class="toten-key" data-toten-key="1" type="button">1</button>
-<button class="toten-key" data-toten-key="2" type="button">2</button>
-<button class="toten-key" data-toten-key="3" type="button">3</button>
-<button class="toten-key" data-toten-key="4" type="button">4</button>
-<button class="toten-key" data-toten-key="5" type="button">5</button>
-<button class="toten-key" data-toten-key="6" type="button">6</button>
-<button class="toten-key" data-toten-key="7" type="button">7</button>
-<button class="toten-key" data-toten-key="8" type="button">8</button>
-<button class="toten-key" data-toten-key="9" type="button">9</button>
-<button class="toten-key action" data-toten-action="clear" type="button">Limpar</button>
-<button class="toten-key" data-toten-key="0" type="button">0</button>
-<button class="toten-key action" data-toten-action="backspace" type="button">Apagar</button>
-<button class="toten-key confirm" disabled="" id="toten-confirm-btn" type="button">Confirmar Check-in</button>
+<div class="totem-cpf-display" id="totem-cpf-display">___.___.___-__</div>
+<div aria-label="Teclado numérico do totem" class="totem-keypad">
+<button class="totem-key" data-totem-key="1" type="button">1</button>
+<button class="totem-key" data-totem-key="2" type="button">2</button>
+<button class="totem-key" data-totem-key="3" type="button">3</button>
+<button class="totem-key" data-totem-key="4" type="button">4</button>
+<button class="totem-key" data-totem-key="5" type="button">5</button>
+<button class="totem-key" data-totem-key="6" type="button">6</button>
+<button class="totem-key" data-totem-key="7" type="button">7</button>
+<button class="totem-key" data-totem-key="8" type="button">8</button>
+<button class="totem-key" data-totem-key="9" type="button">9</button>
+<button class="totem-key action" data-totem-action="clear" type="button">Limpar</button>
+<button class="totem-key" data-totem-key="0" type="button">0</button>
+<button class="totem-key action" data-totem-action="backspace" type="button">Apagar</button>
+<button class="totem-key confirm" disabled="" id="totem-confirm-btn" type="button">Confirmar Check-in</button>
 </div>
-<div class="toten-result" id="toten-result">
+<div class="totem-result" id="totem-result">
 <div class="label">Status</div>
 <div class="value">Aguardando CPF.</div>
 <div class="small">Após confirmar, o paciente será enviado para a fila do Chamador.</div>
@@ -4258,20 +4258,20 @@ button[data-totem-key] {
 <div class="small">Segurança, operação e experiência do usuário na recepção.</div>
 </div>
 </div>
-<div class="toten-practice-grid">
-<div class="toten-practice-card">
+<div class="totem-practice-grid">
+<div class="totem-practice-card">
 <div class="title">CPF validado</div>
 <div class="desc">O sistema bloqueia CPFs com dígitos inválidos, sequências repetidas e erros de máscara.</div>
 </div>
-<div class="toten-practice-card">
+<div class="totem-practice-card">
 <div class="title">Identificação segura</div>
 <div class="desc">No TOTEM, o paciente entra apenas pelo CPF. A Recepção chama o CPF e transforma essa mesma ficha em cadastro nominal.</div>
 </div>
-<div class="toten-practice-card">
+<div class="totem-practice-card">
 <div class="title">Fila automática</div>
 <div class="desc">O check-in envia o paciente para a fila do Chamador, priorizando a recepção selecionada pela operação.</div>
 </div>
-<div class="toten-practice-card">
+<div class="totem-practice-card">
 <div class="title">Experiência touch</div>
 <div class="desc">Botões grandes, alto contraste e mensagens claras para uso em tela de recepção.</div>
 </div>
@@ -4295,19 +4295,19 @@ button[data-totem-key] {
 <th>Preferencial</th>
 </tr>
 </thead>
-<tbody id="toten-patient-table"></tbody>
+<tbody id="totem-patient-table"></tbody>
 </table>
 </div>
 </div>
 <div class="card">
 <div class="call-center-card-title">
 <div>
-<h3>Últimos check-ins do TOTEN</h3>
+<h3>Últimos check-ins do TOTEM</h3>
 <div class="small">Entradas realizadas por CPF; a Recepção deve completar o nome na mesma ficha digital.</div>
 </div>
-<button class="btn btn-ghost" id="toten-clear-checkins" type="button">Limpar</button>
+<button class="btn btn-ghost" id="totem-clear-checkins" type="button">Limpar</button>
 </div>
-<div class="toten-checkin-list" id="toten-checkin-list"></div>
+<div class="totem-checkin-list" id="totem-checkin-list"></div>
 </div>
 </div>
 </div>
@@ -10951,10 +10951,10 @@ function compareQueueOrder(a, b) {
 })();
 </script>
 <script>
-/* ===== MÓDULO TOTEN DE ATENDIMENTO ===== */
+/* ===== MÓDULO TOTEM DE ATENDIMENTO ===== */
 (function() {
   const queueKey = "sesi_chamador_fila_v1";
-  const checkinKey = "sesi_toten_checkins_v1";
+  const checkinKey = "sesi_totem_checkins_v1";
   let cpfDigits = "";
 
   const patients = [
@@ -11048,8 +11048,8 @@ function compareQueueOrder(a, b) {
   }
 
   function renderDisplay() {
-    const display = document.getElementById("toten-cpf-display");
-    const confirm = document.getElementById("toten-confirm-btn");
+    const display = document.getElementById("totem-cpf-display");
+    const confirm = document.getElementById("totem-confirm-btn");
     if (!display || !confirm) return;
 
     display.textContent = maskCpf(cpfDigits);
@@ -11072,9 +11072,9 @@ function compareQueueOrder(a, b) {
   }
 
   function setResult(title, message, mode) {
-    const el = document.getElementById("toten-result");
+    const el = document.getElementById("totem-result");
     if (!el) return;
-    el.className = "toten-result" + (mode ? " " + mode : "");
+    el.className = "totem-result" + (mode ? " " + mode : "");
     el.innerHTML = `
       <div class="label">Status</div>
       <div class="value">${escapeHtml(title)}</div>
@@ -11102,7 +11102,7 @@ function compareQueueOrder(a, b) {
     const alreadyWaiting = queue.some(item => item.cpf === cpfDigits);
     if (!alreadyWaiting) {
       queue.push({
-        id: "toten_" + Date.now() + "_" + Math.random().toString(16).slice(2),
+        id: "totem_" + Date.now() + "_" + Math.random().toString(16).slice(2),
         cpf: cpfDigits,
         name: displayName,
         company,
@@ -11110,7 +11110,7 @@ function compareQueueOrder(a, b) {
         preferential,
         time: nowTime(),
         createdAt: Date.now(),
-        source: "TOTEN"
+        source: "TOTEM"
       });
       save(queueKey, queue);
     }
@@ -11127,13 +11127,17 @@ function compareQueueOrder(a, b) {
     });
     save(checkinKey, checkins.slice(0, 40));
 
-    try {
-      if (typeof window.upsertTotemCpfReceptionRecord === "function") {
-        window.upsertTotemCpfReceptionRecord(cpfDigits, preferential);
-      }
-    } catch (error) {
-      console.warn("Não foi possível enviar o CPF do TOTEM para a Recepção:", error);
-    }
+  try {
+  if (typeof window.upsertTotemCpfReceptionRecord === "function") {
+    window.upsertTotemCpfReceptionRecord(cpfDigits, preferential);
+  }
+
+  if (typeof renderRecepcao === "function") {
+    renderRecepcao();
+  }
+} catch (error) {
+  console.warn("Não foi possível enviar o CPF do TOTEM para a Recepção:", error);
+}
 
     setResult(
       patient ? "Olá, " + patient.name : "CPF registrado",
@@ -11149,7 +11153,7 @@ function compareQueueOrder(a, b) {
   }
 
   function renderPatientTable() {
-    const tbody = document.getElementById("toten-patient-table");
+    const tbody = document.getElementById("totem-patient-table");
     if (!tbody) return;
     tbody.innerHTML = patients.map(patient => `
       <tr>
@@ -11163,21 +11167,21 @@ function compareQueueOrder(a, b) {
   }
 
   function renderCheckins() {
-    const el = document.getElementById("toten-checkin-list");
+    const el = document.getElementById("totem-checkin-list");
     if (!el) return;
     const checkins = safeParse(checkinKey, []);
 
     if (!checkins.length) {
-      el.innerHTML = `<div class="call-center-empty">Nenhum check-in realizado pelo TOTEN.</div>`;
+      el.innerHTML = `<div class="call-center-empty">Nenhum check-in realizado pelo TOTEM.</div>`;
       return;
     }
 
     el.innerHTML = checkins.slice(0, 12).map((item, index) => `
-      <div class="toten-checkin-item">
-        <div class="toten-checkin-badge">${String(index + 1).padStart(2, "0")}</div>
+      <div class="totem-checkin-item">
+        <div class="totem-checkin-badge">${String(index + 1).padStart(2, "0")}</div>
         <div>
-          <div class="toten-checkin-name">${escapeHtml(item.name)}</div>
-          <div class="toten-checkin-meta">${escapeHtml(item.cpf)} • ${escapeHtml(item.company)} • ${escapeHtml(item.time)}</div>
+          <div class="totem-checkin-name">${escapeHtml(item.name)}</div>
+          <div class="totem-checkin-meta">${escapeHtml(item.cpf)} • ${escapeHtml(item.company)} • ${escapeHtml(item.time)}</div>
         </div>
         <div class="chips">
           ${item.preferential === "Sim" ? '<span class="call-badge call-badge-preferential">Preferencial</span>' : ""}
@@ -11187,35 +11191,35 @@ function compareQueueOrder(a, b) {
     `).join("");
   }
 
-  function bindToten() {
-    document.querySelectorAll("[data-toten-key]").forEach(button => {
+  function bindTotem() {
+    document.querySelectorAll("[data-totem-key]").forEach(button => {
       button.addEventListener("click", () => {
-        if (cpfDigits.length < 11) cpfDigits += button.dataset.totenKey;
+        if (cpfDigits.length < 11) cpfDigits += button.dataset.totemKey;
         renderDisplay();
       });
     });
 
-    document.querySelector("[data-toten-action='clear']")?.addEventListener("click", () => {
+    document.querySelector("[data-totem-action='clear']")?.addEventListener("click", () => {
       cpfDigits = "";
       renderDisplay();
     });
 
-    document.querySelector("[data-toten-action='backspace']")?.addEventListener("click", () => {
+    document.querySelector("[data-totem-action='backspace']")?.addEventListener("click", () => {
       cpfDigits = cpfDigits.slice(0, -1);
       renderDisplay();
     });
 
-    document.getElementById("toten-confirm-btn")?.addEventListener("click", confirmCheckin);
+    document.getElementById("totem-confirm-btn")?.addEventListener("click", confirmCheckin);
 
-    document.getElementById("toten-clear-checkins")?.addEventListener("click", () => {
-      if (!confirm("Deseja limpar os check-ins do TOTEN?")) return;
+    document.getElementById("totem-clear-checkins")?.addEventListener("click", () => {
+      if (!confirm("Deseja limpar os check-ins do TOTEM?")) return;
       localStorage.removeItem(checkinKey);
       renderCheckins();
     });
 
     document.addEventListener("keydown", event => {
-      const totenVisible = !document.getElementById("page-toten")?.classList.contains("hidden");
-      if (!totenVisible) return;
+      const totemVisible = !document.getElementById("page-totem")?.classList.contains("hidden");
+      if (!totemVisible) return;
 
       if (/^\d$/.test(event.key) && cpfDigits.length < 11) {
         cpfDigits += event.key;
@@ -11233,38 +11237,38 @@ function compareQueueOrder(a, b) {
     });
   }
 
-  function activateTotenNav() {
+  function activateTotemNav() {
     document.addEventListener("click", function(event) {
-      const button = event.target.closest(".nav button[data-page='toten']");
+      const button = event.target.closest(".nav button[data-page='totem']");
       if (!button) return;
       event.preventDefault();
 
       document.querySelectorAll("[id^='page-']").forEach(section => {
-        section.classList.toggle("hidden", section.id !== "page-toten");
+        section.classList.toggle("hidden", section.id !== "page-totem");
       });
 
       document.querySelectorAll(".nav button[data-page]").forEach(nav => {
-        nav.classList.toggle("active", nav.dataset.page === "toten");
+        nav.classList.toggle("active", nav.dataset.page === "totem");
       });
 
       const title = document.querySelector(".topbar h2");
       const subtitle = document.querySelector(".topbar p");
-      if (title) title.textContent = "TOTEN de Atendimento";
+      if (title) title.textContent = "TOTEM de Atendimento";
       if (subtitle) subtitle.textContent = "Check-in touch por CPF integrado ao Chamador.";
     }, true);
   }
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
-      bindToten();
-      activateTotenNav();
+      bindTotem();
+      activateTotemNav();
       renderDisplay();
       renderPatientTable();
       renderCheckins();
     });
   } else {
-    bindToten();
-    activateTotenNav();
+    bindTotem();
+    activateTotemNav();
     renderDisplay();
     renderPatientTable();
     renderCheckins();
@@ -11272,7 +11276,7 @@ function compareQueueOrder(a, b) {
 })();
 </script>
 <script>
-/* ===== FLUXO FULLSCREEN DO TOTEN ===== */
+/* ===== FLUXO FULLSCREEN DO TOTEM ===== */
 (function() {
   let fullscreenCpf = "";
 
@@ -11306,8 +11310,8 @@ function compareQueueOrder(a, b) {
   }
 
   function updateFullscreenDisplay() {
-    const display = document.getElementById("toten-fullscreen-cpf");
-    const nextBtn = document.getElementById("toten-next-step-btn");
+    const display = document.getElementById("totem-fullscreen-cpf");
+    const nextBtn = document.getElementById("totem-next-step-btn");
 
     if (!display || !nextBtn) return;
 
@@ -11327,29 +11331,29 @@ function compareQueueOrder(a, b) {
     }
   }
 
-  function openFullscreenToten() {
-    document.getElementById("toten-fullscreen-modal")?.classList.add("open");
-    document.getElementById("toten-fullscreen-modal")?.setAttribute("aria-hidden", "false");
+  function openFullscreenTotem() {
+    document.getElementById("totem-fullscreen-modal")?.classList.add("open");
+    document.getElementById("totem-fullscreen-modal")?.setAttribute("aria-hidden", "false");
   }
 
-  function closeFullscreenToten() {
-    document.getElementById("toten-fullscreen-modal")?.classList.remove("open");
-    document.getElementById("toten-fullscreen-modal")?.setAttribute("aria-hidden", "true");
+  function closeFullscreenTotem() {
+    document.getElementById("totem-fullscreen-modal")?.classList.remove("open");
+    document.getElementById("totem-fullscreen-modal")?.setAttribute("aria-hidden", "true");
 
     fullscreenCpf = "";
     updateFullscreenDisplay();
 
-    const step = document.getElementById("toten-preferential-step");
+    const step = document.getElementById("totem-preferential-step");
     if (step) step.style.display = "none";
   }
 
   function nextStep() {
     if (!isValidCpf(fullscreenCpf)) return;
-    document.getElementById("toten-preferential-step").style.display = "block";
+    document.getElementById("totem-preferential-step").style.display = "block";
   }
 
   function nowClock() {
-    const clock = document.getElementById("toten-clock");
+    const clock = document.getElementById("totem-clock");
     if (!clock) return;
     clock.textContent = new Date().toLocaleString("pt-BR", {
       weekday: "short",
@@ -11361,9 +11365,9 @@ function compareQueueOrder(a, b) {
   }
 
   function processPreferential(choice) {
-    const result = document.getElementById("toten-fullscreen-result");
+    const result = document.getElementById("totem-fullscreen-result");
 
-    const event = new CustomEvent("toten-checkin-fullscreen", {
+    const event = new CustomEvent("totem-checkin-fullscreen", {
       detail: {
         cpf: fullscreenCpf,
         preferential: choice
@@ -11373,7 +11377,7 @@ function compareQueueOrder(a, b) {
     window.dispatchEvent(event);
 
     if (result) {
-      result.className = "toten-result success";
+      result.className = "totem-result success";
       result.innerHTML = `
         <div class="label">Check-in realizado</div>
         <div class="value">Seu atendimento foi registrado.</div>
@@ -11384,14 +11388,14 @@ function compareQueueOrder(a, b) {
     }
 
     setTimeout(() => {
-      closeFullscreenToten();
+      closeFullscreenTotem();
     }, 2600);
   }
 
   function bindFullscreen() {
-    document.getElementById("open-toten-fullscreen-btn")?.addEventListener("click", openFullscreenToten);
-    document.getElementById("close-toten-fullscreen-btn")?.addEventListener("click", closeFullscreenToten);
-    document.getElementById("toten-next-step-btn")?.addEventListener("click", nextStep);
+    document.getElementById("open-totem-fullscreen-btn")?.addEventListener("click", openFullscreenTotem);
+    document.getElementById("close-totem-fullscreen-btn")?.addEventListener("click", closeFullscreenTotem);
+    document.getElementById("totem-next-step-btn")?.addEventListener("click", nextStep);
 
     document.querySelectorAll("[data-fullscreen-key]").forEach(btn => {
       btn.addEventListener("click", () => {
@@ -11417,7 +11421,7 @@ function compareQueueOrder(a, b) {
     });
 
     document.addEventListener("keydown", e => {
-      const modal = document.getElementById("toten-fullscreen-modal");
+      const modal = document.getElementById("totem-fullscreen-modal");
       if (!modal?.classList.contains("open")) return;
 
       if (/^\d$/.test(e.key) && fullscreenCpf.length < 11) {
@@ -11431,7 +11435,7 @@ function compareQueueOrder(a, b) {
       }
 
       if (e.key === "Escape") {
-        closeFullscreenToten();
+        closeFullscreenTotem();
       }
     });
 
@@ -11446,9 +11450,9 @@ function compareQueueOrder(a, b) {
   }
 })();
 </script>
-<div aria-hidden="true" class="toten-fullscreen-modal" id="toten-fullscreen-modal">
-<div class="toten-fullscreen-stage">
-<div class="toten-fullscreen-top">
+<div aria-hidden="true" class="totem-fullscreen-modal" id="totem-fullscreen-modal">
+<div class="totem-fullscreen-stage">
+<div class="totem-fullscreen-top">
 <div class="call-display-brand">
 <div class="call-display-logo">🖥️</div>
 <div class="call-display-heading">
@@ -11457,56 +11461,56 @@ function compareQueueOrder(a, b) {
 </div>
 </div>
 <div class="call-display-actions">
-<button class="btn btn-ghost" id="close-toten-fullscreen-btn" type="button">Fechar</button>
+<button class="btn btn-ghost" id="close-totem-fullscreen-btn" type="button">Fechar</button>
 </div>
 </div>
-<div class="toten-fullscreen-body">
-<div class="toten-fullscreen-panel">
-<div class="toten-cpf-display" id="toten-fullscreen-cpf">000.000.000-00</div>
-<div class="toten-screen-head">
-<div class="toten-screen-icon">📄</div>
+<div class="totem-fullscreen-body">
+<div class="totem-fullscreen-panel">
+<div class="totem-cpf-display" id="totem-fullscreen-cpf">000.000.000-00</div>
+<div class="totem-screen-head">
+<div class="totem-screen-icon">📄</div>
 <div>
 <h3>Informe seu CPF</h3>
 <p>Digite os números do CPF para localizar seu atendimento.</p>
 </div>
 </div>
-<div class="toten-keypad" id="toten-fullscreen-keypad">
-<button class="toten-key" data-fullscreen-key="1" type="button">1</button>
-<button class="toten-key" data-fullscreen-key="2" type="button">2</button>
-<button class="toten-key" data-fullscreen-key="3" type="button">3</button>
-<button class="toten-key" data-fullscreen-key="4" type="button">4</button>
-<button class="toten-key" data-fullscreen-key="5" type="button">5</button>
-<button class="toten-key" data-fullscreen-key="6" type="button">6</button>
-<button class="toten-key" data-fullscreen-key="7" type="button">7</button>
-<button class="toten-key" data-fullscreen-key="8" type="button">8</button>
-<button class="toten-key" data-fullscreen-key="9" type="button">9</button>
-<button class="toten-key action" data-fullscreen-action="clear" type="button">Limpar</button>
-<button class="toten-key" data-fullscreen-key="0" type="button">0</button>
-<button class="toten-key action" data-fullscreen-action="backspace" type="button">Apagar</button>
+<div class="totem-keypad" id="totem-fullscreen-keypad">
+<button class="totem-key" data-fullscreen-key="1" type="button">1</button>
+<button class="totem-key" data-fullscreen-key="2" type="button">2</button>
+<button class="totem-key" data-fullscreen-key="3" type="button">3</button>
+<button class="totem-key" data-fullscreen-key="4" type="button">4</button>
+<button class="totem-key" data-fullscreen-key="5" type="button">5</button>
+<button class="totem-key" data-fullscreen-key="6" type="button">6</button>
+<button class="totem-key" data-fullscreen-key="7" type="button">7</button>
+<button class="totem-key" data-fullscreen-key="8" type="button">8</button>
+<button class="totem-key" data-fullscreen-key="9" type="button">9</button>
+<button class="totem-key action" data-fullscreen-action="clear" type="button">Limpar</button>
+<button class="totem-key" data-fullscreen-key="0" type="button">0</button>
+<button class="totem-key action" data-fullscreen-action="backspace" type="button">Apagar</button>
 </div>
-<button class="toten-key confirm" disabled="" id="toten-next-step-btn" type="button">Continuar</button>
-<div class="toten-result" id="toten-fullscreen-result">
+<button class="totem-key confirm" disabled="" id="totem-next-step-btn" type="button">Continuar</button>
+<div class="totem-result" id="totem-fullscreen-result">
 <div class="label">Status</div>
 <div class="value">Aguardando CPF...</div>
 <div class="small">Digite seu CPF para iniciar.</div>
 </div>
-<div aria-hidden="true" class="toten-preferential-popup" id="toten-preferential-step">
-<div class="toten-preferential-card">
-<div class="toten-screen-head">
-<div class="toten-screen-icon">⭐</div>
+<div aria-hidden="true" class="totem-preferential-popup" id="totem-preferential-step">
+<div class="totem-preferential-card">
+<div class="totem-screen-head">
+<div class="totem-screen-icon">⭐</div>
 <div>
 <h3>Seu atendimento é preferencial?</h3>
 <p>Selecione uma das opções abaixo.</p>
 </div>
 </div>
-<div class="toten-question-grid">
-<button class="toten-question-btn preferential" data-preferential="Sim" type="button">
-<div class="toten-question-title">⭐ Sim</div>
-<div class="toten-question-desc">Atendimento preferencial para prioridades legais.</div>
+<div class="totem-question-grid">
+<button class="totem-question-btn preferential" data-preferential="Sim" type="button">
+<div class="totem-question-title">⭐ Sim</div>
+<div class="totem-question-desc">Atendimento preferencial para prioridades legais.</div>
 </button>
-<button class="toten-question-btn" data-preferential="Não" type="button">
-<div class="toten-question-title">✔️ Não</div>
-<div class="toten-question-desc">Atendimento convencional conforme ordem operacional.</div>
+<button class="totem-question-btn" data-preferential="Não" type="button">
+<div class="totem-question-title">✔️ Não</div>
+<div class="totem-question-desc">Atendimento convencional conforme ordem operacional.</div>
 </button>
 </div>
 </div>
@@ -11518,9 +11522,9 @@ function compareQueueOrder(a, b) {
     </div>
 </div>
 </div>
-<script id="toten-final-fix-script">
+<script id="totem-final-fix-script">
 (function(){
-  const queueKey="sesi_chamador_fila_v1", checkinKey="sesi_toten_checkins_v1";
+  const queueKey="sesi_chamador_fila_v1", checkinKey="sesi_totem_checkins_v1";
   let cpf="";
   const pacientes=[
     {cpf:"12345678909",name:"Maria Aparecida Santos",company:"Empresa Modelo A",type:"ASO + Exames Ocupacionais"},
@@ -11536,31 +11540,31 @@ function compareQueueOrder(a, b) {
   function parse(k,f){try{const r=localStorage.getItem(k);return r?JSON.parse(r):f}catch(e){return f}}
   function save(k,v){localStorage.setItem(k,JSON.stringify(v))}
   function time(){return new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}
-  function setResult(t,m,cls){const r=$("toten-fullscreen-result"); if(!r)return; r.className="toten-result "+(cls||""); r.innerHTML=`<div class="label">Status</div><div class="value">${t}</div><div class="small">${m||""}</div>`}
-  function render(){const d=$("toten-fullscreen-cpf"),b=$("toten-next-step-btn"); if(!d||!b)return; d.textContent=maskZero(cpf); d.dataset.helper=cpf.length?`${cpf.length}/11 dígitos informados — confira antes de continuar`:"Digite apenas os 11 números do CPF no teclado abaixo"; d.classList.remove("valid","invalid","is-empty"); if(!cpf.length)d.classList.add("is-empty"); if(cpf.length===11){ if(valid(cpf)){d.classList.add("valid");b.disabled=false;setResult("CPF válido","Toque em Continuar para seguir.","success")} else {d.classList.add("invalid");b.disabled=true;setResult("CPF inválido","Confira os números digitados.","warning")} } else {b.disabled=true;setResult("Aguardando CPF...","Digite seu CPF para iniciar.","")}}
-  function openModal(){const m=$("toten-fullscreen-modal"); if(m){m.classList.add("open");m.setAttribute("aria-hidden","false"); render();}}
-  function closeModal(){const m=$("toten-fullscreen-modal"); if(m){m.classList.remove("open");m.setAttribute("aria-hidden","true");}}
-  function openPref(){ if(!valid(cpf)){setResult("CPF inválido","Confira os números digitados.","warning");return;} const p=$("toten-preferential-step"); if(p){p.classList.add("open");p.setAttribute("aria-hidden","false");}}
-  function closePref(){const p=$("toten-preferential-step"); if(p){p.classList.remove("open");p.setAttribute("aria-hidden","true");}}
-  function finish(pref){ if(!valid(cpf))return; const pac=pacientes.find(p=>p.cpf===cpf); const name=pac?pac.name:"CPF "+maskReal(cpf), company=pac?pac.company:"Paciente sem cadastro", type=pac?pac.type:"ASO + Exames Ocupacionais"; const q=parse(queueKey,[]); if(!q.some(i=>i.cpf===cpf)){q.push({id:"toten_"+Date.now()+"_"+Math.random().toString(16).slice(2),cpf,name,company,type,preferential:pref,time:time(),createdAt:Date.now(),source:"TOTEM"});save(queueKey,q)} const c=parse(checkinKey,[]); c.unshift({cpf:maskReal(cpf),name,company,type,preferential:pref,status:pac?"Cadastro localizado":"CPF sem cadastro",time:time()}); save(checkinKey,c.slice(0,40)); try{window.upsertTotemCpfReceptionRecord&&window.upsertTotemCpfReceptionRecord(cpf,pref)}catch(e){console.warn("Não foi possível enviar o CPF do TOTEM para a Recepção:",e)} closePref(); setResult("Atendimento registrado","Aguarde ser chamado. A tela será liberada em 3 segundos.","success"); try{window.registrarCheckinTotemRules&&window.registrarCheckinTotemRules(cpf,pref);window.renderCaller&&window.renderCaller()}catch(e){} setTimeout(()=>{cpf="";render();openModal();},3000);}
-  function openPage(){const page=$("page-toten"); if(!page)return; document.querySelectorAll("[id^='page-']").forEach(s=>s.classList.toggle("hidden",s.id!=="page-toten")); document.querySelectorAll(".nav button[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page==="toten")); const h=document.querySelector(".topbar h2"),p=document.querySelector(".topbar p"); if(h)h.textContent="TOTEM de Atendimento"; if(p)p.textContent="Check-in touch por CPF integrado ao Chamador."; window.scrollTo({top:0,behavior:"smooth"});}
+  function setResult(t,m,cls){const r=$("totem-fullscreen-result"); if(!r)return; r.className="totem-result "+(cls||""); r.innerHTML=`<div class="label">Status</div><div class="value">${t}</div><div class="small">${m||""}</div>`}
+  function render(){const d=$("totem-fullscreen-cpf"),b=$("totem-next-step-btn"); if(!d||!b)return; d.textContent=maskZero(cpf); d.dataset.helper=cpf.length?`${cpf.length}/11 dígitos informados — confira antes de continuar`:"Digite apenas os 11 números do CPF no teclado abaixo"; d.classList.remove("valid","invalid","is-empty"); if(!cpf.length)d.classList.add("is-empty"); if(cpf.length===11){ if(valid(cpf)){d.classList.add("valid");b.disabled=false;setResult("CPF válido","Toque em Continuar para seguir.","success")} else {d.classList.add("invalid");b.disabled=true;setResult("CPF inválido","Confira os números digitados.","warning")} } else {b.disabled=true;setResult("Aguardando CPF...","Digite seu CPF para iniciar.","")}}
+  function openModal(){const m=$("totem-fullscreen-modal"); if(m){m.classList.add("open");m.setAttribute("aria-hidden","false"); render();}}
+  function closeModal(){const m=$("totem-fullscreen-modal"); if(m){m.classList.remove("open");m.setAttribute("aria-hidden","true");}}
+  function openPref(){ if(!valid(cpf)){setResult("CPF inválido","Confira os números digitados.","warning");return;} const p=$("totem-preferential-step"); if(p){p.classList.add("open");p.setAttribute("aria-hidden","false");}}
+  function closePref(){const p=$("totem-preferential-step"); if(p){p.classList.remove("open");p.setAttribute("aria-hidden","true");}}
+  function finish(pref){ if(!valid(cpf))return; const pac=pacientes.find(p=>p.cpf===cpf); const name=pac?pac.name:"CPF "+maskReal(cpf), company=pac?pac.company:"Paciente sem cadastro", type=pac?pac.type:"ASO + Exames Ocupacionais"; const q=parse(queueKey,[]); if(!q.some(i=>i.cpf===cpf)){q.push({id:"totem_"+Date.now()+"_"+Math.random().toString(16).slice(2),cpf,name,company,type,preferential:pref,time:time(),createdAt:Date.now(),source:"TOTEM"});save(queueKey,q)} const c=parse(checkinKey,[]); c.unshift({cpf:maskReal(cpf),name,company,type,preferential:pref,status:pac?"Cadastro localizado":"CPF sem cadastro",time:time()}); save(checkinKey,c.slice(0,40)); try{window.upsertTotemCpfReceptionRecord&&window.upsertTotemCpfReceptionRecord(cpf,pref)}catch(e){console.warn("Não foi possível enviar o CPF do TOTEM para a Recepção:",e)} closePref(); setResult("Atendimento registrado","Aguarde ser chamado. A tela será liberada em 3 segundos.","success"); try{window.registrarCheckinTotemRules&&window.registrarCheckinTotemRules(cpf,pref);window.renderCaller&&window.renderCaller()}catch(e){} setTimeout(()=>{cpf="";render();openModal();},3000);}
+  function openPage(){const page=$("page-totem"); if(!page)return; document.querySelectorAll("[id^='page-']").forEach(s=>s.classList.toggle("hidden",s.id!=="page-totem")); document.querySelectorAll(".nav button[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page==="totem")); const h=document.querySelector(".topbar h2"),p=document.querySelector(".topbar p"); if(h)h.textContent="TOTEM de Atendimento"; if(p)p.textContent="Check-in touch por CPF integrado ao Chamador."; window.scrollTo({top:0,behavior:"smooth"});}
   document.addEventListener("click",e=>{
-    const nav=e.target.closest(".nav button[data-page='toten']"); if(nav){e.preventDefault();e.stopPropagation();openPage();return;}
-    const open=e.target.closest("#open-toten-fullscreen-btn"); if(open){e.preventDefault();e.stopPropagation();openModal();return;}
-    const close=e.target.closest("#close-toten-fullscreen-btn"); if(close){e.preventDefault();e.stopPropagation();closeModal();return;}
+    const nav=e.target.closest(".nav button[data-page='totem']"); if(nav){e.preventDefault();e.stopPropagation();openPage();return;}
+    const open=e.target.closest("#open-totem-fullscreen-btn"); if(open){e.preventDefault();e.stopPropagation();openModal();return;}
+    const close=e.target.closest("#close-totem-fullscreen-btn"); if(close){e.preventDefault();e.stopPropagation();closeModal();return;}
     const key=e.target.closest("[data-fullscreen-key]"); if(key){e.preventDefault();e.stopPropagation(); if(cpf.length<11)cpf+=key.dataset.fullscreenKey; render(); return;}
     const clear=e.target.closest("[data-fullscreen-action='clear']"); if(clear){e.preventDefault();e.stopPropagation(); cpf=""; render(); return;}
     const back=e.target.closest("[data-fullscreen-action='backspace']"); if(back){e.preventDefault();e.stopPropagation(); cpf=cpf.slice(0,-1); render(); return;}
-    const next=e.target.closest("#toten-next-step-btn"); if(next){e.preventDefault();e.stopPropagation(); openPref(); return;}
+    const next=e.target.closest("#totem-next-step-btn"); if(next){e.preventDefault();e.stopPropagation(); openPref(); return;}
     const pref=e.target.closest("[data-preferential]"); if(pref){e.preventDefault();e.stopPropagation(); finish(pref.dataset.preferential||"Não"); return;}
   },true);
-  document.addEventListener("keydown",e=>{const m=$("toten-fullscreen-modal"); if(!m||!m.classList.contains("open"))return; if(/^\d$/.test(e.key)){if(cpf.length<11)cpf+=e.key;render();} if(e.key==="Backspace"){cpf=cpf.slice(0,-1);render();} if(e.key==="Enter")openPref(); if(e.key==="Escape")closePref();},true);
+  document.addEventListener("keydown",e=>{const m=$("totem-fullscreen-modal"); if(!m||!m.classList.contains("open"))return; if(/^\d$/.test(e.key)){if(cpf.length<11)cpf+=e.key;render();} if(e.key==="Backspace"){cpf=cpf.slice(0,-1);render();} if(e.key==="Enter")openPref(); if(e.key==="Escape")closePref();},true);
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",render); else render();
 })();
 </script>
-<script id="toten-caller-priority-rules-script">
+<script id="totem-caller-priority-rules-script">
 (function(){
-  const queueKey="sesi_chamador_fila_v1",historyKey="sesi_chamador_historico_v1",lastCallKey="sesi_chamador_ultima_chamada_v1",checkinKey="sesi_toten_checkins_v1";
+  const queueKey="sesi_chamador_fila_v1",historyKey="sesi_chamador_historico_v1",lastCallKey="sesi_chamador_ultima_chamada_v1",checkinKey="sesi_totem_checkins_v1";
   const cad=[
     {cpf:"12345678909",name:"Maria Aparecida Santos",company:"Empresa Modelo A",type:"ASO + Exames Ocupacionais"},
     {cpf:"98765432100",name:"João Pedro Oliveira",company:"Contrato 2025-001",type:"ASO"},
@@ -11600,7 +11604,7 @@ function compareQueueOrder(a, b) {
         <div class="call-center-queue-name">${esc(it.displayName)}</div>
         <div class="call-center-queue-meta">
           ${it.preferential==="Sim"?'<span class="call-badge call-badge-preferential">⭐ Preferencial</span>':""}
-          ${it.source==="TOTEM"?'<span class="call-badge call-badge-toten">🖥️ TOTEM</span>':""}
+          ${it.source==="TOTEM"?'<span class="call-badge call-badge-totem">🖥️ TOTEM</span>':""}
           <span class="call-badge ${badge(it.type)}">${esc(it.type)}</span>
           <span>${esc(it.company)}</span>
           ${it.cpf?`<span>CPF: ${esc(mask(it.cpf))}</span>`:""}
@@ -11618,13 +11622,13 @@ function compareQueueOrder(a, b) {
     if(!patientEl||!room||!meta)return;
     if(!last){patientEl.textContent="Nenhum paciente chamado ainda.";room.textContent="";meta.innerHTML="";return}
     const it=norm(last); patientEl.classList.remove("call-tv-empty"); patientEl.textContent=it.displayName; room.textContent=it.room||"";
-    meta.innerHTML=`${it.preferential==="Sim"?'<span class="call-badge call-badge-preferential">⭐ Atendimento Preferencial</span>':""}${it.source==="TOTEM"?'<span class="call-badge call-badge-toten">🖥️ TOTEM</span>':""}<span class="call-badge ${badge(it.type)}">${esc(it.type)}</span>${it.cpf?`<span class="call-badge">CPF ${esc(mask(it.cpf))}</span>`:""}<span class="call-badge call-badge-room">Chamado às ${esc(it.calledAt||"")}</span>`;
+    meta.innerHTML=`${it.preferential==="Sim"?'<span class="call-badge call-badge-preferential">⭐ Atendimento Preferencial</span>':""}${it.source==="TOTEM"?'<span class="call-badge call-badge-totem">🖥️ TOTEM</span>':""}<span class="call-badge ${badge(it.type)}">${esc(it.type)}</span>${it.cpf?`<span class="call-badge">CPF ${esc(mask(it.cpf))}</span>`:""}<span class="call-badge call-badge-room">Chamado às ${esc(it.calledAt||"")}</span>`;
   }
   function renderHistory(){
     const el=document.getElementById("caller-history"); if(!el)return;
     const h=parse(historyKey,[]).map(norm);
     if(!h.length){el.innerHTML='<div class="call-center-empty">Nenhuma chamada registrada.</div>';return}
-    el.innerHTML=h.slice(0,15).map(it=>`<div class="call-center-history-item ${it.preferential==="Sim"?"toten-priority-row":""}"><div><div class="name">${esc(it.displayName)}</div><div class="meta">${esc(it.room||"")} • ${esc(it.type)} • ${esc(it.calledAt||"")}${it.cpf?` • CPF ${esc(mask(it.cpf))}`:""}</div></div><div class="chips">${it.preferential==="Sim"?'<span class="call-badge call-badge-preferential">Preferencial</span>':""}${it.source==="TOTEM"?'<span class="call-badge call-badge-toten">TOTEM</span>':""}<span class="call-badge call-badge-room">Chamado</span></div></div>`).join("");
+    el.innerHTML=h.slice(0,15).map(it=>`<div class="call-center-history-item ${it.preferential==="Sim"?"totem-priority-row":""}"><div><div class="name">${esc(it.displayName)}</div><div class="meta">${esc(it.room||"")} • ${esc(it.type)} • ${esc(it.calledAt||"")}${it.cpf?` • CPF ${esc(mask(it.cpf))}`:""}</div></div><div class="chips">${it.preferential==="Sim"?'<span class="call-badge call-badge-preferential">Preferencial</span>':""}${it.source==="TOTEM"?'<span class="call-badge call-badge-totem">TOTEM</span>':""}<span class="call-badge call-badge-room">Chamado</span></div></div>`).join("");
   }
   function renderAll(){renderQueue();renderTV();renderHistory()}
   function call(id){
@@ -11642,7 +11646,7 @@ function compareQueueOrder(a, b) {
   function register(cpf,pref){
     cpf=d(cpf); const p=patient(cpf), name=p?p.name:"CPF "+mask(cpf), company=p?p.company:"Paciente sem cadastro", type=p?p.type:"ASO + Exames Ocupacionais", preferential=pref==="Sim"?"Sim":"Não";
     const q=parse(queueKey,[]).map(norm);
-    if(!q.some(x=>x.cpf===cpf)){q.push(norm({id:"toten_"+Date.now()+"_"+Math.random().toString(16).slice(2),cpf,name,displayName:name,company,type,preferential,time:time(),createdAt:Date.now(),source:"TOTEM"}));save(queueKey,q)}
+    if(!q.some(x=>x.cpf===cpf)){q.push(norm({id:"totem_"+Date.now()+"_"+Math.random().toString(16).slice(2),cpf,name,displayName:name,company,type,preferential,time:time(),createdAt:Date.now(),source:"TOTEM"}));save(queueKey,q)}
     const ch=parse(checkinKey,[]);ch.unshift({cpf:mask(cpf),name,company,type,preferential,status:p?"Cadastro localizado":"CPF sem cadastro",time:time()});save(checkinKey,ch.slice(0,40));
     try{window.upsertTotemCpfReceptionRecord&&window.upsertTotemCpfReceptionRecord(cpf,preferential)}catch(e){console.warn("Não foi possível enviar o CPF do TOTEM para a Recepção:",e)}
     renderAll();
@@ -12521,7 +12525,7 @@ function compareQueueOrder(a, b) {
     const patient = getPatients().find(p => cpfDigits(p.cpf) === digits);
     if (patient) {
       let queue = safeParse(CALLER_QUEUE_KEY, []);
-      const id = `toten_${patient.id || digits}`.replace(/[^\w-]+/g, "_");
+      const id = `totem_${patient.id || digits}`.replace(/[^\w-]+/g, "_");
       if (!queue.some(item => item.id === id || cpfDigits(item.cpf) === digits)) {
         queue.push({
           id,
@@ -12536,7 +12540,7 @@ function compareQueueOrder(a, b) {
           createdAt: Date.now(),
           source: "TOTEM",
           workflowStage: "Recepção",
-          suggestedRoom: "Recepção Ocupacional 1"
+          suggestedRoom: "Recepção"
         });
         saveJson(CALLER_QUEUE_KEY, queue);
       }
@@ -12570,7 +12574,7 @@ function compareQueueOrder(a, b) {
   const QUEUE_KEY = "sesi_chamador_fila_v1";
   const HISTORY_KEY = "sesi_chamador_historico_v1";
   const LAST_KEY = "sesi_chamador_ultima_chamada_v1";
-  const CHECKIN_KEY = "sesi_toten_checkins_v1";
+  const CHECKIN_KEY = "sesi_totem_checkins_v1";
 
   const digits = value => String(value || "").replace(/\D/g, "").slice(0, 11);
   const parse = (key, fallback) => { try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; } catch(e) { return fallback; } };
@@ -12874,7 +12878,7 @@ function compareQueueOrder(a, b) {
           <div class="call-center-queue-name">${esc(item.displayName || item.name)}</div>
           <div class="call-center-queue-meta">
             ${item.preferential === "Sim" ? '<span class="call-badge call-badge-preferential">⭐ Preferencial</span>' : ""}
-            ${item.source === "TOTEM" ? '<span class="call-badge call-badge-toten">🖥️ TOTEM</span>' : ""}
+            ${item.source === "TOTEM" ? '<span class="call-badge call-badge-totem">🖥️ TOTEM</span>' : ""}
             <span class="call-badge ${typeBadge(item.type)}">${esc(item.type)}</span>
             <span class="call-badge call-badge-room">Fluxo: ${esc(item.workflowStage || itemStage(item))}</span>
             ${item.workflowExamName ? `<span class="call-badge call-badge-room">${esc(item.workflowExamName)}</span>` : ""}
@@ -13055,7 +13059,7 @@ function compareQueueOrder(a, b) {
   const PREFIX = "sesi-fluxo-ocupacional-v7-clean";
   const UNIT_KEY = `${PREFIX}-selected-unit`;
   const QUEUE_KEY = "sesi_chamador_fila_v1";
-  const CHECKIN_KEY = "sesi_toten_checkins_v1";
+  const CHECKIN_KEY = "sesi_totem_checkins_v1";
   const digits = value => String(value || "").replace(/\D/g, "").slice(0, 11);
   const parse = (key, fallback) => { try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; } catch(e) { return fallback; } };
   const save = (key, value) => localStorage.setItem(key, JSON.stringify(value));
@@ -13691,7 +13695,7 @@ function compareQueueOrder(a, b) {
 (function(){
   const PREFIX = "sesi-fluxo-ocupacional-v7-clean";
   const UNIT_KEY = `${PREFIX}-selected-unit`;
-  const CHECKIN_KEY = "sesi_toten_checkins_v1";
+  const CHECKIN_KEY = "sesi_totem_checkins_v1";
   const QUEUE_KEY = "sesi_chamador_fila_v1";
 
   const digits = value => String(value || "").replace(/\D/g, "").slice(0, 11);
@@ -13944,7 +13948,7 @@ function compareQueueOrder(a, b) {
 (function(){
   const PREFIX = 'sesi-fluxo-ocupacional-v7-clean';
   const UNIT_KEY = `${PREFIX}-selected-unit`;
-  const CHECKIN_KEY = 'sesi_toten_checkins_v1';
+  const CHECKIN_KEY = 'sesi_totem_checkins_v1';
   const QUEUE_KEY = 'sesi_chamador_fila_v1';
 
   function parseJson(key, fallback){
@@ -14937,7 +14941,7 @@ function compareQueueOrder(a, b) {
             <div class="call-center-queue-name">${esc(callName(item))}</div>
             <div class="call-center-queue-meta">
               ${item.preferential === "Sim" ? '<span class="call-badge call-badge-preferential">⭐ Preferencial</span>' : ""}
-              ${item.source === "TOTEM" ? '<span class="call-badge call-badge-toten">🖥️ TOTEM</span>' : ""}
+              ${item.source === "TOTEM" ? '<span class="call-badge call-badge-totem">🖥️ TOTEM</span>' : ""}
               <span class="call-badge ${typeBadge(item.type)}">${esc(item.type || "Atendimento")}</span>
               ${item.workflowStage ? `<span class="call-badge call-badge-room">Fluxo: ${esc(item.workflowStage)}</span>` : ""}
               ${item.workflowExamName ? `<span class="call-badge call-badge-room">${esc(item.workflowExamName)}</span>` : ""}
@@ -15168,7 +15172,7 @@ function compareQueueOrder(a, b) {
             <div class="call-center-queue-name">${esc(callName(item))}</div>
             <div class="call-center-queue-meta">
               ${item.preferential === "Sim" ? '<span class="call-badge call-badge-preferential">⭐ Preferencial</span>' : ""}
-              ${item.source === "TOTEM" ? '<span class="call-badge call-badge-toten">🖥️ TOTEM</span>' : ""}
+              ${item.source === "TOTEM" ? '<span class="call-badge call-badge-totem">🖥️ TOTEM</span>' : ""}
               <span class="call-badge ${typeBadge(item.type)}">${esc(item.type || "Atendimento")}</span>
               ${item.workflowStage ? `<span class="call-badge call-badge-room">Fluxo: ${esc(item.workflowStage)}</span>` : ""}
               ${item.workflowExamName ? `<span class="call-badge call-badge-room">${esc(item.workflowExamName)}</span>` : ""}
@@ -15951,6 +15955,994 @@ function compareQueueOrder(a, b) {
   setInterval(applyTvSocialName, 1200);
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
   else start();
+})();
+</script>
+
+
+
+<script id="fix-final-totem-recepcao-mesmo-cpf-multiplas-demandas">
+/* Correção final: TOTEM -> Recepção aceitando o MESMO CPF várias vezes.
+   Regra: cada confirmação no TOTEM gera uma nova demanda/ficha de atendimento,
+   pois o mesmo trabalhador pode retornar para demandas diferentes. */
+(function(){
+  const PREFIX = 'sesi-fluxo-ocupacional-v7-clean';
+  const UNIT_KEY = `${PREFIX}-selected-unit`;
+  const QUEUE_KEY = 'sesi_chamador_fila_v1';
+  const CHECKIN_KEY = 'sesi_totem_checkins_v1';
+
+  const digits = value => String(value || '').replace(/\D/g, '').slice(0, 11);
+  const parseJson = (key, fallback) => {
+    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+    catch(e) { return fallback; }
+  };
+  const saveJson = (key, value) => localStorage.setItem(key, JSON.stringify(value));
+  const activeUnit = () => {
+    try { if (typeof selectedUnit !== 'undefined' && selectedUnit) return selectedUnit; } catch(e) {}
+    return localStorage.getItem(UNIT_KEY) || 'paulista';
+  };
+  const patientsKey = () => `${PREFIX}-${activeUnit()}`;
+  const maskCpf = value => {
+    const d = digits(value);
+    return d.length === 11 ? `${d.slice(0,3)}.${d.slice(3,6)}.${d.slice(6,9)}-${d.slice(9)}` : d;
+  };
+  const nowTime = () => new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  const todayIso = () => new Date().toISOString().slice(0, 10);
+  const newDemandId = cpf => `TOTEM-${Date.now()}-${cpf}-${Math.random().toString(16).slice(2, 8)}`;
+
+  let lastCreated = { cpf: '', at: 0, record: null, queueItem: null };
+
+  function defaultExams(){
+    try {
+      if (Array.isArray(EXAM_ORDER)) return EXAM_ORDER.map(ex => ({ key: ex.key, nome: ex.nome, status: 'Não se aplica', motivoNaoRealizado: '' }));
+    } catch(e) {}
+    return [
+      { key: 'clinico', nome: 'Exame Clínico', status: 'Não se aplica', motivoNaoRealizado: '' },
+      { key: 'lab', nome: 'Exames Laboratoriais', status: 'Não se aplica', motivoNaoRealizado: '' },
+      { key: 'rx', nome: 'Raio X', status: 'Não se aplica', motivoNaoRealizado: '' },
+      { key: 'audio', nome: 'Audiometria', status: 'Não se aplica', motivoNaoRealizado: '' },
+      { key: 'ecg', nome: 'ECG', status: 'Não se aplica', motivoNaoRealizado: '' }
+    ];
+  }
+
+  function nextPatientId(list){
+    const next = list.reduce((max, patient) => {
+      const match = String(patient && patient.id || '').match(/AT-(\d+)/);
+      return Math.max(max, match ? Number(match[1]) : 0);
+    }, 0) + 1;
+    return `AT-${String(next).padStart(4, '0')}`;
+  }
+
+  function syncRuntimePatients(list){
+    // Correção: a aba Recepção renderiza pela variável global `patients`.
+    // Antes, o TOTEM salvava no localStorage, mas a lista em memória não era atualizada,
+    // fazendo o CPF não aparecer imediatamente na Recepção.
+    try {
+      if (Array.isArray(list) && typeof patients !== 'undefined') {
+        patients = (typeof sanitizePatientRecord === 'function')
+          ? list.map(item => sanitizePatientRecord(item))
+          : list;
+      }
+    } catch(e) {}
+  }
+
+  function makeReceptionDemand(cpfValue, preferential){
+    const d = digits(cpfValue);
+    if (d.length !== 11) return null;
+
+    const masked = maskCpf(d);
+    const list = parseJson(patientsKey(), []);
+    const maxOrder = list.reduce((max, patient) => Math.max(max, Number(patient && patient.ordem || 0)), 0);
+    const demandId = newDemandId(d);
+
+    const record = {
+      ordem: maxOrder + 1,
+      id: nextPatientId(list),
+      demandaId: demandId,
+      checkinId: demandId,
+      dataAtendimento: todayIso(),
+      retorno: 'Não',
+      dataRetorno: '',
+      cnpj: '',
+      empresa: '',
+      contratoNumero: '',
+      contratoStatus: 'Pendente',
+      contratoStatusFinanceiro: 'Pendente',
+      contratoTipo: 'ASO + Exames Ocupacionais',
+      obra: '',
+      cboObra: '',
+      cei: '',
+      preferencial: preferential === 'Sim' ? 'Sim' : 'Não',
+      nome: `CPF ${masked}`,
+      nomeSocial: '',
+      setor: '',
+      funcao: '',
+      cpf: masked,
+      dataNascimento: '',
+      sexo: '',
+      telefone: '',
+      email: '',
+      endereco: '',
+      cep: '',
+      tipoAtendimento: 'Aguardando cadastro nominal',
+      grupoServico: 'EXAMES OCUPACIONAIS',
+      servico: 'SERVIÇOS MÉDICOS OCUPACIONAIS',
+      rxTipo: '',
+      labTipo: '',
+      rxTipos: [],
+      labTipos: [],
+      obsCadastro: 'CPF informado no TOTEM. Nova demanda aberta para este CPF. A Recepção deve chamar e completar o cadastro desta ficha, sem reaproveitar atendimento anterior.',
+      asoCadastrado: false,
+      etapa: 'Recepção',
+      statusAtendimento: 'Pendente',
+      exames: defaultExams(),
+      triagem: { status: 'Bloqueado', data: '', observacoes: '' },
+      medico: { nome: '', resultado: '', data: '', pendencia: '', observacoes: '' },
+      papaFila: (typeof normalizePapaFila === 'function') ? normalizePapaFila() : {},
+      attendanceMetrics: (typeof normalizeAttendanceMetrics === 'function') ? normalizeAttendanceMetrics() : {},
+      source: 'TOTEM',
+      origem: 'TOTEM',
+      cadastroNominal: false,
+      createdAt: Date.now(),
+      time: nowTime()
+    };
+
+    list.push(record);
+    saveJson(patientsKey(), list);
+    syncRuntimePatients(list);
+    return record;
+  }
+
+  function syncQueueForDemand(record, preferential){
+    if (!record) return null;
+    const d = digits(record.cpf);
+    if (d.length !== 11) return null;
+
+    let queue = parseJson(QUEUE_KEY, []);
+    const now = Date.now();
+
+    // Se o módulo original acabou de criar uma entrada genérica do TOTEM para este CPF,
+    // reaproveita essa linha em vez de criar duplicidade na primeira chamada.
+    const recentBareIndex = queue.findIndex(item => {
+      const sameCpf = digits(item && item.cpf) === d;
+      const recent = Math.abs(now - Number(item && item.createdAt || now)) < 2500;
+      const noPatient = !item.patientId;
+      const fromTotem = /totem/i.test(String(item && item.source || ''));
+      return sameCpf && recent && noPatient && fromTotem;
+    });
+
+    const item = {
+      ...(recentBareIndex >= 0 ? queue[recentBareIndex] : {}),
+      id: recentBareIndex >= 0 ? queue[recentBareIndex].id : `recepcao_${record.demandaId || Date.now()}_${Math.random().toString(16).slice(2, 8)}`,
+      cpf: d,
+      patientId: record.id,
+      demandaId: record.demandaId || record.checkinId || '',
+      checkinId: record.checkinId || record.demandaId || '',
+      name: record.nome || `CPF ${maskCpf(d)}`,
+      nome: record.nome || `CPF ${maskCpf(d)}`,
+      displayName: record.nome || `CPF ${maskCpf(d)}`,
+      company: record.empresa || record.contratoNumero || 'Cadastro aguardando recepção',
+      empresa: record.empresa || '',
+      type: 'Recepção / CPF do TOTEM',
+      preferential: record.preferencial || preferential || 'Não',
+      workflowStage: 'Recepção',
+      suggestedRoom: 'Recepção',
+      source: 'TOTEM',
+      statusAtendimento: 'Pendente',
+      createdAt: recentBareIndex >= 0 ? (queue[recentBareIndex].createdAt || now) : now,
+      time: recentBareIndex >= 0 ? (queue[recentBareIndex].time || nowTime()) : nowTime()
+    };
+
+    if (recentBareIndex >= 0) queue[recentBareIndex] = item;
+    else queue.push(item);
+
+    saveJson(QUEUE_KEY, queue);
+    return item;
+  }
+
+  function markLatestCheckin(record){
+    const d = digits(record && record.cpf);
+    if (!d) return;
+    const checkins = parseJson(CHECKIN_KEY, []);
+    const idx = checkins.findIndex(item => digits(item && item.cpf) === d && !item.patientId && !item.demandaId);
+    if (idx >= 0) {
+      checkins[idx] = {
+        ...checkins[idx],
+        cpf: maskCpf(d),
+        patientId: record.id,
+        demandaId: record.demandaId || record.checkinId || '',
+        checkinId: record.checkinId || record.demandaId || '',
+        source: 'TOTEM',
+        status: 'Aguardando recepção'
+      };
+      saveJson(CHECKIN_KEY, checkins);
+    }
+  }
+
+  function refreshScreens(){
+    try { if (typeof renderRecepcao === 'function') renderRecepcao(); } catch(e) {}
+    try { if (typeof window.renderCallerRules === 'function') window.renderCallerRules(); } catch(e) {}
+    try { if (typeof window.renderCaller === 'function') window.renderCaller(); } catch(e) {}
+    try { if (typeof renderAll === 'function') renderAll(); } catch(e) {}
+  }
+
+  function createDemandFromTotem(cpf, preferential){
+    const d = digits(cpf);
+    if (d.length !== 11) return null;
+
+    // Garante que a lista em memória esteja sincronizada antes de criar a nova ficha.
+    syncRuntimePatients(parseJson(patientsKey(), []));
+
+    // Evita dupla criação na mesma confirmação, pois alguns botões chamam upsertTotemCpfReceptionRecord
+    // e registrarCheckinTotemRules em sequência. Após o reset do TOTEM, o mesmo CPF pode criar nova demanda normalmente.
+    if (lastCreated.cpf === d && (Date.now() - lastCreated.at) < 2200) return lastCreated.record;
+
+    const record = makeReceptionDemand(d, preferential);
+    const queueItem = syncQueueForDemand(record, preferential);
+    markLatestCheckin(record);
+    lastCreated = { cpf: d, at: Date.now(), record, queueItem };
+    refreshScreens();
+    return record;
+  }
+
+  // A partir daqui, CPF repetido não atualiza atendimento antigo: sempre abre uma nova demanda.
+  window.upsertTotemCpfReceptionRecord = function(cpf, preferential){
+    return createDemandFromTotem(cpf, preferential);
+  };
+
+  window.registrarCheckinTotemRules = function(cpf, pref){
+    return createDemandFromTotem(cpf, pref || 'Não');
+  };
+
+  // Garante que entradas antigas ou genéricas do TOTEM continuem aparecendo no Chamador,
+  // mas sem apagar demandas repetidas já criadas.
+  window.syncTotemRecepcaoMultiplasDemandas = function(){
+    const queue = parseJson(QUEUE_KEY, []);
+    const normalized = queue.map(item => {
+      const d = digits(item && item.cpf);
+      if (!d) return item;
+      if (item.patientId || item.demandaId) return item;
+      return {
+        ...item,
+        cpf: d,
+        displayName: item.displayName || item.name || `CPF ${maskCpf(d)}`,
+        name: item.name || item.displayName || `CPF ${maskCpf(d)}`,
+        workflowStage: item.workflowStage || 'Recepção',
+        suggestedRoom: item.suggestedRoom || 'Recepção',
+        source: item.source || 'TOTEM'
+      };
+    });
+    saveJson(QUEUE_KEY, normalized);
+    syncRuntimePatients(parseJson(patientsKey(), []));
+    refreshScreens();
+  };
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', window.syncTotemRecepcaoMultiplasDemandas);
+  else setTimeout(window.syncTotemRecepcaoMultiplasDemandas, 80);
+})();
+</script>
+
+
+<script id="fix-definitivo-totem-cpf-fila-chamador-2026-06-01">
+/*
+  Correção definitiva: todo CPF inserido no TOTEM deve aparecer também na fila do Chamador.
+  - Mantém o CPF aparecendo na aba Recepção.
+  - Cria/normaliza o item da fila do Chamador na etapa Recepção.
+  - Permite o mesmo CPF várias vezes, tratando cada confirmação como uma nova demanda.
+  - Não altera as demais etapas do fluxo.
+*/
+(function(){
+  const PREFIX = "sesi-fluxo-ocupacional-v7-clean";
+  const UNIT_KEY = `${PREFIX}-selected-unit`;
+  const QUEUE_KEY = "sesi_chamador_fila_v1";
+  const CHECKIN_KEY = "sesi_totem_checkins_v1";
+
+  function digits(value){ return String(value || "").replace(/\D/g, "").slice(0, 11); }
+  function maskCpf(value){
+    const d = digits(value);
+    return d.length === 11 ? `${d.slice(0,3)}.${d.slice(3,6)}.${d.slice(6,9)}-${d.slice(9)}` : d;
+  }
+  function parseJson(key, fallback){
+    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+    catch(e){ return fallback; }
+  }
+  function saveJson(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+  function nowTime(){ return new Date().toLocaleTimeString("pt-BR", { hour:"2-digit", minute:"2-digit" }); }
+  function selectedUnitKey(){
+    let unit = "";
+    try { unit = (typeof selectedUnit !== "undefined" && selectedUnit) ? selectedUnit : ""; } catch(e) {}
+    if (!unit) {
+      try { unit = localStorage.getItem(UNIT_KEY) || ""; } catch(e) {}
+    }
+    return `${PREFIX}-${unit || "paulista"}`;
+  }
+  function readPatients(){ return parseJson(selectedUnitKey(), []); }
+  function writePatients(list){
+    saveJson(selectedUnitKey(), list);
+    try {
+      if (Array.isArray(list) && typeof patients !== "undefined") {
+        patients = (typeof sanitizePatientRecord === "function") ? list.map(item => sanitizePatientRecord(item)) : list;
+      }
+    } catch(e) {}
+  }
+  function isCpfTotemReceptionRecord(patient){
+    const cpf = digits(patient && patient.cpf);
+    if (!cpf) return false;
+    const sourceText = String([patient.source, patient.origem, patient.obsCadastro].filter(Boolean).join(" ")).toLowerCase();
+    const stage = String(patient.etapa || patient.workflowStage || "Recepção").toLowerCase();
+    const status = String(patient.statusAtendimento || "").toLowerCase();
+    const name = String(patient.nome || patient.name || patient.displayName || "").trim();
+    const isCpfName = !name || /^cpf\s/i.test(name) || digits(name) === cpf;
+    const isClosed = status.includes("conclu") || stage.includes("conclu");
+    return !isClosed && stage.includes("recep") && (sourceText.includes("totem") || isCpfName);
+  }
+  function queueIdentity(item){
+    return String(item && (item.demandaId || item.checkinId || item.patientId || item.id || "") || "");
+  }
+  function makeQueueItemFromPatient(patient){
+    const cpf = digits(patient.cpf);
+    const demanda = patient.demandaId || patient.checkinId || patient.id || `TOTEM-${cpf}-${Date.now()}`;
+    const name = `CPF ${maskCpf(cpf)}`;
+    return {
+      id: `chamador_${demanda}`,
+      cpf: cpf,
+      patientId: patient.id || "",
+      demandaId: patient.demandaId || patient.checkinId || demanda,
+      checkinId: patient.checkinId || patient.demandaId || demanda,
+      name: name,
+      nome: name,
+      displayName: name,
+      company: patient.empresa || patient.contratoNumero || "Cadastro aguardando recepção",
+      empresa: patient.empresa || "",
+      type: "Recepção / CPF do TOTEM",
+      preferential: patient.preferencial === "Sim" ? "Sim" : "Não",
+      workflowStage: "Recepção",
+      stage: "Recepção",
+      etapa: "Recepção",
+      suggestedRoom: "Recepção",
+      source: "TOTEM",
+      cadastroNominal: false,
+      statusAtendimento: "Pendente",
+      createdAt: Number(patient.createdAt || Date.now()),
+      time: patient.time || nowTime()
+    };
+  }
+  function normalizeQueueItem(item){
+    const cpf = digits(item && item.cpf);
+    if (!cpf) return item;
+    const sourceText = String(item && item.source || "").toLowerCase();
+    const name = String(item && (item.displayName || item.name || item.nome) || "").trim();
+    const isTotemLike = sourceText.includes("totem") || /^cpf\s/i.test(name) || String(item && item.workflowStage || "").toLowerCase().includes("recep");
+    if (!isTotemLike) return item;
+    const cpfName = /^cpf\s/i.test(name) ? name : `CPF ${maskCpf(cpf)}`;
+    return {
+      ...item,
+      cpf,
+      name: cpfName,
+      nome: cpfName,
+      displayName: cpfName,
+      company: item.company || item.empresa || "Cadastro aguardando recepção",
+      type: "Recepção / CPF do TOTEM",
+      workflowStage: "Recepção",
+      stage: "Recepção",
+      etapa: "Recepção",
+      suggestedRoom: "Recepção",
+      source: item.source || "TOTEM",
+      cadastroNominal: false,
+      statusAtendimento: item.statusAtendimento || "Pendente",
+      createdAt: Number(item.createdAt || Date.now()),
+      time: item.time || nowTime()
+    };
+  }
+  function syncTotemCpfsToCallerQueue(){
+    const patientsList = readPatients();
+    if (!Array.isArray(patientsList)) return;
+
+    let queue = parseJson(QUEUE_KEY, []);
+    if (!Array.isArray(queue)) queue = [];
+    queue = queue.map(normalizeQueueItem);
+
+    const keys = new Set(queue.map(item => queueIdentity(item)).filter(Boolean));
+
+    patientsList
+      .filter(isCpfTotemReceptionRecord)
+      .forEach(patient => {
+        const item = makeQueueItemFromPatient(patient);
+        const identities = [item.demandaId, item.checkinId, item.patientId].filter(Boolean).map(String);
+        const exists = identities.some(id => keys.has(id)) || queue.some(row => {
+          const samePatient = item.patientId && String(row.patientId || "") === String(item.patientId);
+          const sameDemand = item.demandaId && String(row.demandaId || row.checkinId || "") === String(item.demandaId);
+          return samePatient || sameDemand;
+        });
+        if (!exists) {
+          queue.push(item);
+          identities.forEach(id => keys.add(id));
+        }
+      });
+
+    saveJson(QUEUE_KEY, queue);
+    writePatients(patientsList);
+
+    try { if (typeof window.renderCallerRules === "function") window.renderCallerRules(); } catch(e) {}
+    try { if (typeof window.renderCaller === "function") window.renderCaller(); } catch(e) {}
+    try { if (typeof window.__sesiRenderFilteredCaller === "function") window.__sesiRenderFilteredCaller(); } catch(e) {}
+  }
+
+  const previousUpsert = window.upsertTotemCpfReceptionRecord;
+  window.upsertTotemCpfReceptionRecord = function(cpf, preferential){
+    let result = null;
+    try { if (typeof previousUpsert === "function") result = previousUpsert.apply(this, arguments); } catch(e) {}
+    setTimeout(syncTotemCpfsToCallerQueue, 0);
+    setTimeout(syncTotemCpfsToCallerQueue, 120);
+    return result;
+  };
+
+  const previousRegister = window.registrarCheckinTotemRules;
+  window.registrarCheckinTotemRules = function(cpf, pref){
+    let result = null;
+    try { if (typeof previousRegister === "function") result = previousRegister.apply(this, arguments); } catch(e) {}
+    setTimeout(syncTotemCpfsToCallerQueue, 0);
+    setTimeout(syncTotemCpfsToCallerQueue, 120);
+    return result;
+  };
+
+  document.addEventListener("click", function(event){
+    if (event.target?.closest?.("#totem-confirm-btn, #totem-next-step-btn, [data-fullscreen-confirm], [data-page='chamador']")) {
+      setTimeout(syncTotemCpfsToCallerQueue, 80);
+      setTimeout(syncTotemCpfsToCallerQueue, 350);
+    }
+  }, true);
+
+  window.syncTotemCpfFilaChamador = syncTotemCpfsToCallerQueue;
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => setTimeout(syncTotemCpfsToCallerQueue, 180));
+  } else {
+    setTimeout(syncTotemCpfsToCallerQueue, 180);
+  }
+})();
+</script>
+
+
+<script id="recepcao-filtro-cpfs-patch">
+(function(){
+  "use strict";
+  if (window.__recepcaoFiltroCpfsPatchApplied) return;
+  window.__recepcaoFiltroCpfsPatchApplied = true;
+
+  function digits(value){ return String(value || "").replace(/\D/g, ""); }
+  function escapeHtml(value){
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function isCpfOnlyReceptionPatient(patient){
+    if (!patient) return false;
+    const cpf = digits(patient.cpf);
+    if (cpf.length < 11) return false;
+    const name = String(patient.nome || patient.name || patient.displayName || "").trim();
+    const nameDigits = digits(name);
+    const explicitNotNominal = patient.cadastroNominal === false || patient.cadastroNominal === "false";
+    const fromTotem = String(patient.source || patient.origem || "").toUpperCase() === "TOTEM";
+    const hasCpfAsName = !name || /^CPF\s/i.test(name) || nameDigits === cpf;
+    return hasCpfAsName || (explicitNotNominal && fromTotem);
+  }
+
+  function getReceptionQueue(){
+    const list = Array.isArray(window.patients) ? window.patients : (Array.isArray(patients) ? patients : []);
+    const sorted = list.slice();
+    if (typeof compareQueueOrder === "function") sorted.sort(compareQueueOrder);
+    else sorted.sort((a,b) => Number(a?.ordem || 0) - Number(b?.ordem || 0));
+    return sorted.filter(patient => digits(patient && patient.cpf).length >= 11);
+  }
+
+  function applyCpfOnlyReceptionFilter(){
+    const tbody = document.getElementById("tbody-recepcao");
+    const searchInput = document.getElementById("search-recepcao");
+    if (!tbody) return;
+
+    const term = String(searchInput && searchInput.value || "").trim().toLowerCase();
+    let filtered = getReceptionQueue().filter(isCpfOnlyReceptionPatient);
+    if (term) {
+      filtered = filtered.filter(patient => {
+        const text = [
+          patient.nome, patient.name, patient.displayName, patient.id, patient.cpf,
+          patient.empresa, patient.funcao, patient.setor, patient.obra, patient.tipoAtendimento
+        ].map(v => String(v || "").toLowerCase()).join(" ");
+        return term.split(/\s+/).filter(Boolean).every(token => text.includes(token));
+      });
+    }
+
+    if (typeof patientRow === "function") {
+      tbody.innerHTML = filtered.length
+        ? filtered.map(patient => patientRow("recepcao", patient)).join("")
+        : `<tr><td colspan="7"><div class="small">Nenhum CPF aguardando cadastro nominal na Recepção.</div></td></tr>`;
+    } else {
+      tbody.innerHTML = filtered.length
+        ? filtered.map(patient => `<tr><td><strong>${escapeHtml(patient.nome || patient.cpf || "CPF")}</strong><div class="small">${escapeHtml(patient.id || "")}</div></td><td colspan="6">Aguardando cadastro nominal</td></tr>`).join("")
+        : `<tr><td colspan="7"><div class="small">Nenhum CPF aguardando cadastro nominal na Recepção.</div></td></tr>`;
+    }
+
+    const countChip = document.querySelector('#page-recepcao .clinic-titlebar .chips .chip');
+    if (countChip) countChip.textContent = `${filtered.length} CPF(s)`;
+  }
+
+  function installCpfFilterButton(){
+    const group = document.getElementById("quickfilters-recepcao");
+    if (!group || group.querySelector('[data-flag="cpfs"]')) return;
+
+    const button = document.createElement("button");
+    button.className = "smart-filter";
+    button.type = "button";
+    button.dataset.flag = "cpfs";
+    button.textContent = "CPFs";
+    button.title = "Mostrar somente fichas do TOTEM que ainda estão apenas com CPF, sem cadastro nominal.";
+    group.appendChild(button);
+
+    button.addEventListener("click", function(event){
+      event.preventDefault();
+      event.stopPropagation();
+      group.querySelectorAll(".smart-filter").forEach(item => item.classList.toggle("active", item === button));
+      applyCpfOnlyReceptionFilter();
+    }, true);
+
+    const searchInput = document.getElementById("search-recepcao");
+    if (searchInput && !searchInput.dataset.cpfFilterListener) {
+      searchInput.dataset.cpfFilterListener = "true";
+      searchInput.addEventListener("input", function(){
+        const active = group.querySelector('[data-flag="cpfs"].active');
+        if (active) applyCpfOnlyReceptionFilter();
+      });
+    }
+  }
+
+  function enhanceReceptionPage(){
+    installCpfFilterButton();
+  }
+
+  const previousRenderRecepcao = window.renderRecepcao || (typeof renderRecepcao === "function" ? renderRecepcao : null);
+  if (typeof previousRenderRecepcao === "function") {
+    window.renderRecepcao = function(){
+      const result = previousRenderRecepcao.apply(this, arguments);
+      setTimeout(enhanceReceptionPage, 0);
+      return result;
+    };
+    try { renderRecepcao = window.renderRecepcao; } catch(e) {}
+  }
+
+  document.addEventListener("click", function(event){
+    if (event.target && event.target.closest && event.target.closest('[data-page="recepcao"]')) {
+      setTimeout(enhanceReceptionPage, 120);
+      setTimeout(enhanceReceptionPage, 350);
+    }
+  }, true);
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => setTimeout(enhanceReceptionPage, 250));
+  } else {
+    setTimeout(enhanceReceptionPage, 250);
+  }
+})();
+</script>
+
+
+
+<script id="recepcao-cpfs-filtro-fila-auto-refresh-patch">
+/* Atualização: quando o filtro "CPFs" estiver ativo na Recepção,
+   novos CPFs vindos do TOTEM atualizam a visualização da Recepção
+   e também sincronizam automaticamente a fila do Chamador. */
+(function(){
+  "use strict";
+  if (window.__recepcaoCpfsFiltroFilaAutoRefreshApplied) return;
+  window.__recepcaoCpfsFiltroFilaAutoRefreshApplied = true;
+
+  const FILTER_STATE_KEY = "sesi_recepcao_filtro_cpfs_ativo";
+
+  function digits(value){ return String(value || "").replace(/\D/g, ""); }
+  function escapeHtml(value){
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+  function getPatientsList(){
+    try { if (Array.isArray(window.patients)) return window.patients; } catch(e) {}
+    try { if (Array.isArray(patients)) return patients; } catch(e) {}
+    return [];
+  }
+  function isCpfOnlyReceptionPatient(patient){
+    if (!patient) return false;
+    const cpf = digits(patient.cpf);
+    if (cpf.length < 11) return false;
+    const name = String(patient.nome || patient.name || patient.displayName || "").trim();
+    const nameDigits = digits(name);
+    const explicitNotNominal = patient.cadastroNominal === false || patient.cadastroNominal === "false";
+    const fromTotem = String(patient.source || patient.origem || "").toUpperCase() === "TOTEM";
+    const hasCpfAsName = !name || /^CPF\s/i.test(name) || nameDigits === cpf;
+    return hasCpfAsName || (explicitNotNominal && fromTotem);
+  }
+  function getReceptionCpfOnlyQueue(){
+    const list = getPatientsList().slice();
+    if (typeof compareQueueOrder === "function") list.sort(compareQueueOrder);
+    else list.sort((a,b) => Number(a && a.ordem || 0) - Number(b && b.ordem || 0));
+    return list.filter(isCpfOnlyReceptionPatient);
+  }
+  function isCpfFilterActive(){
+    const button = document.querySelector('#quickfilters-recepcao [data-flag="cpfs"]');
+    return Boolean(button && button.classList.contains('active')) || localStorage.getItem(FILTER_STATE_KEY) === "true";
+  }
+  function setCpfFilterActive(active){
+    localStorage.setItem(FILTER_STATE_KEY, active ? "true" : "false");
+  }
+  function applyCpfOnlyReceptionFilter(){
+    const tbody = document.getElementById("tbody-recepcao");
+    if (!tbody) return;
+
+    const group = document.getElementById("quickfilters-recepcao");
+    if (group) {
+      group.querySelectorAll(".smart-filter").forEach(btn => btn.classList.toggle("active", btn.dataset.flag === "cpfs"));
+    }
+
+    const searchInput = document.getElementById("search-recepcao");
+    const term = String(searchInput && searchInput.value || "").trim().toLowerCase();
+    let filtered = getReceptionCpfOnlyQueue();
+    if (term) {
+      const tokens = term.split(/\s+/).filter(Boolean);
+      filtered = filtered.filter(patient => {
+        const text = [
+          patient.nome, patient.name, patient.displayName, patient.id, patient.cpf,
+          patient.empresa, patient.funcao, patient.setor, patient.obra, patient.tipoAtendimento
+        ].map(v => String(v || "").toLowerCase()).join(" ");
+        return tokens.every(token => text.includes(token));
+      });
+    }
+
+    tbody.innerHTML = filtered.length
+      ? filtered.map(patient => typeof patientRow === "function"
+          ? patientRow("recepcao", patient)
+          : `<tr><td><strong>${escapeHtml(patient.nome || patient.cpf || "CPF")}</strong><div class="small">${escapeHtml(patient.id || "")}</div></td><td colspan="6">Aguardando cadastro nominal</td></tr>`
+        ).join("")
+      : `<tr><td colspan="7"><div class="small">Nenhum CPF aguardando cadastro nominal na Recepção.</div></td></tr>`;
+  }
+  function installCpfFilterPersistence(){
+    const group = document.getElementById("quickfilters-recepcao");
+    if (!group) return;
+    const cpfButton = group.querySelector('[data-flag="cpfs"]');
+    if (!cpfButton) return;
+
+    if (!cpfButton.dataset.autoRefreshInstalled) {
+      cpfButton.dataset.autoRefreshInstalled = "true";
+      cpfButton.addEventListener("click", function(){
+        setCpfFilterActive(true);
+        setTimeout(applyCpfOnlyReceptionFilter, 0);
+        setTimeout(syncCallerQueueAndReceptionCpfFilter, 120);
+      });
+    }
+
+    group.querySelectorAll('.smart-filter').forEach(button => {
+      if (button.dataset.flag !== "cpfs" && !button.dataset.clearCpfFilterInstalled) {
+        button.dataset.clearCpfFilterInstalled = "true";
+        button.addEventListener("click", () => setCpfFilterActive(false));
+      }
+    });
+
+    if (localStorage.getItem(FILTER_STATE_KEY) === "true") {
+      setTimeout(applyCpfOnlyReceptionFilter, 0);
+    }
+  }
+  function syncCallerQueueAndReceptionCpfFilter(){
+    try { if (typeof window.syncTotemCpfFilaChamador === "function") window.syncTotemCpfFilaChamador(); } catch(e) {}
+    try { if (typeof window.renderCaller === "function") window.renderCaller(); } catch(e) {}
+    try { if (typeof window.renderCallerRules === "function") window.renderCallerRules(); } catch(e) {}
+    if (isCpfFilterActive()) setTimeout(applyCpfOnlyReceptionFilter, 0);
+  }
+
+  const previousRenderRecepcao = window.renderRecepcao || (typeof renderRecepcao === "function" ? renderRecepcao : null);
+  if (typeof previousRenderRecepcao === "function") {
+    window.renderRecepcao = function(){
+      const result = previousRenderRecepcao.apply(this, arguments);
+      setTimeout(() => {
+        installCpfFilterPersistence();
+        if (isCpfFilterActive()) applyCpfOnlyReceptionFilter();
+        syncCallerQueueAndReceptionCpfFilter();
+      }, 0);
+      return result;
+    };
+    try { renderRecepcao = window.renderRecepcao; } catch(e) {}
+  }
+
+  const previousUpsertTotem = window.upsertTotemCpfReceptionRecord;
+  if (typeof previousUpsertTotem === "function") {
+    window.upsertTotemCpfReceptionRecord = function(){
+      const result = previousUpsertTotem.apply(this, arguments);
+      setTimeout(syncCallerQueueAndReceptionCpfFilter, 0);
+      setTimeout(syncCallerQueueAndReceptionCpfFilter, 180);
+      return result;
+    };
+  }
+
+  document.addEventListener("click", function(event){
+    const filterButton = event.target && event.target.closest && event.target.closest('#quickfilters-recepcao .smart-filter');
+    if (filterButton) {
+      setCpfFilterActive(filterButton.dataset.flag === "cpfs");
+      if (filterButton.dataset.flag === "cpfs") {
+        setTimeout(syncCallerQueueAndReceptionCpfFilter, 0);
+      }
+    }
+    if (event.target && event.target.closest && event.target.closest('#totem-confirm-btn, #totem-next-step-btn, [data-fullscreen-confirm]')) {
+      setTimeout(syncCallerQueueAndReceptionCpfFilter, 80);
+      setTimeout(syncCallerQueueAndReceptionCpfFilter, 350);
+    }
+  }, true);
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      setTimeout(installCpfFilterPersistence, 250);
+      setTimeout(syncCallerQueueAndReceptionCpfFilter, 350);
+    });
+  } else {
+    setTimeout(installCpfFilterPersistence, 250);
+    setTimeout(syncCallerQueueAndReceptionCpfFilter, 350);
+  }
+})();
+</script>
+
+
+
+<script id="fix-final-cpfs-recepcao-fila-20260601">
+/* Correção final: mantém o filtro "CPFs" ativo na Recepção exibindo somente fichas sem nome
+   e sincroniza essas fichas com a fila do Chamador sempre que o TOTEM registrar um CPF. */
+(function(){
+  "use strict";
+  if (window.__fixFinalCpfsRecepcaoFila20260601) return;
+  window.__fixFinalCpfsRecepcaoFila20260601 = true;
+
+  var QUEUE_KEY = "sesi_chamador_fila_v1";
+  var FILTER_KEY = "sesi_recepcao_filtro_cpfs_ativo";
+
+  function digits(value){ return String(value || "").replace(/\D/g, ""); }
+  function maskCpf(value){
+    var d = digits(value).slice(0, 11);
+    return d.length === 11 ? d.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, "$1.$2.$3-$4") : d;
+  }
+  function nowTime(){
+    try { return new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }); }
+    catch(e){ return ""; }
+  }
+  function parseStore(key, fallback){
+    try {
+      var parsed = JSON.parse(localStorage.getItem(key) || "null");
+      return parsed == null ? fallback : parsed;
+    } catch(e) { return fallback; }
+  }
+  function saveStore(key, value){
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch(e) {}
+  }
+  function patientList(){
+    try { if (Array.isArray(patients)) return patients; } catch(e) {}
+    try { if (Array.isArray(window.patients)) return window.patients; } catch(e) {}
+    return [];
+  }
+  function savePatientList(list){
+    try {
+      if (Array.isArray(list) && typeof patients !== "undefined") patients = list;
+      if (typeof savePatients === "function") savePatients();
+      else if (typeof getStorageKey === "function") saveStore(getStorageKey(), list);
+    } catch(e) {}
+  }
+  function isCpfOnlyRecord(patient){
+    if (!patient) return false;
+    var cpf = digits(patient.cpf);
+    if (cpf.length !== 11) return false;
+    var name = String(patient.nome || patient.name || patient.displayName || "").trim();
+    var nameDigits = digits(name);
+    var fromTotem = String(patient.source || patient.origem || "").toUpperCase() === "TOTEM";
+    var notNominal = patient.cadastroNominal === false || patient.cadastroNominal === "false";
+    return !name || /^CPF\s/i.test(name) || nameDigits === cpf || (fromTotem && notNominal);
+  }
+  function orderPatients(a, b){
+    try { if (typeof compareQueueOrder === "function") return compareQueueOrder(a, b); } catch(e) {}
+    return Number(a && a.ordem || 0) - Number(b && b.ordem || 0);
+  }
+  function queueItemFromPatient(patient){
+    var cpf = digits(patient.cpf);
+    var masked = maskCpf(cpf);
+    var label = "CPF " + masked;
+    return {
+      id: "recepcao_" + String(patient.demandaId || patient.checkinId || patient.id || cpf || Date.now()),
+      cpf: cpf,
+      patientId: patient.id || "",
+      demandaId: patient.demandaId || patient.checkinId || "",
+      checkinId: patient.checkinId || patient.demandaId || "",
+      name: label,
+      nome: label,
+      displayName: label,
+      company: patient.empresa || patient.contratoNumero || "Cadastro aguardando recepção",
+      empresa: patient.empresa || "",
+      type: "Recepção / CPF do TOTEM",
+      preferential: patient.preferencial || patient.preferential || "Não",
+      workflowStage: "Recepção",
+      stage: "Recepção",
+      etapa: "Recepção",
+      suggestedRoom: "Recepção",
+      source: "TOTEM",
+      cadastroNominal: false,
+      statusAtendimento: "Pendente",
+      createdAt: Number(patient.createdAt || Date.now()),
+      time: patient.time || nowTime()
+    };
+  }
+  function sameQueueDemand(row, item){
+    if (!row || !item) return false;
+    var samePatient = item.patientId && String(row.patientId || "") === String(item.patientId);
+    var sameDemand = item.demandaId && String(row.demandaId || row.checkinId || "") === String(item.demandaId);
+    var sameId = String(row.id || "") === String(item.id || "");
+    return Boolean(samePatient || sameDemand || sameId);
+  }
+  function syncCpfOnlyReceptionToCallerQueue(){
+    var cpfPatients = patientList().filter(isCpfOnlyRecord).sort(orderPatients);
+    var queue = parseStore(QUEUE_KEY, []);
+    if (!Array.isArray(queue)) queue = [];
+
+    cpfPatients.forEach(function(patient){
+      var item = queueItemFromPatient(patient);
+      var existingIndex = queue.findIndex(function(row){ return sameQueueDemand(row, item); });
+      if (existingIndex >= 0) {
+        queue[existingIndex] = Object.assign({}, queue[existingIndex], item, {
+          createdAt: queue[existingIndex].createdAt || item.createdAt,
+          time: queue[existingIndex].time || item.time
+        });
+      } else {
+        // Evita duplicar uma entrada genérica do TOTEM criada segundos antes para o mesmo CPF.
+        var cpf = digits(item.cpf);
+        var recentIndex = queue.findIndex(function(row){
+          return digits(row && row.cpf) === cpf &&
+            !row.patientId &&
+            /totem/i.test(String(row && row.source || "")) &&
+            Math.abs(Date.now() - Number(row && row.createdAt || Date.now())) < 5000;
+        });
+        if (recentIndex >= 0) queue[recentIndex] = Object.assign({}, queue[recentIndex], item, { createdAt: queue[recentIndex].createdAt || item.createdAt, time: queue[recentIndex].time || item.time });
+        else queue.push(item);
+      }
+    });
+
+    saveStore(QUEUE_KEY, queue);
+    try { if (typeof window.renderCallerRules === "function") window.renderCallerRules(); } catch(e) {}
+    try { if (typeof window.__sesiRenderFilteredCaller === "function") window.__sesiRenderFilteredCaller(); } catch(e) {}
+    try { if (typeof window.renderCaller === "function") window.renderCaller(); } catch(e) {}
+    return cpfPatients;
+  }
+  function cpfFilterIsActive(){
+    var btn = document.querySelector('#quickfilters-recepcao [data-flag="cpfs"]');
+    return Boolean(btn && btn.classList.contains('active')) || localStorage.getItem(FILTER_KEY) === "true";
+  }
+  function setCpfFilterActive(active){
+    try { localStorage.setItem(FILTER_KEY, active ? "true" : "false"); } catch(e) {}
+  }
+  function ensureCpfButton(){
+    var group = document.getElementById("quickfilters-recepcao");
+    if (!group) return null;
+    var button = group.querySelector('[data-flag="cpfs"]');
+    if (!button) {
+      button = document.createElement("button");
+      button.type = "button";
+      button.className = "smart-filter";
+      button.dataset.flag = "cpfs";
+      button.textContent = "CPFs";
+      button.title = "Mostrar apenas atendimentos vindos do TOTEM que ainda estão sem nome.";
+      group.appendChild(button);
+    }
+    if (!button.dataset.finalCpfListener) {
+      button.dataset.finalCpfListener = "true";
+      button.addEventListener("click", function(event){
+        event.preventDefault();
+        event.stopPropagation();
+        setCpfFilterActive(true);
+        group.querySelectorAll(".smart-filter").forEach(function(item){ item.classList.toggle("active", item === button); });
+        syncCpfOnlyReceptionToCallerQueue();
+        renderCpfOnlyReceptionRows();
+      }, true);
+    }
+    group.querySelectorAll(".smart-filter").forEach(function(item){
+      if (item.dataset.flag !== "cpfs" && !item.dataset.finalClearCpfListener) {
+        item.dataset.finalClearCpfListener = "true";
+        item.addEventListener("click", function(){ setCpfFilterActive(false); }, true);
+      }
+    });
+    return button;
+  }
+  function renderCpfOnlyReceptionRows(){
+    var tbody = document.getElementById("tbody-recepcao");
+    if (!tbody) return;
+    var button = ensureCpfButton();
+    if (button) {
+      var group = button.closest("#quickfilters-recepcao");
+      if (group) group.querySelectorAll(".smart-filter").forEach(function(item){ item.classList.toggle("active", item.dataset.flag === "cpfs"); });
+    }
+    setCpfFilterActive(true);
+    var search = String((document.getElementById("search-recepcao") || {}).value || "").trim().toLowerCase();
+    var tokens = search.split(/\s+/).filter(Boolean);
+    var rows = syncCpfOnlyReceptionToCallerQueue();
+    if (tokens.length) {
+      rows = rows.filter(function(patient){
+        var text = [patient.nome, patient.name, patient.displayName, patient.cpf, patient.id, patient.empresa, patient.funcao, patient.tipoAtendimento]
+          .map(function(v){ return String(v || "").toLowerCase(); }).join(" ");
+        return tokens.every(function(token){ return text.indexOf(token) >= 0; });
+      });
+    }
+    tbody.innerHTML = rows.length
+      ? rows.map(function(patient){
+          try { if (typeof patientRow === "function") return patientRow("recepcao", patient); } catch(e) {}
+          var name = String(patient.nome || ("CPF " + maskCpf(patient.cpf)));
+          return '<tr><td><strong>' + name.replace(/[&<>]/g, "") + '</strong><div class="small">' + String(patient.id || "") + '</div></td><td colspan="6">Aguardando cadastro nominal</td></tr>';
+        }).join("")
+      : '<tr><td colspan="7"><div class="small">Nenhum CPF aguardando cadastro nominal na Recepção.</div></td></tr>';
+  }
+  function refreshAfterTotem(){
+    syncCpfOnlyReceptionToCallerQueue();
+    if (cpfFilterIsActive()) {
+      setTimeout(renderCpfOnlyReceptionRows, 0);
+      setTimeout(renderCpfOnlyReceptionRows, 200);
+    }
+  }
+
+  var oldUpsert = window.upsertTotemCpfReceptionRecord;
+  if (typeof oldUpsert === "function") {
+    window.upsertTotemCpfReceptionRecord = function(){
+      var result = oldUpsert.apply(this, arguments);
+      setTimeout(refreshAfterTotem, 0);
+      setTimeout(refreshAfterTotem, 250);
+      return result;
+    };
+  }
+  var oldRegistrar = window.registrarCheckinTotemRules;
+  if (typeof oldRegistrar === "function") {
+    window.registrarCheckinTotemRules = function(){
+      var result = oldRegistrar.apply(this, arguments);
+      setTimeout(refreshAfterTotem, 0);
+      setTimeout(refreshAfterTotem, 250);
+      return result;
+    };
+  }
+  var oldRender = window.renderRecepcao || (typeof renderRecepcao === "function" ? renderRecepcao : null);
+  if (typeof oldRender === "function") {
+    window.renderRecepcao = function(){
+      var result = oldRender.apply(this, arguments);
+      setTimeout(function(){
+        ensureCpfButton();
+        syncCpfOnlyReceptionToCallerQueue();
+        if (cpfFilterIsActive()) renderCpfOnlyReceptionRows();
+      }, 0);
+      return result;
+    };
+    try { renderRecepcao = window.renderRecepcao; } catch(e) {}
+  }
+  document.addEventListener("input", function(event){
+    if (event.target && event.target.id === "search-recepcao" && cpfFilterIsActive()) {
+      setTimeout(renderCpfOnlyReceptionRows, 0);
+    }
+  }, true);
+  document.addEventListener("click", function(event){
+    if (event.target && event.target.closest && event.target.closest('#totem-confirm-btn, #totem-next-step-btn, [data-fullscreen-confirm]')) {
+      setTimeout(refreshAfterTotem, 80);
+      setTimeout(refreshAfterTotem, 400);
+    }
+    if (event.target && event.target.closest && event.target.closest('[data-page="recepcao"]')) {
+      setTimeout(function(){ ensureCpfButton(); if (cpfFilterIsActive()) renderCpfOnlyReceptionRows(); }, 200);
+    }
+  }, true);
+  window.syncTotemCpfFilaChamador = syncCpfOnlyReceptionToCallerQueue;
+  window.renderRecepcaoSomenteCpfs = renderCpfOnlyReceptionRows;
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function(){ setTimeout(refreshAfterTotem, 300); });
+  } else {
+    setTimeout(refreshAfterTotem, 300);
+  }
 })();
 </script>
 
