@@ -16946,5 +16946,865 @@ function compareQueueOrder(a, b) {
 })();
 </script>
 
+
+<script>
+/* ===== Aba Contratos: cadastro, vigência, itens e PDF anexado ===== */
+(function(){
+  'use strict';
+  const STORAGE_KEY = 'sesi_contracts_database_v1';
+  const STATUS_OPTIONS = ['Vigente','A vencer','Vencido','Suspenso','Em renovação','Encerrado'];
+  const CONTRACT_TYPES = ['ASO','Exames Ocupacionais','ASO + Exames Ocupacionais','Vacinação','Saúde Assistencial','Engenharia de Segurança','Contrato Guarda-chuva','Outro'];
+
+  function esc(value){
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
+    });
+  }
+  function digits(value){ return String(value || '').replace(/\D/g, ''); }
+  function money(value){
+    const n = Number(value || 0);
+    return n ? n.toLocaleString('pt-BR', { style:'currency', currency:'BRL' }) : '-';
+  }
+  function dateBR(value){
+    if(!value) return '-';
+    const parts = String(value).split('-');
+    return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : value;
+  }
+  function daysUntil(value){
+    if(!value) return null;
+    const today = new Date(); today.setHours(0,0,0,0);
+    const end = new Date(value + 'T00:00:00');
+    return Math.ceil((end - today) / 86400000);
+  }
+  function calcStatus(contract){
+    if(contract.status && contract.status !== 'Vigente') return contract.status;
+    const d = daysUntil(contract.vigenciaFim);
+    if(d === null) return contract.status || 'Vigente';
+    if(d < 0) return 'Vencido';
+    if(d <= Number(contract.alertaDias || 60)) return 'A vencer';
+    return contract.status || 'Vigente';
+  }
+  function getContracts(){
+    try {
+      const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      if(Array.isArray(data)) return data;
+    } catch(e) {}
+    return [];
+  }
+  function saveContracts(list){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  }
+  function createId(){ return 'CTR-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).slice(2,6).toUpperCase(); }
+  function normalizeItemLine(line){
+    const raw = String(line || '').trim();
+    if(!raw) return null;
+    const parts = raw.split('|').map(p => p.trim());
+    return { nome: parts[0] || raw, quantidade: parts[1] || '', valor: parts[2] || '', observacao: parts[3] || '' };
+  }
+  function itemsToText(items){
+    return (items || []).map(item => [item.nome, item.quantidade, item.valor, item.observacao].filter(Boolean).join(' | ')).join('\n');
+  }
+  function contractTotal(contract){
+    return (contract.itens || []).reduce((sum,item) => {
+      const q = Number(String(item.quantidade || '1').replace(',','.')) || 1;
+      const v = Number(String(item.valor || '0').replace(/\./g,'').replace(',','.')) || 0;
+      return sum + (q * v);
+    }, 0) || Number(contract.valorGlobal || 0) || 0;
+  }
+  function badge(status){
+    const cls = status === 'Vigente' ? 'st-concluido' : status === 'A vencer' || status === 'Em renovação' ? 'st-pendente' : status === 'Vencido' || status === 'Suspenso' ? 'st-bloqueado' : 'st-na';
+    return `<span class="status ${cls}">${esc(status)}</span>`;
+  }
+  function ensurePage(){
+    const nav = document.querySelector('nav.nav');
+    if(nav && !nav.querySelector('[data-page="contratos"]')){
+      const ref = nav.querySelector('[data-page="recepcao"]') || nav.children[1];
+      const btn = document.createElement('button');
+      btn.className = 'nav-btn';
+      btn.dataset.page = 'contratos';
+      btn.type = 'button';
+      btn.innerHTML = '<span class="left"><span>📄</span><span>Contratos</span></span><span>›</span>';
+      btn.addEventListener('click', function(){ if(typeof setPage === 'function') setPage('contratos'); });
+      if(ref && ref.nextSibling) nav.insertBefore(btn, ref.nextSibling); else nav.appendChild(btn);
+    }
+    const main = document.querySelector('main.main');
+    if(main && !document.getElementById('page-contratos')){
+      const section = document.createElement('section');
+      section.className = 'content hidden';
+      section.id = 'page-contratos';
+      const before = document.getElementById('page-exames') || document.getElementById('page-relatorios');
+      main.insertBefore(section, before || null);
+    }
+    try {
+      if(typeof PAGE_META === 'object') PAGE_META.contratos = ['Contratos', 'Cadastro e controle de contratos, itens, vigência e anexos em PDF.'];
+    } catch(e) {}
+  }
+  function contractForm(contract){
+    const c = contract || {};
+    const typeOptions = CONTRACT_TYPES.map(t => `<option ${c.tipoContrato===t?'selected':''}>${esc(t)}</option>`).join('');
+    const statusOptions = STATUS_OPTIONS.map(t => `<option ${calcStatus(c)===t || c.status===t?'selected':''}>${esc(t)}</option>`).join('');
+    return `
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px">
+          <div>
+            <h3 style="margin:0 0 6px">${c.id ? 'Editar contrato' : 'Novo contrato'}</h3>
+            <div class="small">Registre contrato, vigência, itens contratados, responsáveis, status e anexo em PDF.</div>
+          </div>
+          <button class="btn btn-ghost" type="button" onclick="window.cancelContractEdit()">Limpar formulário</button>
+        </div>
+        <form id="contractForm" data-edit-id="${esc(c.id || '')}">
+          <div class="form-grid-3">
+            <div class="field"><label>Nome do Contrato *</label><input id="contractNome" required value="${esc(c.nomeContrato || '')}" placeholder="Ex.: Contrato SESI Saúde - Empresa X"></div>
+            <div class="field"><label>Nº / Código do Contrato</label><input id="contractNumero" value="${esc(c.numeroContrato || '')}" placeholder="Ex.: CTR-2026-001"></div>
+            <div class="field"><label>Tipo de Contrato *</label><select id="contractTipo" required>${typeOptions}</select></div>
+            <div class="field"><label>Empresa / Cliente</label><input id="contractEmpresa" value="${esc(c.empresa || '')}" placeholder="Razão social do cliente"></div>
+            <div class="field"><label>CNPJ</label><input id="contractCnpj" value="${esc(c.cnpj || '')}" placeholder="00.000.000/0000-00"></div>
+            <div class="field"><label>Unidade responsável</label><input id="contractUnidade" value="${esc(c.unidade || '')}" placeholder="Ex.: SESI Saúde Santo Amaro"></div>
+            <div class="field"><label>Início da vigência *</label><input id="contractInicio" type="date" required value="${esc(c.vigenciaInicio || '')}"></div>
+            <div class="field"><label>Fim da vigência *</label><input id="contractFim" type="date" required value="${esc(c.vigenciaFim || '')}"></div>
+            <div class="field"><label>Alerta de renovação</label><select id="contractAlerta"><option value="30" ${String(c.alertaDias||60)==='30'?'selected':''}>30 dias antes</option><option value="60" ${String(c.alertaDias||60)==='60'?'selected':''}>60 dias antes</option><option value="90" ${String(c.alertaDias||60)==='90'?'selected':''}>90 dias antes</option></select></div>
+            <div class="field"><label>Status</label><select id="contractStatus">${statusOptions}</select></div>
+            <div class="field"><label>Gestor / Responsável</label><input id="contractGestor" value="${esc(c.gestor || '')}" placeholder="Responsável pelo acompanhamento"></div>
+            <div class="field"><label>E-mail do responsável</label><input id="contractEmail" type="email" value="${esc(c.emailResponsavel || '')}" placeholder="email@empresa.com"></div>
+            <div class="field"><label>Valor global estimado</label><input id="contractValor" type="number" min="0" step="0.01" value="${esc(c.valorGlobal || '')}" placeholder="0,00"></div>
+            <div class="field"><label>Índice de reajuste</label><input id="contractReajuste" value="${esc(c.indiceReajuste || '')}" placeholder="Ex.: IPCA, INPC, Sem reajuste"></div>
+            <div class="field"><label>SLA / Prazo de atendimento</label><input id="contractSla" value="${esc(c.sla || '')}" placeholder="Ex.: 5 dias úteis"></div>
+          </div>
+          <div class="form-grid" style="margin-top:14px">
+            <div class="field"><label>Itens do contrato *</label><textarea id="contractItens" required placeholder="Informe um item por linha. Ex.: ASO Admissional | 100 | 35,00 | Unidade Santo Amaro">${esc(itemsToText(c.itens))}</textarea><div class="small">Formato sugerido: item | quantidade | valor unitário | observação.</div></div>
+            <div class="field"><label>Observações / regras comerciais</label><textarea id="contractObs" placeholder="Ex.: regras de faturamento, escopo, exceções, renovação automática, aditivos.">${esc(c.observacoes || '')}</textarea></div>
+          </div>
+          <div class="form-grid" style="margin-top:14px">
+            <div class="field"><label>Anexar contrato em PDF</label><input id="contractPdf" type="file" accept="application/pdf"><div class="small">Boas práticas: anexar contrato assinado e manter vigência/status atualizados. ${c.pdfName ? 'PDF atual: ' + esc(c.pdfName) : ''}</div></div>
+            <div class="field"><label>Centro de custo / referência interna</label><input id="contractCentroCusto" value="${esc(c.centroCusto || '')}" placeholder="Ex.: SST / Saúde Ocupacional"></div>
+          </div>
+          <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:16px">
+            <button class="btn btn-primary" type="submit">💾 Salvar contrato</button>
+          </div>
+        </form>
+      </div>`;
+  }
+  function renderContracts(){
+    ensurePage();
+    const page = document.getElementById('page-contratos');
+    if(!page) return;
+    const list = getContracts();
+    const q = String(document.getElementById('contractsSearch')?.value || '').toLowerCase();
+    const statusFilter = String(document.getElementById('contractsStatusFilter')?.value || 'Todos');
+    let rows = list.map(c => ({...c, statusCalculado: calcStatus(c), total: contractTotal(c)}));
+    if(q){
+      rows = rows.filter(c => [c.nomeContrato,c.numeroContrato,c.tipoContrato,c.empresa,c.cnpj,c.gestor,c.unidade,c.statusCalculado,(c.itens||[]).map(i=>i.nome).join(' ')].join(' ').toLowerCase().includes(q));
+    }
+    if(statusFilter !== 'Todos') rows = rows.filter(c => c.statusCalculado === statusFilter);
+    const totalVigentes = list.filter(c => calcStatus(c) === 'Vigente').length;
+    const totalAVencer = list.filter(c => calcStatus(c) === 'A vencer').length;
+    const totalVencidos = list.filter(c => calcStatus(c) === 'Vencido').length;
+    const totalValor = list.reduce((s,c)=>s+contractTotal(c),0);
+    const editId = window.__editingContractId;
+    const editing = editId ? list.find(c => c.id === editId) : null;
+    page.innerHTML = `
+      <div class="dashboard-hero">
+        <div class="dashboard-hero-grid">
+          <div><h3>Contratos</h3><p>Controle dos contratos ocupacionais, vigência, itens contratados, anexos em PDF e dados de governança.</p><div class="dashboard-hero-chips"><span class="chip">📄 PDF anexado</span><span class="chip">📆 Vigência</span><span class="chip">🧾 Itens contratados</span><span class="chip">🔔 Alerta de renovação</span></div></div>
+          <div class="dashboard-hero-note"><div class="big">Boas práticas</div><div class="small">Mantenha contrato assinado, vigência, responsável, SLA, reajuste, status financeiro/comercial e aditivos atualizados para evitar atendimento fora de escopo.</div></div>
+        </div>
+      </div>
+      <div class="grid-4">
+        <div class="card kpi"><div class="label">Contratos cadastrados</div><div class="value">${list.length}</div><div class="hint">base local do sistema</div></div>
+        <div class="card kpi"><div class="label">Vigentes</div><div class="value">${totalVigentes}</div><div class="hint">em período válido</div></div>
+        <div class="card kpi"><div class="label">A vencer</div><div class="value">${totalAVencer}</div><div class="hint">dentro do alerta</div></div>
+        <div class="card kpi"><div class="label">Valor estimado</div><div class="value" style="font-size:26px">${money(totalValor)}</div><div class="hint">soma dos itens/valor global</div></div>
+      </div>
+      ${contractForm(editing)}
+      <div class="card">
+        <div class="filters">
+          <div class="search"><span>🔎</span><input id="contractsSearch" value="${esc(document.getElementById('contractsSearch')?.value || '')}" placeholder="Buscar por contrato, empresa, CNPJ, gestor ou item" type="search"></div>
+          <div class="field" style="max-width:220px"><label>Status</label><select id="contractsStatusFilter"><option>Todos</option>${STATUS_OPTIONS.map(st=>`<option ${statusFilter===st?'selected':''}>${esc(st)}</option>`).join('')}</select></div>
+          <button class="btn btn-ghost" type="button" onclick="window.exportContractsCsv()">Exportar CSV</button>
+        </div>
+        <div class="table-wrap"><table><thead><tr><th>Contrato</th><th>Tipo / Itens</th><th>Empresa</th><th>Vigência</th><th>Status</th><th>Responsável</th><th>PDF</th><th>Ações</th></tr></thead><tbody>
+          ${rows.length ? rows.map(c => contractRow(c)).join('') : `<tr><td colspan="8"><div class="small">Nenhum contrato encontrado.</div></td></tr>`}
+        </tbody></table></div>
+      </div>`;
+    bindContractsEvents();
+  }
+  function contractRow(c){
+    const d = daysUntil(c.vigenciaFim);
+    const itemPreview = (c.itens || []).slice(0,3).map(i => `<span class="chip">${esc(i.nome)}${i.quantidade ? ' • ' + esc(i.quantidade) : ''}</span>`).join('') || '<span class="small">Sem itens</span>';
+    const pdf = c.pdfData ? `<button class="btn btn-ghost" type="button" onclick="window.downloadContractPdf('${esc(c.id)}')">📎 ${esc(c.pdfName || 'PDF')}</button>` : '<span class="small">Sem anexo</span>';
+    return `<tr>
+      <td><div class="row-title">${esc(c.nomeContrato)}</div><div class="small">${esc(c.numeroContrato || c.id)}<br>Valor: ${money(c.total)}</div></td>
+      <td><div class="row-title">${esc(c.tipoContrato)}</div><div class="chips" style="margin-top:8px">${itemPreview}</div></td>
+      <td>${esc(c.empresa || '-')}<div class="small">CNPJ: ${esc(c.cnpj || '-')}<br>Unidade: ${esc(c.unidade || '-')}</div></td>
+      <td>${dateBR(c.vigenciaInicio)} a ${dateBR(c.vigenciaFim)}<div class="small">${d == null ? 'Sem cálculo' : d < 0 ? 'Vencido há ' + Math.abs(d) + ' dia(s)' : d + ' dia(s) restantes'}</div></td>
+      <td>${badge(c.statusCalculado)}</td>
+      <td>${esc(c.gestor || '-')}<div class="small">${esc(c.emailResponsavel || '')}<br>SLA: ${esc(c.sla || '-')}</div></td>
+      <td>${pdf}</td>
+      <td><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary" type="button" onclick="window.editContract('${esc(c.id)}')">Editar</button><button class="btn btn-danger" type="button" onclick="window.deleteContract('${esc(c.id)}')">Excluir</button></div></td>
+    </tr>`;
+  }
+  function readPdf(file){
+    return new Promise((resolve) => {
+      if(!file) return resolve(null);
+      if(file.type !== 'application/pdf') return resolve({ error:'Selecione apenas arquivo PDF.' });
+      if(file.size > 2500000) return resolve({ error:'PDF muito grande para armazenamento local. Use arquivo até 2,5 MB.' });
+      const reader = new FileReader();
+      reader.onload = () => resolve({ name:file.name, data:reader.result, size:file.size });
+      reader.onerror = () => resolve({ error:'Não foi possível ler o PDF.' });
+      reader.readAsDataURL(file);
+    });
+  }
+  async function saveFromForm(event){
+    event.preventDefault();
+    const form = event.target;
+    const pdfInput = document.getElementById('contractPdf');
+    const pdf = await readPdf(pdfInput?.files?.[0]);
+    if(pdf && pdf.error){ alert(pdf.error); return; }
+    const list = getContracts();
+    const editId = form.dataset.editId || '';
+    const old = editId ? list.find(c => c.id === editId) : null;
+    const contract = {
+      ...(old || {}),
+      id: editId || createId(),
+      nomeContrato: document.getElementById('contractNome').value.trim(),
+      numeroContrato: document.getElementById('contractNumero').value.trim(),
+      tipoContrato: document.getElementById('contractTipo').value,
+      empresa: document.getElementById('contractEmpresa').value.trim(),
+      cnpj: document.getElementById('contractCnpj').value.trim(),
+      unidade: document.getElementById('contractUnidade').value.trim(),
+      vigenciaInicio: document.getElementById('contractInicio').value,
+      vigenciaFim: document.getElementById('contractFim').value,
+      alertaDias: document.getElementById('contractAlerta').value,
+      status: document.getElementById('contractStatus').value,
+      gestor: document.getElementById('contractGestor').value.trim(),
+      emailResponsavel: document.getElementById('contractEmail').value.trim(),
+      valorGlobal: document.getElementById('contractValor').value,
+      indiceReajuste: document.getElementById('contractReajuste').value.trim(),
+      sla: document.getElementById('contractSla').value.trim(),
+      itens: document.getElementById('contractItens').value.split(/\n+/).map(normalizeItemLine).filter(Boolean),
+      observacoes: document.getElementById('contractObs').value.trim(),
+      centroCusto: document.getElementById('contractCentroCusto').value.trim(),
+      updatedAt: new Date().toISOString()
+    };
+    if(pdf){ contract.pdfName = pdf.name; contract.pdfData = pdf.data; contract.pdfSize = pdf.size; }
+    if(!contract.nomeContrato || !contract.tipoContrato || !contract.vigenciaInicio || !contract.vigenciaFim || !contract.itens.length){ alert('Preencha Nome, Tipo, Vigência e pelo menos um item do contrato.'); return; }
+    const idx = list.findIndex(c => c.id === contract.id);
+    if(idx >= 0) list[idx] = contract; else list.unshift(contract);
+    try { saveContracts(list); }
+    catch(e){ alert('Não foi possível salvar. O armazenamento local pode estar cheio, possivelmente por PDF grande.'); return; }
+    window.__editingContractId = '';
+    renderContracts();
+    try { if(typeof showToast === 'function') showToast('Contrato salvo', 'Cadastro de contrato atualizado com sucesso.', '📄'); } catch(e) {}
+  }
+  function bindContractsEvents(){
+    document.getElementById('contractForm')?.addEventListener('submit', saveFromForm);
+    document.getElementById('contractsSearch')?.addEventListener('input', renderContracts);
+    document.getElementById('contractsStatusFilter')?.addEventListener('change', renderContracts);
+  }
+  window.renderContratos = renderContracts;
+  window.editContract = function(id){ window.__editingContractId = id; renderContracts(); window.scrollTo({top:0, behavior:'smooth'}); };
+  window.cancelContractEdit = function(){ window.__editingContractId = ''; renderContracts(); };
+  window.deleteContract = function(id){
+    if(!confirm('Deseja excluir este contrato?')) return;
+    saveContracts(getContracts().filter(c => c.id !== id));
+    if(window.__editingContractId === id) window.__editingContractId = '';
+    renderContracts();
+  };
+  window.downloadContractPdf = function(id){
+    const c = getContracts().find(item => item.id === id);
+    if(!c || !c.pdfData) return alert('PDF não encontrado.');
+    const a = document.createElement('a');
+    a.href = c.pdfData;
+    a.download = c.pdfName || (c.nomeContrato || 'contrato') + '.pdf';
+    document.body.appendChild(a); a.click(); a.remove();
+  };
+  window.exportContractsCsv = function(){
+    const rows = getContracts().map(c => ({
+      Nome: c.nomeContrato, Numero: c.numeroContrato, Tipo: c.tipoContrato, Empresa: c.empresa, CNPJ: c.cnpj,
+      VigenciaInicio: c.vigenciaInicio, VigenciaFim: c.vigenciaFim, Status: calcStatus(c), Gestor: c.gestor,
+      Email: c.emailResponsavel, SLA: c.sla, Valor: contractTotal(c), Itens: (c.itens||[]).map(i=>i.nome).join('; '), PDF: c.pdfName || ''
+    }));
+    const header = Object.keys(rows[0] || {Nome:'',Numero:'',Tipo:'',Empresa:'',CNPJ:'',VigenciaInicio:'',VigenciaFim:'',Status:'',Gestor:'',Email:'',SLA:'',Valor:'',Itens:'',PDF:''});
+    const csv = [header.join(';')].concat(rows.map(r => header.map(h => '"' + String(r[h] || '').replace(/"/g,'""') + '"').join(';'))).join('\n');
+    const blob = new Blob(['\ufeff' + csv], {type:'text/csv;charset=utf-8'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'contratos_sesi.csv'; document.body.appendChild(a); a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 1000); a.remove();
+  };
+
+  function patchNavigation(){
+    ensurePage();
+    const originalSetPage = window.setPage || (typeof setPage === 'function' ? setPage : null);
+    if(originalSetPage && !window.__contractsSetPagePatched){
+      window.__contractsSetPagePatched = true;
+      window.setPage = function(page){
+        ensurePage();
+        const result = originalSetPage.apply(this, arguments);
+        if(page === 'contratos') renderContracts();
+        return result;
+      };
+      try { setPage = window.setPage; } catch(e) {}
+    }
+    if((window.currentPage || '').toString() === 'contratos') renderContracts();
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', patchNavigation);
+  else patchNavigation();
+  setTimeout(patchNavigation, 300);
+})();
+</script>
+
+
+
+<script id="fix-seguro-fila-cpf-sem-loop-20260602">
+/* Correção segura 2026-06-02
+   Objetivo: quando o filtro CPFs estiver ativo na Recepção, a lista de fila do Chamador
+   deve exibir somente os atendimentos operacionais que ainda estão apenas com CPF.
+   Esta versão não chama renderCaller dentro do próprio renderCaller, evitando tela travada/carregamento infinito. */
+(function(){
+  'use strict';
+  if (window.__fixSeguroFilaCpfSemLoop20260602) return;
+  window.__fixSeguroFilaCpfSemLoop20260602 = true;
+
+  var FILTER_KEY = 'sesi_recepcao_filtro_cpfs_ativo';
+  var QUEUE_KEY = 'sesi_chamador_fila_v1';
+  var HISTORY_KEY = 'sesi_chamador_historico_v1';
+  var LAST_CALL_KEY = 'sesi_chamador_ultima_chamada_v1';
+  var renderScheduled = false;
+
+  function digits(value){ return String(value || '').replace(/\D/g, ''); }
+  function text(value){ return String(value == null ? '' : value).trim(); }
+  function esc(value){
+    return String(value == null ? '' : value)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+  }
+  function read(key, fallback){
+    try { var raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+    catch(e){ return fallback; }
+  }
+  function write(key, value){ try { localStorage.setItem(key, JSON.stringify(value)); } catch(e){} }
+  function nowTime(){
+    try { return new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}); }
+    catch(e){ return ''; }
+  }
+  function maskCpf(value){
+    var d = digits(value).slice(0,11);
+    return d.length === 11 ? d.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4') : d;
+  }
+  function isCpfFilterActive(){
+    var btn = document.querySelector('#quickfilters-recepcao [data-flag="cpfs"]');
+    return Boolean(btn && btn.classList.contains('active')) || localStorage.getItem(FILTER_KEY) === 'true';
+  }
+  function setCpfFilterActive(active){
+    try { localStorage.setItem(FILTER_KEY, active ? 'true' : 'false'); } catch(e){}
+  }
+  function getPatients(){
+    try { if (Array.isArray(window.patients)) return window.patients; } catch(e){}
+    try { if (Array.isArray(patients)) return patients; } catch(e){}
+    return [];
+  }
+  function isCpfOnlyRecord(item){
+    if (!item) return false;
+    var cpf = digits(item.cpf || item.documento || item.cpfPaciente);
+    var nome = text(item.nome || item.name || item.displayName || item.patientName);
+    var nameDigits = digits(nome);
+    var source = text(item.source || item.origem || item.origin).toUpperCase();
+    var type = text(item.type || item.tipo || item.etapa || item.stage || item.workflowStage);
+    var notNominal = item.cadastroNominal === false || item.cadastroNominal === 'false';
+    if (cpf.length !== 11) return false;
+    return !nome || /^CPF\s/i.test(nome) || nameDigits === cpf || notNominal || (source === 'TOTEM' && /recep/i.test(type));
+  }
+  function makeQueueItemFromPatient(patient){
+    var cpf = digits(patient.cpf);
+    var uid = text(patient.demandaId || patient.checkinId || patient.id || cpf || Date.now());
+    var label = 'CPF ' + maskCpf(cpf);
+    return {
+      id: 'recepcao_' + uid,
+      patientId: patient.id || '',
+      demandaId: patient.demandaId || patient.checkinId || '',
+      checkinId: patient.checkinId || patient.demandaId || '',
+      cpf: cpf,
+      name: label,
+      nome: label,
+      displayName: label,
+      company: patient.empresa || patient.contratoNumero || 'Cadastro aguardando recepção',
+      empresa: patient.empresa || '',
+      type: 'Recepção / CPF do TOTEM',
+      etapa: 'Recepção',
+      stage: 'Recepção',
+      workflowStage: 'Recepção',
+      suggestedRoom: 'Recepção',
+      source: 'TOTEM',
+      cadastroNominal: false,
+      preferential: patient.preferencial || patient.preferential || 'Não',
+      time: patient.time || nowTime(),
+      createdAt: Number(patient.createdAt || Date.now()),
+      statusAtendimento: 'Pendente'
+    };
+  }
+  function sameDemand(a,b){
+    if (!a || !b) return false;
+    return text(a.id) === text(b.id) ||
+      (b.patientId && text(a.patientId) === text(b.patientId)) ||
+      (b.demandaId && text(a.demandaId || a.checkinId) === text(b.demandaId)) ||
+      (digits(a.cpf) === digits(b.cpf) && text(a.id).indexOf('recepcao_') === 0 && text(b.id).indexOf('recepcao_') === 0);
+  }
+  function sortQueue(queue){
+    return queue.slice().sort(function(a,b){
+      if ((a.preferential || a.preferencial) === 'Sim' && (b.preferential || b.preferencial) !== 'Sim') return -1;
+      if ((a.preferential || a.preferencial) !== 'Sim' && (b.preferential || b.preferencial) === 'Sim') return 1;
+      return Number(a.createdAt || 0) - Number(b.createdAt || 0);
+    });
+  }
+  function syncCpfPatientsToQueue(){
+    var queue = read(QUEUE_KEY, []);
+    if (!Array.isArray(queue)) queue = [];
+    getPatients().filter(isCpfOnlyRecord).forEach(function(patient){
+      var item = makeQueueItemFromPatient(patient);
+      var idx = queue.findIndex(function(row){ return sameDemand(row, item); });
+      if (idx >= 0) queue[idx] = Object.assign({}, queue[idx], item, { createdAt: queue[idx].createdAt || item.createdAt, time: queue[idx].time || item.time });
+      else queue.push(item);
+    });
+    write(QUEUE_KEY, queue);
+    return queue;
+  }
+  function callCpfQueueItem(id){
+    var queue = read(QUEUE_KEY, []);
+    if (!Array.isArray(queue)) queue = [];
+    var item = queue.find(function(row){ return text(row.id) === text(id); });
+    if (!item) return;
+    var room = (document.getElementById('caller-default-room') || {}).value || item.suggestedRoom || 'Recepção';
+    var call = Object.assign({}, item, { room: room, calledAt: nowTime(), calledTimestamp: Date.now() });
+    write(QUEUE_KEY, queue.filter(function(row){ return text(row.id) !== text(id); }));
+    var history = read(HISTORY_KEY, []);
+    if (!Array.isArray(history)) history = [];
+    write(HISTORY_KEY, [call].concat(history).slice(0,60));
+    write(LAST_CALL_KEY, call);
+    try {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        var msg = new SpeechSynthesisUtterance('Paciente ' + (call.name || call.nome || 'CPF') + ', dirigir-se para ' + room);
+        msg.lang = 'pt-BR';
+        msg.rate = 0.92;
+        msg.volume = 1;
+        window.speechSynthesis.speak(msg);
+      }
+    } catch(e){}
+    try { if (typeof window.showToast === 'function') window.showToast('Paciente chamado', (call.name || call.nome || '') + ' • ' + room, '📣'); } catch(e){}
+    scheduleCpfQueueRender();
+  }
+  function renderCpfQueueOnly(){
+    renderScheduled = false;
+    if (!isCpfFilterActive()) return;
+    syncCpfPatientsToQueue();
+    var el = document.getElementById('caller-queue-list');
+    if (!el) return;
+    var all = read(QUEUE_KEY, []);
+    if (!Array.isArray(all)) all = [];
+    var rows = sortQueue(all.filter(isCpfOnlyRecord));
+    var waitingEl = document.getElementById('caller-kpi-waiting');
+    var prefEl = document.getElementById('caller-kpi-preferential');
+    if (waitingEl) waitingEl.textContent = rows.length;
+    if (prefEl) prefEl.textContent = rows.filter(function(item){ return (item.preferential || item.preferencial) === 'Sim'; }).length;
+    if (!rows.length) {
+      el.innerHTML = '<div class="call-center-empty">Nenhum CPF aguardando cadastro nominal na Recepção.</div>';
+      return;
+    }
+    el.innerHTML = rows.map(function(item, index){
+      var pref = (item.preferential || item.preferencial) === 'Sim';
+      var name = item.name || item.nome || ('CPF ' + maskCpf(item.cpf));
+      var type = item.type || 'Recepção / CPF do TOTEM';
+      var company = item.company || item.empresa || 'Cadastro aguardando recepção';
+      return '<div class="call-center-queue-item '+(pref ? 'is-preferential' : '')+'" data-id="'+esc(item.id)+'" data-cpf-only-row="true">'
+        + '<div class="call-center-ticket">'+String(index + 1).padStart(2,'0')+'</div>'
+        + '<div class="call-center-queue-main">'
+        + '<div class="call-center-queue-name">'+esc(name)+'</div>'
+        + '<div class="call-center-queue-meta">'
+        + (pref ? '<span class="call-badge call-badge-preferential">⭐ Preferencial</span>' : '')
+        + '<span class="call-badge call-badge-room">'+esc(type)+'</span>'
+        + '<span>'+esc(company)+'</span>'
+        + '<span>Entrada: '+esc(item.time || '--:--')+'</span>'
+        + '</div></div>'
+        + '<div class="call-center-actions"><button class="btn btn-success" type="button" data-cpf-call-action="call" data-id="'+esc(item.id)+'">Chamar</button></div>'
+        + '</div>';
+    }).join('');
+    el.querySelectorAll('[data-cpf-call-action="call"]').forEach(function(btn){
+      if (btn.dataset.boundCpfCall) return;
+      btn.dataset.boundCpfCall = 'true';
+      btn.addEventListener('click', function(ev){
+        ev.preventDefault();
+        ev.stopPropagation();
+        callCpfQueueItem(btn.getAttribute('data-id'));
+      }, true);
+    });
+  }
+  function scheduleCpfQueueRender(){
+    if (renderScheduled) return;
+    renderScheduled = true;
+    setTimeout(renderCpfQueueOnly, 0);
+  }
+  function ensureCpfButtonState(){
+    var group = document.getElementById('quickfilters-recepcao');
+    if (!group) return;
+    var btn = group.querySelector('[data-flag="cpfs"]');
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'smart-filter';
+      btn.dataset.flag = 'cpfs';
+      btn.textContent = 'CPFs';
+      group.appendChild(btn);
+    }
+    if (!btn.dataset.fixSeguroCpfBound) {
+      btn.dataset.fixSeguroCpfBound = 'true';
+      btn.addEventListener('click', function(){
+        setCpfFilterActive(true);
+        scheduleCpfQueueRender();
+      }, true);
+    }
+    group.querySelectorAll('.smart-filter').forEach(function(item){
+      if (item.dataset.flag !== 'cpfs' && !item.dataset.fixSeguroCpfClearBound) {
+        item.dataset.fixSeguroCpfClearBound = 'true';
+        item.addEventListener('click', function(){ setCpfFilterActive(false); }, true);
+      }
+    });
+  }
+  function wrapRender(name){
+    var original = window[name];
+    if (typeof original !== 'function' || original.__fixSeguroFilaCpfWrapped) return;
+    var wrapped = function(){
+      var result = original.apply(this, arguments);
+      if (isCpfFilterActive()) scheduleCpfQueueRender();
+      return result;
+    };
+    wrapped.__fixSeguroFilaCpfWrapped = true;
+    window[name] = wrapped;
+  }
+  function refreshAfterAction(){
+    ensureCpfButtonState();
+    if (isCpfFilterActive()) scheduleCpfQueueRender();
+  }
+
+  document.addEventListener('click', function(ev){
+    var target = ev.target;
+    if (!target || !target.closest) return;
+    if (target.closest('#quickfilters-recepcao [data-flag="cpfs"]')) {
+      setCpfFilterActive(true);
+      setTimeout(refreshAfterAction, 50);
+      setTimeout(refreshAfterAction, 250);
+    }
+    if (target.closest('#quickfilters-recepcao .smart-filter:not([data-flag="cpfs"])')) {
+      setCpfFilterActive(false);
+    }
+    if (target.closest('[data-page="chamador"], #totem-confirm-btn, #totem-next-step-btn, [data-fullscreen-confirm]')) {
+      setTimeout(refreshAfterAction, 120);
+      setTimeout(refreshAfterAction, 400);
+    }
+  }, true);
+
+  document.addEventListener('DOMContentLoaded', function(){
+    ensureCpfButtonState();
+    wrapRender('renderCaller');
+    wrapRender('renderCallerRules');
+    wrapRender('__sesiRenderFilteredCaller');
+    refreshAfterAction();
+  });
+
+  if (document.readyState !== 'loading') {
+    ensureCpfButtonState();
+    wrapRender('renderCaller');
+    wrapRender('renderCallerRules');
+    wrapRender('__sesiRenderFilteredCaller');
+    refreshAfterAction();
+  }
+
+  window.__corrigirFilaCpfRecepcaoSemLoop = refreshAfterAction;
+})();
+</script>
+
+
+<script id="fix-fila-atendimento-espelha-recepcao-filtros-20260602">
+/* Correção: a Fila de atendimento do Chamador passa a espelhar a Fila operacional da aba Recepção,
+   respeitando busca e filtros rápidos ativos na Recepção, inclusive CPFs. */
+(function(){
+  'use strict';
+  if (window.__fixFilaAtendimentoEspelhaRecepcaoFiltros20260602) return;
+  window.__fixFilaAtendimentoEspelhaRecepcaoFiltros20260602 = true;
+
+  var CALLER_QUEUE_KEY = 'sesi_chamador_fila_v1';
+  var LAST_SYNC_KEY = 'sesi_recepcao_fila_operacional_filtrada_v1';
+  var CPF_FILTER_KEY = 'sesi_recepcao_filtro_cpfs_ativo';
+
+  function digits(value){ return String(value || '').replace(/\D/g, ''); }
+  function normalize(value){
+    return String(value || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+  function maskCpf(value){
+    var d = digits(value).slice(0, 11);
+    return d.length === 11 ? d.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4') : d;
+  }
+  function nowTime(){
+    try { return new Date().toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' }); }
+    catch(e){ return ''; }
+  }
+  function readJson(key, fallback){
+    try {
+      var data = JSON.parse(localStorage.getItem(key) || 'null');
+      return data == null ? fallback : data;
+    } catch(e) { return fallback; }
+  }
+  function saveJson(key, value){
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch(e) {}
+  }
+  function getPatients(){
+    try { if (Array.isArray(window.patients)) return window.patients; } catch(e) {}
+    try { if (typeof patients !== 'undefined' && Array.isArray(patients)) return patients; } catch(e) {}
+    return [];
+  }
+  function order(a,b){
+    try { if (typeof window.compareQueueOrder === 'function') return window.compareQueueOrder(a,b); } catch(e) {}
+    try { if (typeof compareQueueOrder === 'function') return compareQueueOrder(a,b); } catch(e) {}
+    var prefA = (a && (a.preferencial === 'Sim' || a.preferential === 'Sim' || a.preferencial === true || a.preferential === true)) ? 1 : 0;
+    var prefB = (b && (b.preferencial === 'Sim' || b.preferential === 'Sim' || b.preferencial === true || b.preferential === true)) ? 1 : 0;
+    if (prefA !== prefB) return prefB - prefA;
+    return Number(a && (a.createdAt || a.ordem) || 0) - Number(b && (b.createdAt || b.ordem) || 0);
+  }
+  function hasCpfOnlyIdentity(patient){
+    if (!patient) return false;
+    var cpf = digits(patient.cpf);
+    if (cpf.length < 11) return false;
+    var name = String(patient.nome || patient.name || patient.displayName || '').trim();
+    var nameDigits = digits(name);
+    var fromTotem = normalize(patient.source || patient.origem) === 'totem';
+    var notNominal = patient.cadastroNominal === false || patient.cadastroNominal === 'false';
+    return !name || /^CPF\s/i.test(name) || nameDigits === cpf || (fromTotem && notNominal);
+  }
+  function baseReceptionQueue(){
+    return getPatients()
+      .slice()
+      .sort(order)
+      .filter(function(patient){ return digits(patient && patient.cpf).length >= 11; });
+  }
+  function getActiveReceptionFlag(){
+    var active = document.querySelector('#quickfilters-recepcao .smart-filter.active');
+    if (active && active.dataset && active.dataset.flag) return active.dataset.flag;
+    return localStorage.getItem(CPF_FILTER_KEY) === 'true' ? 'cpfs' : 'todos';
+  }
+  function quickFilterMatch(patient, flag){
+    if (!patient) return false;
+    if (!flag || flag === 'todos') return true;
+    if (flag === 'cpfs') return hasCpfOnlyIdentity(patient);
+    try {
+      if (typeof window.filterPatientsAdvanced === 'function') {
+        return window.filterPatientsAdvanced([patient], { term:'', flag: flag }).length > 0;
+      }
+    } catch(e) {}
+    try {
+      if (typeof filterPatientsAdvanced === 'function') {
+        return filterPatientsAdvanced([patient], { term:'', flag: flag }).length > 0;
+      }
+    } catch(e) {}
+    var pref = patient.preferencial === 'Sim' || patient.preferential === 'Sim' || patient.preferencial === true || patient.preferential === true;
+    var obra = Boolean(patient.obra || patient.isObra || patient.emObra);
+    var semAso = normalize(patient.asoCadastrado || patient.aso || patient.temAso || patient.atendimentoPossuiAso) === 'nao' || normalize(patient.asoCadastrado || patient.aso || patient.temAso || patient.atendimentoPossuiAso) === 'não';
+    var status = normalize(patient.status || patient.statusAtendimento || patient.etapaStatus);
+    if (flag === 'preferenciais') return pref;
+    if (flag === 'obra') return obra;
+    if (flag === 'semAso') return semAso;
+    if (flag === 'pendentes') return !status || !['concluido','concluído','finalizado','realizado'].includes(status);
+    return true;
+  }
+  function termMatch(patient, term){
+    var tokens = normalize(term).split(' ').filter(Boolean);
+    if (!tokens.length) return true;
+    var text = normalize([
+      patient.nome, patient.name, patient.displayName, patient.id, patient.cpf,
+      patient.empresa, patient.company, patient.funcao, patient.setor, patient.obra,
+      patient.tipoAtendimento, patient.contratoTipo, patient.status, patient.etapa
+    ].join(' '));
+    return tokens.every(function(token){ return text.indexOf(token) >= 0; });
+  }
+  function filteredReceptionQueue(){
+    var term = (document.getElementById('search-recepcao') || {}).value || '';
+    var flag = getActiveReceptionFlag();
+    var rows = baseReceptionQueue().filter(function(patient){ return quickFilterMatch(patient, flag) && termMatch(patient, term); });
+    return { rows: rows, flag: flag, term: term };
+  }
+  function receptionItemId(patient){
+    return 'recepcao_filter_' + String(patient.demandaId || patient.checkinId || patient.id || digits(patient.cpf) || Date.now());
+  }
+  function displayName(patient){
+    var cpf = digits(patient.cpf);
+    var name = String(patient.nome || patient.name || patient.displayName || '').trim();
+    if (!name || digits(name) === cpf || /^CPF\s/i.test(name)) return 'CPF ' + maskCpf(cpf);
+    return name;
+  }
+  function queueItemFromPatient(patient){
+    var cpf = digits(patient.cpf);
+    var pref = patient.preferencial === 'Sim' || patient.preferential === 'Sim' || patient.preferencial === true || patient.preferential === true;
+    var name = displayName(patient);
+    return {
+      id: receptionItemId(patient),
+      patientId: patient.id || '',
+      demandaId: patient.demandaId || patient.checkinId || '',
+      checkinId: patient.checkinId || patient.demandaId || '',
+      cpf: cpf,
+      name: name,
+      nome: name,
+      displayName: name,
+      company: patient.empresa || patient.company || patient.contratoNumero || 'Cadastro aguardando recepção',
+      empresa: patient.empresa || patient.company || '',
+      type: patient.tipoAtendimento || patient.contratoTipo || patient.type || (hasCpfOnlyIdentity(patient) ? 'Recepção / CPF do TOTEM' : 'Recepção'),
+      preferential: pref ? 'Sim' : 'Não',
+      preferencial: pref ? 'Sim' : 'Não',
+      workflowStage: 'Recepção',
+      stage: 'Recepção',
+      etapa: 'Recepção',
+      suggestedRoom: 'Recepção',
+      source: patient.source || patient.origem || (hasCpfOnlyIdentity(patient) ? 'TOTEM' : 'Recepção'),
+      cadastroNominal: !hasCpfOnlyIdentity(patient),
+      statusAtendimento: patient.statusAtendimento || patient.status || 'Pendente',
+      createdAt: Number(patient.createdAt || patient.ordem || Date.now()),
+      time: patient.time || patient.horaEntrada || nowTime()
+    };
+  }
+  function isReceptionCallerItem(item){
+    if (!item) return false;
+    var text = normalize([item.id, item.workflowStage, item.stage, item.etapa, item.suggestedRoom, item.source, item.type].join(' '));
+    return String(item.id || '').indexOf('recepcao_filter_') === 0 ||
+      text.indexOf('recepcao') >= 0 || text.indexOf('recepção') >= 0 || text.indexOf('totem') >= 0;
+  }
+  function syncCallerQueueWithReceptionFilters(){
+    var data = filteredReceptionQueue();
+    var filteredItems = data.rows.map(queueItemFromPatient);
+    var current = readJson(CALLER_QUEUE_KEY, []);
+    if (!Array.isArray(current)) current = [];
+    var nonReception = current.filter(function(item){ return !isReceptionCallerItem(item); });
+    var finalQueue = nonReception.concat(filteredItems).sort(function(a,b){
+      var prefA = a.preferential === 'Sim' ? 1 : 0;
+      var prefB = b.preferential === 'Sim' ? 1 : 0;
+      if (prefA !== prefB) return prefB - prefA;
+      return Number(a.createdAt || 0) - Number(b.createdAt || 0);
+    });
+    saveJson(CALLER_QUEUE_KEY, finalQueue);
+    saveJson(LAST_SYNC_KEY, {
+      flag: data.flag,
+      term: data.term,
+      total: filteredItems.length,
+      updatedAt: new Date().toISOString()
+    });
+    updateReceptionCount(data.rows.length, data.flag);
+    try { if (typeof window.renderCallerRules === 'function') window.renderCallerRules(); } catch(e) {}
+    try { if (typeof window.__sesiRenderFilteredCaller === 'function') window.__sesiRenderFilteredCaller(); } catch(e) {}
+    try { if (typeof window.renderCaller === 'function') window.renderCaller(); } catch(e) {}
+    return data.rows;
+  }
+  function updateReceptionCount(total, flag){
+    var chip = document.querySelector('#page-recepcao .clinic-titlebar .chips .chip');
+    if (!chip) return;
+    chip.textContent = flag === 'cpfs' ? (total + ' CPF(s)') : (total + ' paciente(s)');
+  }
+  function renderReceptionRowsFromCurrentFilters(){
+    var tbody = document.getElementById('tbody-recepcao');
+    if (!tbody) return;
+    var data = filteredReceptionQueue();
+    tbody.innerHTML = data.rows.length
+      ? data.rows.map(function(patient){
+          try { if (typeof window.patientRow === 'function') return window.patientRow('recepcao', patient); } catch(e) {}
+          try { if (typeof patientRow === 'function') return patientRow('recepcao', patient); } catch(e) {}
+          return '<tr><td><strong>' + displayName(patient) + '</strong><div class="small">CPF: ' + maskCpf(patient.cpf) + '</div></td><td colspan="6">Aguardando atendimento na Recepção</td></tr>';
+        }).join('')
+      : '<tr><td colspan="7"><div class="small">Nenhum resultado encontrado para os filtros da Recepção.</div></td></tr>';
+    updateReceptionCount(data.rows.length, data.flag);
+  }
+  var pending = null;
+  function scheduleSync(){
+    clearTimeout(pending);
+    pending = setTimeout(function(){
+      renderReceptionRowsFromCurrentFilters();
+      syncCallerQueueWithReceptionFilters();
+    }, 60);
+  }
+  function bindReceptionFilterEvents(){
+    var group = document.getElementById('quickfilters-recepcao');
+    if (group && !group.dataset.filaAtendimentoEspelhoBound) {
+      group.dataset.filaAtendimentoEspelhoBound = 'true';
+      group.addEventListener('click', function(event){
+        var btn = event.target && event.target.closest && event.target.closest('.smart-filter');
+        if (!btn) return;
+        if (btn.dataset.flag === 'cpfs') localStorage.setItem(CPF_FILTER_KEY, 'true');
+        else localStorage.setItem(CPF_FILTER_KEY, 'false');
+        setTimeout(scheduleSync, 0);
+      }, true);
+    }
+    var search = document.getElementById('search-recepcao');
+    if (search && !search.dataset.filaAtendimentoEspelhoBound) {
+      search.dataset.filaAtendimentoEspelhoBound = 'true';
+      search.addEventListener('input', scheduleSync, true);
+    }
+  }
+  function afterReceptionRender(){
+    bindReceptionFilterEvents();
+    scheduleSync();
+  }
+  var previousRenderRecepcao = window.renderRecepcao || (typeof renderRecepcao === 'function' ? renderRecepcao : null);
+  if (typeof previousRenderRecepcao === 'function' && !previousRenderRecepcao.__filaAtendimentoEspelhoWrapped) {
+    var wrappedRenderRecepcao = function(){
+      var result = previousRenderRecepcao.apply(this, arguments);
+      setTimeout(afterReceptionRender, 0);
+      setTimeout(afterReceptionRender, 220);
+      return result;
+    };
+    wrappedRenderRecepcao.__filaAtendimentoEspelhoWrapped = true;
+    window.renderRecepcao = wrappedRenderRecepcao;
+    try { renderRecepcao = window.renderRecepcao; } catch(e) {}
+  }
+  var oldUpsert = window.upsertTotemCpfReceptionRecord;
+  if (typeof oldUpsert === 'function' && !oldUpsert.__filaAtendimentoEspelhoWrapped) {
+    var wrappedUpsert = function(){
+      var result = oldUpsert.apply(this, arguments);
+      setTimeout(scheduleSync, 80);
+      setTimeout(scheduleSync, 350);
+      return result;
+    };
+    wrappedUpsert.__filaAtendimentoEspelhoWrapped = true;
+    window.upsertTotemCpfReceptionRecord = wrappedUpsert;
+  }
+  var oldRegistrar = window.registrarCheckinTotemRules;
+  if (typeof oldRegistrar === 'function' && !oldRegistrar.__filaAtendimentoEspelhoWrapped) {
+    var wrappedRegistrar = function(){
+      var result = oldRegistrar.apply(this, arguments);
+      setTimeout(scheduleSync, 80);
+      setTimeout(scheduleSync, 350);
+      return result;
+    };
+    wrappedRegistrar.__filaAtendimentoEspelhoWrapped = true;
+    window.registrarCheckinTotemRules = wrappedRegistrar;
+  }
+  document.addEventListener('click', function(event){
+    var target = event.target;
+    if (!target || !target.closest) return;
+    if (target.closest('[data-page="recepcao"]')) setTimeout(afterReceptionRender, 160);
+    if (target.closest('#totem-confirm-btn, #totem-next-step-btn, [data-fullscreen-confirm]')) {
+      setTimeout(scheduleSync, 120);
+      setTimeout(scheduleSync, 450);
+    }
+  }, true);
+  document.addEventListener('input', function(event){
+    if (event.target && event.target.id === 'search-recepcao') scheduleSync();
+  }, true);
+  window.sincronizarFilaAtendimentoComFiltrosRecepcao = syncCallerQueueWithReceptionFilters;
+  window.renderizarRecepcaoComFiltrosAtivos = renderReceptionRowsFromCurrentFilters;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(afterReceptionRender, 300); });
+  } else {
+    setTimeout(afterReceptionRender, 300);
+  }
+})();
+</script>
+
 </body>
 </html>
