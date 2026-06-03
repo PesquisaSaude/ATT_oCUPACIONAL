@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>SESI Saúde Paulista • Fluxo Ocupacional</title>
-<script crossorigin="anonymous" referrerpolicy="no-referrer" src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script type="text/javascript" src="https://gc.kes.v2.scr.kaspersky-labs.com/7EA5E9BB-55E1-4C31-9C21-4943DDFED2E4/main.js?attr=bB-wto38bu-Q-BjocTcwAfjUWZ3hBR2Ymx2ro50NQFTn4RHGEfaZQiUfg88QIniB5fnGhDxod8mP3vKHdpb3yJ13RFOA1AJnq2zg0sljvuvpQRDYODOwoUJzKh8fsCtb4-mfgOm1cmGwhZNmVetqk0S2v2GG1mPpKFQTQA9cTCpOTlpZWrX-uJUkow78qHkASslw7loUCKOyVmFs6fhOOutBs3R3wqimtLsFA1BntsMzMlxe3UOxptD0K_FYsty41XjI7KgKvV2jeuZzl3m0JVz_1jqIIbyO0m7u1OLi-017S7g4_O0ycAb_eWbUfVpMS6kz9Kpu-k26SbkqaRa05q8kajqgN9H3TAUf4Fxr650" charset="UTF-8"></script><script crossorigin="anonymous" referrerpolicy="no-referrer" src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script crossorigin="anonymous" referrerpolicy="no-referrer" src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
         :root {
@@ -4410,8 +4410,8 @@ button[data-totem-key] {
 <option>Sala Audiometria 1</option>
 <option>Sala Audiometria 2</option>
 <option>Sala Espirometria</option>
-<option>Sala ECG</option>
-<option>Sala EEG</option>
+<option>Sala ECG Eletrocardiograma</option>
+<option>Sala EEG Eletroencefalograma</option>
 <option>Sala Avaliação Psicossocial 1</option>
 <option>Sala Avaliação Psicossocial 2</option>
 <option>Sala de Raio X</option>
@@ -4714,8 +4714,8 @@ button[data-totem-key] {
       { key: 'audiometria', nome: 'Audiometria' },
       { key: 'acuidade', nome: 'Acuidade Visual' },
       { key: 'espirometria', nome: 'Espirometria' },
-      { key: 'ecg', nome: 'ECG' },
-      { key: 'eeg', nome: 'EEG' },
+      { key: 'ecg', nome: 'ECG Eletrocardiograma' },
+      { key: 'eeg', nome: 'EEG Eletroencefalograma' },
       { key: 'rx', nome: 'Raio X' },
       { key: 'lab', nome: 'Exames Laboratoriais' },
       { key: 'psicossocial', nome: 'Avaliação Psicossocial' },
@@ -4753,8 +4753,8 @@ button[data-totem-key] {
       { key: 'audiometria-01', label: 'Sala Audiometria', stage: 'Exames', icon: '🎧', description: 'Chamada exclusiva para pacientes com Audiometria pendente.' },
       { key: 'acuidade-01', label: 'Sala Acuidade Visual', stage: 'Exames', icon: '👁️', description: 'Chamada exclusiva para pacientes com Acuidade Visual pendente.' },
       { key: 'espirometria-01', label: 'Sala Espirometria', stage: 'Exames', icon: '🌬️', description: 'Chamada exclusiva para pacientes com Espirometria pendente.' },
-      { key: 'ecg-01', label: 'Sala ECG', stage: 'Exames', icon: '🫀', description: 'Chamada exclusiva para pacientes com ECG pendente.' },
-      { key: 'eeg-01', label: 'Sala EEG', stage: 'Exames', icon: '🧠', description: 'Chamada exclusiva para pacientes com EEG pendente.' },
+      { key: 'ecg-01', label: 'Sala ECG Eletrocardiograma', stage: 'Exames', icon: '🫀', description: 'Chamada exclusiva para pacientes com ECG Eletrocardiograma pendente.' },
+      { key: 'eeg-01', label: 'Sala EEG Eletroencefalograma', stage: 'Exames', icon: '🧠', description: 'Chamada exclusiva para pacientes com EEG Eletroencefalograma pendente.' },
       { key: 'rx-01', label: 'Sala de Raio X', stage: 'Exames', icon: '🩻', description: 'Chamada exclusiva para pacientes com Raio X pendente.' },
       { key: 'coleta-01', label: 'Sala Coleta / Laboratório', stage: 'Exames', icon: '🧪', description: 'Chamada para exames laboratoriais e coleta.' },
       { key: 'psicossocial-01', label: 'Sala Avaliação Psicossocial', stage: 'Exames', icon: '💬', description: 'Chamada exclusiva para Avaliação Psicossocial.' },
@@ -4769,8 +4769,8 @@ button[data-totem-key] {
       { value: 'Audiometria', stage: 'Exames', icon: '🎧' },
       { value: 'Acuidade Visual', stage: 'Exames', icon: '👁️' },
       { value: 'Espirometria', stage: 'Exames', icon: '🌬️' },
-      { value: 'ECG', stage: 'Exames', icon: '🫀' },
-      { value: 'EEG', stage: 'Exames', icon: '🧠' },
+      { value: 'ECG Eletrocardiograma', stage: 'Exames', icon: '🫀' },
+      { value: 'EEG Eletroencefalograma', stage: 'Exames', icon: '🧠' },
       { value: 'Raio X', stage: 'Exames', icon: '🩻' },
       { value: 'Exames Laboratoriais', stage: 'Exames', icon: '🧪' },
       { value: 'Avaliação Psicossocial', stage: 'Exames', icon: '💬' },
@@ -4790,8 +4790,8 @@ button[data-totem-key] {
       if (label.includes('audiometria')) return 'Audiometria';
       if (label.includes('acuidade')) return 'Acuidade Visual';
       if (label.includes('espirometria')) return 'Espirometria';
-      if (label.includes('ecg')) return 'ECG';
-      if (label.includes('eeg')) return 'EEG';
+      if (label.includes('ecg')) return 'ECG Eletrocardiograma';
+      if (label.includes('eeg')) return 'EEG Eletroencefalograma';
       if (label.includes('rx') || label.includes('raio x')) return 'Raio X';
       if (label.includes('coleta') || label.includes('laborat')) return 'Exames Laboratoriais';
       if (label.includes('psicossocial')) return 'Avaliação Psicossocial';
@@ -7997,8 +7997,8 @@ function compareQueueOrder(a, b) {
                   <th>Audiometria</th>
                   <th>Acuidade Visual</th>
                   <th>Espirometria</th>
-                  <th>ECG</th>
-                  <th>EEG</th>
+                  <th>ECG Eletrocardiograma</th>
+                  <th>EEG Eletroencefalograma</th>
                   <th>Raio X</th>
                   <th>Exames Laboratoriais</th>
                   <th>Avaliação Psicossocial</th>
@@ -9324,6 +9324,7 @@ function compareQueueOrder(a, b) {
             </div>
             <div class="modal-foot" style="padding:0;margin-top:16px;border-top:0;justify-content:flex-end;gap:10px;flex-wrap:wrap">
               <button type="button" class="btn btn-success" onclick="downloadOccupationalPdf('${patient.id}')">📄 Baixar Atendimento Ocupacional PDF</button>
+              <button type="button" class="btn btn-warning" onclick="printThermalReception('${patient.id}')">🧾 Impressão térmica</button>
               <button type="button" class="btn btn-primary" onclick="saveReception('${patient.id}')">Salvar recepção</button>
             </div>
           </div>
@@ -9745,6 +9746,80 @@ function compareQueueOrder(a, b) {
         observacoes: readReceptionFieldValue('edit-obs-cadastro', patient.obsCadastro),
         exames: exams
       };
+    }
+
+    function printThermalReception(id) {
+      const patient = findPatient(id);
+      if (!patient) return;
+      const data = getReceptionPdfData(patient);
+      const escThermal = value => String(value || '—')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+      const examesHtml = data.exames.length
+        ? data.exames.map((exam, index) => `<div class="receipt-row"><span>${String(index + 1).padStart(2, '0')}.</span><strong>${escThermal(exam)}</strong></div>`).join('')
+        : '<div class="receipt-muted">Nenhum exame selecionado.</div>';
+      const retornoHtml = data.asoMesmoDia === 'Não'
+        ? `<div class="receipt-line"><b>Retorno:</b> ${escThermal(data.dataRetorno || data.retorno || 'Não informado')}</div>`
+        : `<div class="receipt-line"><b>Retorno:</b> ${escThermal(data.retorno || 'Não')}</div>`;
+      const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Impressão térmica - ${escThermal(data.nome || data.cpf || id)}</title>
+<style>
+  @page { size: 80mm auto; margin: 4mm; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #fff; color: #000; font-family: Arial, Helvetica, sans-serif; font-size: 12px; }
+  .receipt { width: 72mm; margin: 0 auto; padding: 4mm 2mm; }
+  .center { text-align: center; }
+  .title { font-size: 15px; font-weight: 800; text-transform: uppercase; margin-bottom: 2mm; }
+  .subtitle { font-size: 11px; margin-bottom: 3mm; }
+  .divider { border-top: 1px dashed #000; margin: 3mm 0; }
+  .receipt-line { margin: 1.6mm 0; line-height: 1.35; word-break: break-word; }
+  .receipt-row { display: grid; grid-template-columns: 7mm 1fr; gap: 2mm; margin: 1.6mm 0; line-height: 1.3; }
+  .receipt-muted { color: #444; font-style: italic; margin: 2mm 0; }
+  .footer { font-size: 10px; margin-top: 3mm; }
+  @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+  <div class="receipt">
+    <div class="center">
+      <div class="title">SESI Saúde</div>
+      <div class="subtitle">Atendimento Ocupacional</div>
+    </div>
+    <div class="divider"></div>
+    <div class="receipt-line"><b>Paciente:</b> ${escThermal(data.nome || data.nomeSocial)}</div>
+    <div class="receipt-line"><b>Nome social:</b> ${escThermal(data.nomeSocial)}</div>
+    <div class="receipt-line"><b>CPF:</b> ${escThermal(data.cpf)}</div>
+    <div class="receipt-line"><b>RG:</b> ${escThermal(data.rg)}</div>
+    <div class="receipt-line"><b>Empresa:</b> ${escThermal(data.empresa)}</div>
+    <div class="receipt-line"><b>CNPJ:</b> ${escThermal(data.cnpj)}</div>
+    <div class="receipt-line"><b>Tipo exame:</b> ${escThermal(data.tipoAtendimento)}</div>
+    <div class="receipt-line"><b>Prioritário:</b> ${escThermal(data.preferencial)}</div>
+    <div class="receipt-line"><b>ASO mesmo dia:</b> ${escThermal(data.asoMesmoDia)}</div>
+    ${retornoHtml}
+    <div class="divider"></div>
+    <div class="receipt-line"><b>Exames:</b></div>
+    ${examesHtml}
+    <div class="divider"></div>
+    <div class="receipt-line"><b>Obs.:</b> ${escThermal(data.observacoes)}</div>
+    <div class="footer center">Gerado em ${new Date().toLocaleString('pt-BR')}</div>
+  </div>
+<script>window.onload = function(){ setTimeout(function(){ window.print(); }, 250); };<\/script>
+</body>
+</html>`;
+      const thermalWindow = window.open('', '_blank', 'width=420,height=720');
+      if (!thermalWindow) {
+        alert('Permita pop-ups para abrir a impressão térmica.');
+        return;
+      }
+      thermalWindow.document.open();
+      thermalWindow.document.write(html);
+      thermalWindow.document.close();
     }
 
     function downloadOccupationalPdf(id) {
@@ -10466,8 +10541,8 @@ function compareQueueOrder(a, b) {
     "Sala Audiometria",
     "Sala Acuidade Visual",
     "Sala Espirometria",
-    "Sala ECG",
-    "Sala EEG",
+    "Sala ECG Eletrocardiograma",
+    "Sala EEG Eletroencefalograma",
     "Sala de Raio X",
     "Sala Coleta / Laboratório",
     "Sala Avaliação Psicossocial",
@@ -12889,8 +12964,8 @@ function compareQueueOrder(a, b) {
     if (r.includes("audiometria")) return { stage:"Exames", exam:"Audiometria", examKey:"audiometria", label:"Audiometria" };
     if (r.includes("acuidade")) return { stage:"Exames", exam:"Acuidade Visual", examKey:"acuidade", label:"Acuidade Visual" };
     if (r.includes("espirometria")) return { stage:"Exames", exam:"Espirometria", examKey:"espirometria", label:"Espirometria" };
-    if (r.includes("ecg")) return { stage:"Exames", exam:"ECG", examKey:"ecg", label:"ECG" };
-    if (r.includes("eeg")) return { stage:"Exames", exam:"EEG", examKey:"eeg", label:"EEG" };
+    if (r.includes("ecg")) return { stage:"Exames", exam:"ECG Eletrocardiograma", examKey:"ecg", label:"ECG Eletrocardiograma" };
+    if (r.includes("eeg")) return { stage:"Exames", exam:"EEG Eletroencefalograma", examKey:"eeg", label:"EEG Eletroencefalograma" };
     if (r.includes("rx") || r.includes("raio")) return { stage:"Exames", exam:"Raio X", examKey:"rx", label:"Raio X" };
     if (r.includes("coleta") || r.includes("laborat")) return { stage:"Exames", exam:"Exames Laboratoriais", examKey:"lab", label:"Coleta / Laboratoriais" };
     if (r.includes("psicossocial")) return { stage:"Exames", exam:"Avaliação Psicossocial", examKey:"psicossocial", label:"Avaliação Psicossocial" };
@@ -13513,8 +13588,8 @@ function compareQueueOrder(a, b) {
     'Sala Audiometria 1',
     'Sala Audiometria 2',
     'Sala Espirometria',
-    'Sala ECG',
-    'Sala EEG',
+    'Sala ECG Eletrocardiograma',
+    'Sala EEG Eletroencefalograma',
     'Sala Avaliação Psicossocial 1',
     'Sala Avaliação Psicossocial 2',
     'Sala de Raio X'
@@ -13888,8 +13963,8 @@ function compareQueueOrder(a, b) {
       { key:"audiometria", nome:"Audiometria", status:"Não se aplica" },
       { key:"acuidade", nome:"Acuidade Visual", status:"Não se aplica" },
       { key:"espirometria", nome:"Espirometria", status:"Não se aplica" },
-      { key:"ecg", nome:"ECG", status:"Não se aplica" },
-      { key:"eeg", nome:"EEG", status:"Não se aplica" },
+      { key:"ecg", nome:"ECG Eletrocardiograma", status:"Não se aplica" },
+      { key:"eeg", nome:"EEG Eletroencefalograma", status:"Não se aplica" },
       { key:"rx", nome:"Raio X", status:"Não se aplica" },
       { key:"lab", nome:"Exames Laboratoriais", status:"Não se aplica" },
       { key:"psicossocial", nome:"Avaliação Psicossocial", status:"Não se aplica" }
@@ -14358,8 +14433,8 @@ function compareQueueOrder(a, b) {
     { key: "audiometria", nome: "Audiometria" },
     { key: "acuidade", nome: "Acuidade Visual" },
     { key: "espirometria", nome: "Espirometria" },
-    { key: "ecg", nome: "ECG" },
-    { key: "eeg", nome: "EEG" },
+    { key: "ecg", nome: "ECG Eletrocardiograma" },
+    { key: "eeg", nome: "EEG Eletroencefalograma" },
     { key: "rx", nome: "Raio X" },
     { key: "lab", nome: "Exames Laboratoriais" },
     { key: "psicossocial", nome: "Avaliação Psicossocial" }
@@ -14393,8 +14468,8 @@ function compareQueueOrder(a, b) {
     "Sala Audiometria 2",
     "Sala Audiometria",
     "Sala Espirometria",
-    "Sala ECG",
-    "Sala EEG",
+    "Sala ECG Eletrocardiograma",
+    "Sala EEG Eletroencefalograma",
     "Sala de Raio X",
     "Sala Avaliação Psicossocial 1",
     "Sala Avaliação Psicossocial 2",
@@ -14407,8 +14482,8 @@ function compareQueueOrder(a, b) {
     { nome: "Sala Audiometria", tipo: "Exames Ocupacionais" },
     { nome: "Sala Acuidade Visual", tipo: "Exames Ocupacionais" },
     { nome: "Sala Espirometria", tipo: "Exames Ocupacionais" },
-    { nome: "Sala ECG", tipo: "Exames Ocupacionais" },
-    { nome: "Sala EEG", tipo: "Exames Ocupacionais" },
+    { nome: "Sala ECG Eletrocardiograma", tipo: "Exames Ocupacionais" },
+    { nome: "Sala EEG Eletroencefalograma", tipo: "Exames Ocupacionais" },
     { nome: "Sala de Raio X", tipo: "Exames Ocupacionais" },
     { nome: "Sala Coleta / Laboratório", tipo: "Exames Ocupacionais" },
     { nome: "Sala Avaliação Psicossocial", tipo: "Exames Ocupacionais" },
@@ -16146,7 +16221,7 @@ function compareQueueOrder(a, b) {
       { key: 'lab', nome: 'Exames Laboratoriais', status: 'Não se aplica', motivoNaoRealizado: '' },
       { key: 'rx', nome: 'Raio X', status: 'Não se aplica', motivoNaoRealizado: '' },
       { key: 'audio', nome: 'Audiometria', status: 'Não se aplica', motivoNaoRealizado: '' },
-      { key: 'ecg', nome: 'ECG', status: 'Não se aplica', motivoNaoRealizado: '' }
+      { key: 'ecg', nome: 'ECG Eletrocardiograma', status: 'Não se aplica', motivoNaoRealizado: '' }
     ];
   }
 
