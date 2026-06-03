@@ -9227,6 +9227,7 @@ function compareQueueOrder(a, b) {
             <div class="form-grid">
               <div class="field"><label>Nome do paciente</label><input id="edit-nome" value="${patient.nome || ''}"></div>
               <div class="field"><label>CPF</label><input id="edit-cpf" value="${patient.cpf || ''}"></div>
+              <div class="field"><label>RG</label><input id="edit-rg" value="${patient.rg || ''}"></div>
               <div class="field"><label>Empresa</label><input id="edit-empresa" value="${patient.empresa || ''}"></div>
               <div class="field"><label>Contrato</label>
                 <select id="edit-contrato-numero" onchange="syncContractFields('edit')">${contractOptionsHtml(patient.contratoNumero || '')}</select>
@@ -9321,7 +9322,8 @@ function compareQueueOrder(a, b) {
               <label>Observações do cadastro / recepção</label>
               <textarea id="edit-obs-cadastro">${patient.obsCadastro || ''}</textarea>
             </div>
-            <div class="modal-foot" style="padding:0;margin-top:16px;border-top:0">
+            <div class="modal-foot" style="padding:0;margin-top:16px;border-top:0;justify-content:flex-end;gap:10px;flex-wrap:wrap">
+              <button type="button" class="btn btn-success" onclick="downloadOccupationalPdf('${patient.id}')">📄 Baixar Atendimento Ocupacional PDF</button>
               <button type="button" class="btn btn-primary" onclick="saveReception('${patient.id}')">Salvar recepção</button>
             </div>
           </div>
@@ -9680,6 +9682,148 @@ function compareQueueOrder(a, b) {
       document.getElementById('patientModal').classList.remove('open');
     }
 
+
+    function readReceptionFieldValue(fieldId, fallbackValue) {
+      const field = document.getElementById(fieldId);
+      if (!field) return sanitizeText(fallbackValue || '');
+      if (field.type === 'checkbox') return field.checked ? 'Sim' : 'Não';
+      return sanitizeText(field.value || fallbackValue || '');
+    }
+
+    function getReceptionPdfData(patient) {
+      const selectedExamKeys = new Set();
+      const checklist = document.getElementById('editExamChecklist');
+      if (checklist) {
+        checklist.querySelectorAll('input[type="checkbox"]:checked').forEach(input => selectedExamKeys.add(input.value));
+      } else {
+        (patient.exames || []).forEach(ex => {
+          if (ex.status !== 'Não se aplica') selectedExamKeys.add(ex.key);
+        });
+      }
+
+      const rxTipos = selectedExamKeys.has('rx') && typeof getEditExamDetailValues === 'function'
+        ? getEditExamDetailValues('rx')
+        : (patient.rxTipos || []);
+      const labTipos = selectedExamKeys.has('lab') && typeof getEditExamDetailValues === 'function'
+        ? getEditExamDetailValues('lab')
+        : (patient.labTipos || []);
+
+      const exams = EXAM_ORDER
+        .filter(ex => selectedExamKeys.has(ex.key))
+        .map(ex => {
+          let detalhes = '';
+          if (ex.key === 'rx') detalhes = serializeExamTypeList(rxTipos || []);
+          if (ex.key === 'lab') detalhes = serializeExamTypeList(labTipos || []);
+          return detalhes ? `${ex.nome} — ${detalhes}` : ex.nome;
+        });
+
+      return {
+        nome: readReceptionFieldValue('edit-nome', patient.nome),
+        nomeSocial: readReceptionFieldValue('edit-nome-social', patient.nomeSocial),
+        cpf: readReceptionFieldValue('edit-cpf', patient.cpf),
+        rg: readReceptionFieldValue('edit-rg', patient.rg),
+        dataNascimento: readReceptionFieldValue('edit-data-nascimento', patient.dataNascimento),
+        sexo: readReceptionFieldValue('edit-sexo', patient.sexo),
+        telefone: readReceptionFieldValue('edit-telefone', patient.telefone),
+        email: readReceptionFieldValue('edit-email', patient.email),
+        empresa: readReceptionFieldValue('edit-empresa', patient.empresa),
+        cnpj: readReceptionFieldValue('edit-cnpj', patient.cnpj),
+        contrato: readReceptionFieldValue('edit-contrato-numero', patient.contratoNumero),
+        tipoContrato: readReceptionFieldValue('edit-contrato-tipo', patient.contratoTipo),
+        tipoAtendimento: readReceptionFieldValue('edit-tipo-atendimento', patient.tipoAtendimento),
+        dataAtendimento: readReceptionFieldValue('edit-data-atendimento', patient.dataAtendimento),
+        setor: readReceptionFieldValue('edit-setor', patient.setor),
+        funcao: readReceptionFieldValue('edit-funcao', patient.funcao),
+        grupoServico: readReceptionFieldValue('edit-grupo-servico', patient.grupoServico),
+        servico: readReceptionFieldValue('edit-servico', patient.servico),
+        preferencial: readReceptionFieldValue('edit-preferencial', patient.preferencial || 'Não'),
+        asoMesmoDia: readReceptionFieldValue('edit-aso-cadastrado', patient.asoCadastrado ? 'true' : 'false') === 'true' ? 'Sim' : 'Não',
+        retorno: readReceptionFieldValue('edit-retorno', patient.retorno || 'Não'),
+        dataRetorno: readReceptionFieldValue('edit-data-retorno', patient.dataRetorno),
+        obra: readReceptionFieldValue('edit-obra', patient.obra),
+        cei: readReceptionFieldValue('edit-cei', patient.cei),
+        observacoes: readReceptionFieldValue('edit-obs-cadastro', patient.obsCadastro),
+        exames: exams
+      };
+    }
+
+    function downloadOccupationalPdf(id) {
+      const patient = findPatient(id);
+      if (!patient) return;
+      const data = getReceptionPdfData(patient);
+      const escPdf = value => String(value || '—')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+      const logoSrc = document.querySelector('.logo-sesi-img img')?.src || '';
+      const retornoHtml = data.asoMesmoDia === 'Não'
+        ? `<div class="info"><strong>Data de retorno:</strong><span>${escPdf(data.dataRetorno || 'Não informada')}</span></div>`
+        : '';
+      const examesHtml = data.exames.length
+        ? data.exames.map((exam, index) => `<tr><td>${index + 1}</td><td>${escPdf(exam)}</td></tr>`).join('')
+        : '<tr><td colspan="2">Nenhum exame selecionado no atendimento.</td></tr>';
+      const filename = `Atendimento Ocupacional - ${data.nome || data.cpf || id}`.replace(/[\\/:*?"<>|]+/g, '-');
+      const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>${escPdf(filename)}</title>
+<style>
+  *{box-sizing:border-box} body{font-family:Arial,Helvetica,sans-serif;margin:0;color:#172033;background:#fff} .page{max-width:980px;margin:0 auto;padding:32px} .header{display:flex;align-items:center;justify-content:space-between;gap:18px;border-bottom:4px solid #005baa;padding-bottom:18px;margin-bottom:22px}.logo{max-width:190px;max-height:86px;object-fit:contain}.title{text-align:right}.title h1{margin:0;color:#005baa;font-size:26px}.title p{margin:8px 0 0;color:#475569;font-size:13px}.section{margin-top:18px;border:1px solid #d9e2ef;border-radius:12px;overflow:hidden}.section h2{margin:0;background:#005baa;color:#fff;font-size:15px;padding:11px 14px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0}.info{display:grid;grid-template-columns:190px 1fr;border-top:1px solid #edf2f7;min-height:42px}.info strong{background:#f4f8fc;padding:11px 12px;border-right:1px solid #edf2f7;color:#334155}.info span{padding:11px 12px}.full{grid-column:1/-1}table{width:100%;border-collapse:collapse}th,td{border-top:1px solid #edf2f7;padding:11px 12px;text-align:left;vertical-align:top}th{background:#f4f8fc;color:#334155}.badge{display:inline-block;border-radius:999px;padding:6px 11px;background:#e7f2ff;color:#005baa;font-weight:700}.footer{margin-top:28px;color:#64748b;font-size:12px;text-align:center;border-top:1px solid #e2e8f0;padding-top:14px}@media print{body{print-color-adjust:exact;-webkit-print-color-adjust:exact}.page{padding:18px}.no-print{display:none!important}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div>${logoSrc ? `<img class="logo" alt="Logo SESI" src="${logoSrc}">` : '<strong>SESI</strong>'}</div>
+    <div class="title"><h1>Atendimento Ocupacional</h1><p>Ficha de atendimento gerada pela Recepção</p></div>
+  </div>
+  <div class="section"><h2>Informações do Paciente</h2><div class="grid">
+    <div class="info"><strong>Nome completo:</strong><span>${escPdf(data.nome)}</span></div>
+    <div class="info"><strong>Nome social:</strong><span>${escPdf(data.nomeSocial)}</span></div>
+    <div class="info"><strong>CPF:</strong><span>${escPdf(data.cpf)}</span></div>
+    <div class="info"><strong>RG:</strong><span>${escPdf(data.rg)}</span></div>
+    <div class="info"><strong>Data de nascimento:</strong><span>${escPdf(data.dataNascimento)}</span></div>
+    <div class="info"><strong>Sexo:</strong><span>${escPdf(data.sexo)}</span></div>
+    <div class="info"><strong>Telefone:</strong><span>${escPdf(data.telefone)}</span></div>
+    <div class="info"><strong>E-mail:</strong><span>${escPdf(data.email)}</span></div>
+  </div></div>
+  <div class="section"><h2>Dados do Atendimento</h2><div class="grid">
+    <div class="info"><strong>Empresa:</strong><span>${escPdf(data.empresa)}</span></div>
+    <div class="info"><strong>CNPJ:</strong><span>${escPdf(data.cnpj)}</span></div>
+    <div class="info"><strong>Contrato:</strong><span>${escPdf(data.contrato)}</span></div>
+    <div class="info"><strong>Tipo de contrato:</strong><span>${escPdf(data.tipoContrato)}</span></div>
+    <div class="info"><strong>Tipo de exame:</strong><span>${escPdf(data.tipoAtendimento)}</span></div>
+    <div class="info"><strong>Data do atendimento:</strong><span>${escPdf(data.dataAtendimento)}</span></div>
+    <div class="info"><strong>Setor:</strong><span>${escPdf(data.setor)}</span></div>
+    <div class="info"><strong>Função:</strong><span>${escPdf(data.funcao)}</span></div>
+    <div class="info"><strong>Atendimento prioritário:</strong><span><span class="badge">${escPdf(data.preferencial)}</span></span></div>
+    <div class="info"><strong>ASO no mesmo dia:</strong><span><span class="badge">${escPdf(data.asoMesmoDia)}</span></span></div>
+    ${retornoHtml}
+    <div class="info"><strong>Retorno:</strong><span>${escPdf(data.retorno)}</span></div>
+    <div class="info"><strong>Obra:</strong><span>${escPdf(data.obra)}</span></div>
+    <div class="info"><strong>CEI:</strong><span>${escPdf(data.cei)}</span></div>
+    <div class="info full"><strong>Serviço:</strong><span>${escPdf(data.grupoServico)} / ${escPdf(data.servico)}</span></div>
+  </div></div>
+  <div class="section"><h2>Exames a realizar</h2><table><thead><tr><th style="width:70px">Nº</th><th>Exame</th></tr></thead><tbody>${examesHtml}</tbody></table></div>
+  <div class="section"><h2>Observações</h2><div class="info full"><strong>Registro:</strong><span>${escPdf(data.observacoes)}</span></div></div>
+  <div class="footer">Documento gerado em ${new Date().toLocaleString('pt-BR')} • SESI Saúde</div>
+</div>
+<script>window.onload = function(){ setTimeout(function(){ window.print(); }, 300); };<\/script>
+</body>
+</html>`;
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        alert('Permita pop-ups para gerar o PDF do atendimento ocupacional.');
+        return;
+      }
+      printWindow.document.open();
+      printWindow.document.write(html);
+      printWindow.document.close();
+    }
+
     function saveReception(id) {
       const patient = findPatient(id);
       if (!patient) return;
@@ -9698,6 +9842,7 @@ function compareQueueOrder(a, b) {
 
       patient.nome = sanitizeText(document.getElementById('edit-nome').value);
       patient.cpf = sanitizeText(document.getElementById('edit-cpf').value);
+      patient.rg = sanitizeText(document.getElementById('edit-rg')?.value || patient.rg || '');
       patient.empresa = sanitizeText(document.getElementById('edit-empresa').value);
       patient.contratoNumero = sanitizeText(document.getElementById('edit-contrato-numero')?.value || '');
       patient.contratoStatus = sanitizeText(document.getElementById('edit-contrato-status')?.value || 'Vigente');
@@ -10283,6 +10428,7 @@ function compareQueueOrder(a, b) {
     window.openGlobalSearchModal = openGlobalSearchModal;
     window.closeGlobalSearchModal = closeGlobalSearchModal;
     window.saveReception = saveReception;
+    window.downloadOccupationalPdf = downloadOccupationalPdf;
     window.saveExams = saveExams;
     window.finishTriage = finishTriage;
     window.finishMedical = finishMedical;
